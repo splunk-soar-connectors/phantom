@@ -1,7 +1,7 @@
 # --
 # File: phantom_connector.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2016
+# Copyright (c) Phantom Cyber Corporation, 2016-2017
 #
 # This unpublished material is proprietary to Phantom Cyber.
 # All rights reserved. The methods and
@@ -18,7 +18,7 @@ import phantom.app as phantom
 from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
-from phantom.cef import CEF_NAME_MAPPING
+from phantom.cef import CEF_JSON
 from phantom.utils import CONTAINS_VALIDATORS
 import phantom.utils as ph_utils
 from phantom.vault import Vault
@@ -124,7 +124,7 @@ class PhantomConnector(BaseConnector):
         if (failed):
             return RetVal3(
                     action_result.set_status(phantom.APP_ERROR, "Error from server. Status code: {0}, Details: {1} ".format(response.status_code,
-                        self._get_error_details(resp_json))), response)
+                        self._get_error_details(resp_json))), response, resp_json)
 
         if (200 <= response.status_code < 399):
             return RetVal3(phantom.APP_SUCCESS, response, resp_json)
@@ -276,24 +276,37 @@ class PhantomConnector(BaseConnector):
         name = param.get('name')
         container_id = param.get('container_id', self.get_container_id())
         label = param.get('label', 'event')
-        contains = param.get('contains', '').strip().split(',')
-        cef_name = param.get('cef_name')
-        cef_value = param.get('cef_value')
+        contains = param.get('contains')
+        cef = param.get('cef')
+
+        try:
+            loaded_cef = json.loads(cef)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF paramter", e)
+
+        try:
+            loaded_contains = json.loads(contains)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains paramter", e)
 
         artifact = {}
         artifact['name'] = name
         artifact['label'] = label
         artifact['container_id'] = container_id
-        artifact['cef'] = {
-            cef_name: cef_value,
-        }
+        artifact['cef'] = loaded_cef
+        artifact['cef_types'] = loaded_contains
 
-        if contains:
-            artifact['cef_types'] = {'cef_name': contains}
-        elif cef_name not in CEF_NAME_MAPPING:
-            contains = determine_contains(cef_value)
-            if contains:
-                artifact['cef_types'] = {'cef_name': [contains]}
+        for cef_name in loaded_cef:
+
+            if loaded_contains.get(cef_name):
+                continue
+
+            if cef_name not in CEF_JSON:
+                determined_contains = determine_contains(loaded_cef[cef_name])
+                if determined_contains:
+                    artifact['cef_types'][cef_name] = [determined_contains]
+            else:
+                artifact['cef_types'][cef_name] = CEF_JSON[cef_name]['contains']
 
         success, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifact)
 
