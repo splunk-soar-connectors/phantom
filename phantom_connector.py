@@ -275,19 +275,32 @@ class PhantomConnector(BaseConnector):
 
         name = param.get('name')
         container_id = param.get('container_id', self.get_container_id())
+        sdi = param.get('source_data_identifier')
         label = param.get('label', 'event')
         contains = param.get('contains')
-        cef = param.get('cef')
+        cef_name = param.get('cef_name')
+        cef_value = param.get('cef_value')
+        cef_dict = param.get('cef_dictionary')
 
-        try:
-            loaded_cef = json.loads(cef)
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF paramter", e)
+        loaded_cef = {}
+        loaded_contains = {}
 
-        try:
-            loaded_contains = json.loads(contains)
-        except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains paramter", e)
+        if cef_dict:
+
+            try:
+                loaded_cef = json.loads(cef_dict)
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF paramter", e)
+
+            if '{' in contains or '}' in contains:
+                try:
+                    loaded_contains = json.loads(contains)
+                except Exception as e:
+                    return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains paramter", e)
+
+        if cef_name and cef_value:
+            loaded_cef[cef_name] = cef_value
+            loaded_contains[cef_name] = contains
 
         artifact = {}
         artifact['name'] = name
@@ -295,6 +308,7 @@ class PhantomConnector(BaseConnector):
         artifact['container_id'] = container_id
         artifact['cef'] = loaded_cef
         artifact['cef_types'] = loaded_contains
+        artifact['source_data_identifier'] = sdi
 
         for cef_name in loaded_cef:
 
@@ -306,7 +320,7 @@ class PhantomConnector(BaseConnector):
                 if determined_contains:
                     artifact['cef_types'][cef_name] = [determined_contains]
             else:
-                artifact['cef_types'][cef_name] = CEF_JSON[cef_name]['contains']
+                artifact['cef_types'][cef_name] = [CEF_JSON[cef_name].get('contains')]
 
         success, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifact)
 
