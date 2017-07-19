@@ -557,13 +557,13 @@ class PhantomConnector(BaseConnector):
         ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifacts)
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, "Error adding artifact: {}".format(action_result.get_message()))
+        failed = 0
         for resp in resp_data:  # is a list
-            failed = 0
             if resp.get('failed') is True:
                 failed += 1
-            if failed:
-                action_result.update_summary({'failed_artifact_count': failed})
-                return action_result.set_status(phantom.APP_ERROR, "Failed to add one or more artifacts")
+        if failed:
+            action_result.update_summary({'failed_artifact_count': failed})
+            return action_result.set_status(phantom.APP_ERROR, "Failed to add one or more artifacts")
         return phantom.APP_SUCCESS
 
     def _create_container_copy(self, action_result, container_id):
