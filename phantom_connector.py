@@ -119,7 +119,11 @@ class PhantomConnector(BaseConnector):
         except Exception as e:
             return RetVal3(action_result.set_status(phantom.APP_ERROR, "Unable to parse response as JSON", e), response)
 
-        failed = resp_json.get('failed', False)
+        try:
+            failed = resp_json.get('failed', False)
+        except AttributeError:
+            # It's a list of responses, let's not parse it here
+            return RetVal3(phantom.APP_SUCCESS, response, resp_json)
 
         if (failed):
             return RetVal3(
@@ -550,11 +554,17 @@ class PhantomConnector(BaseConnector):
 
     def _add_artifact_list(self, action_result, artifacts):
         """ Add a list of artifacts """
-        for artifact in artifacts:
-            self.debug_print(artifact)
-            ret_val, resp_json, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifact)
-            if phantom.is_fail(ret_val):
-                return action_result.set_status(phantom.APP_ERROR, "Error adding artifact: {}".format(action_result.get_message()))
+        ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifacts)
+        if phantom.is_fail(ret_val):
+            return action_result.set_status(phantom.APP_ERROR, "Error adding artifact: {}".format(action_result.get_message()))
+        for resp in resp_data:  # is a list
+            failed = 0
+            if resp.get('failed') is True:
+                failed += 1
+            if failed:
+                # Some artifacts failed to add, but let's not fail the app
+                action_result.update_summary({'failed_artifact_count': failed})
+                return action_result.set_status(phantom.APP_ERROR, "Failed to add one or more artifacts")
         return phantom.APP_SUCCESS
 
     def _create_container_copy(self, action_result, container_id):
@@ -587,7 +597,7 @@ class PhantomConnector(BaseConnector):
 
         # Retrieve artifacts from old container
         url = '/rest/container/{}/artifacts'.format(container_id)
-        params = {'sort': 'id', 'order': 'asc'}
+        params = {'sort': 'id', 'order': 'asc', 'page_size': 0}
         ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params)
 
         artifacts = resp_data['data']

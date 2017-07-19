@@ -886,6 +886,13 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.summary.failed_artifact_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        7
+                    ]
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
