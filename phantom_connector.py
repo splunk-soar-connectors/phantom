@@ -562,7 +562,6 @@ class PhantomConnector(BaseConnector):
             if resp.get('failed') is True:
                 failed += 1
             if failed:
-                # Some artifacts failed to add, but let's not fail the app
                 action_result.update_summary({'failed_artifact_count': failed})
                 return action_result.set_status(phantom.APP_ERROR, "Failed to add one or more artifacts")
         return phantom.APP_SUCCESS
