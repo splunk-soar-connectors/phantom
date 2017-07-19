@@ -1,11 +1,11 @@
 {
-    "appid"       : "deb82aa9-22cc-4675-9cf1-534b8d006eb7",
-    "name"      : "Phantom",
-    "description" : "This App exposes various Phantom APIs as actions.",
+    "appid": "deb82aa9-22cc-4675-9cf1-534b8d006eb7",
+    "name": "Phantom",
+    "description": "This App exposes various Phantom APIs as actions.",
     "package_name": "phantom_phantom",
     "publisher": "Phantom",
     "type": "information",
-    "main_module"    : "phantom_connector.pyc",
+    "main_module": "phantom_connector.pyc",
     "app_version": "2.0.15",
     "utctime_updated": "2017-04-29T02:30:27.000000Z",
     "product_vendor": "Phantom",
@@ -48,725 +48,875 @@
         }
     },
     "actions": [
-      {
-          "action": "test connectivity",
-          "description": "Validate the asset configuration for connectivity",
-          "type": "test",
-          "identifier": "test_asset_connectivity",
-          "read_only": true,
-          "parameters": {},
-          "output": [],
-          "versions": "EQ(*)"
-      },
-      {
-        "action" : "find artifacts",
-        "description": "Find artifacts containing a CEF value",
-        "verbose": "",
-        "type": "investigate",
-        "identifier": "find_artifacts",
-        "read_only": true,
-        "parameters": {
-          "values": {
-            "description": "Find this value in artifacts",
-            "data_type": "string",
-            "order": 0,
-            "required": true,
-            "contains": ["*"],
-            "primary": true
-          },
-          "exact_match": {
-            "description": "Exact match",
-            "data_type": "boolean",
-            "order": 1,
-            "required": false,
-            "default": true
-          }
+        {
+            "action": "test connectivity",
+            "description": "Validate the asset configuration for connectivity",
+            "type": "test",
+            "identifier": "test_asset_connectivity",
+            "read_only": true,
+            "parameters": {},
+            "output": [],
+            "versions": "EQ(*)"
         },
-        "render": {
-          "type": "custom",
-          "width": 10,
-          "height": 5,
-          "view": "phantom_views.find_artifacts",
-          "title": "FIND ARTIFACTS"
+        {
+            "action": "find artifacts",
+            "description": "Find artifacts containing a CEF value",
+            "verbose": "",
+            "type": "investigate",
+            "identifier": "find_artifacts",
+            "read_only": true,
+            "parameters": {
+                "values": {
+                    "description": "Find this value in artifacts",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "contains": [
+                        "*"
+                    ],
+                    "primary": true
+                },
+                "exact_match": {
+                    "description": "Exact match",
+                    "data_type": "boolean",
+                    "order": 1,
+                    "required": false,
+                    "default": true
+                }
+            },
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "phantom_views.find_artifacts",
+                "title": "FIND ARTIFACTS"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "column_name": "Artifact ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Artifact Name",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.matched",
+                    "data_type": "string",
+                    "column_name": "Matched",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.found in",
+                    "data_type": "string",
+                    "column_name": "Found in Field",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.server",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.artifacts found",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.values",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.exact_match",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
         },
-        "output": [
-            {
-              "data_path": "action_result.data.*.id",
-              "data_type": "numeric",
-              "column_name": "Artifact ID",
-              "column_order": 0
+        {
+            "action": "add listitem",
+            "description": "Add value to a custom list",
+            "verbose": "To add a row containing a single value to a list simply pass the value. However, to pass multiple values in a row, format it like a JSON array (e.g. [\"item1\", \"item2\", \"item3\"])",
+            "type": "generic",
+            "identifier": "add_listitem",
+            "read_only": false,
+            "parameters": {
+                "list": {
+                    "description": "Name or ID of a custom list",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true
+                },
+                "new_row": {
+                    "description": "New Row (string or JSON list)",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "*"
+                    ]
+                },
+                "create": {
+                    "description": "Create list if it does not exist",
+                    "data_type": "boolean",
+                    "order": 2,
+                    "required": false,
+                    "default": false
+                }
             },
-            {
-              "data_path": "action_result.data.*.name",
-              "data_type": "string",
-              "column_name": "Artifact Name",
-              "column_order": 1
+            "render": {},
+            "output": [
+                {
+                    "data_path": "action_result.data.*.success",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.server",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.create",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.new_row",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.failed",
+                    "data_type": "boolean"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "find listitem",
+            "description": "Find value in a custom list",
+            "verbose": "Row and column coordinates for each matching value can be found in the result summary under \"locations\". The match is case sensitive.",
+            "type": "investigate",
+            "identifier": "find_listitem",
+            "read_only": true,
+            "parameters": {
+                "list": {
+                    "description": "Name or ID of a custom list",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true
+                },
+                "column_index": {
+                    "description": "Search in column number (0 based)",
+                    "data_type": "numeric",
+                    "order": 1,
+                    "required": false
+                },
+                "values": {
+                    "description": "Value to search for",
+                    "data_type": "string",
+                    "order": 2,
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "*"
+                    ]
+                },
+                "exact_match": {
+                    "description": "Exact match",
+                    "data_type": "boolean",
+                    "order": 3,
+                    "required": false
+                }
             },
-            {
-              "data_path": "action_result.data.*.matched",
-              "data_type": "string",
-              "column_name": "Matched",
-              "column_order": 3
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "phantom_views.find_listitem",
+                "title": "FIND ARTIFACTS"
             },
-            {
-              "data_path": "action_result.data.*.found in",
-              "data_type": "string",
-              "column_name": "Found in Field",
-              "column_order": 2
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.server",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.found matches",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.locations",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.list",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.values",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.column_index",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.exact_match",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "add artifact",
+            "description": "Add a value as a new artifact",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "add_artifact",
+            "read_only": false,
+            "parameters": {
+                "name": {
+                    "description": "Name of the new artifact",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": false,
+                    "default": "User created artifact"
+                },
+                "container_id": {
+                    "description": "Numeric container ID for the new artifact",
+                    "data_type": "numeric",
+                    "order": 1,
+                    "contains": [
+                        "phantom container id"
+                    ],
+                    "required": false
+                },
+                "label": {
+                    "description": "Artifact label (default: event)",
+                    "data_type": "string",
+                    "order": 2,
+                    "required": false,
+                    "default": "event"
+                },
+                "contains": {
+                    "description": "Data type (comma separated \"ip\", \"domain\", etc.)",
+                    "data_type": "string",
+                    "order": 3,
+                    "required": false
+                },
+                "cef_name": {
+                    "description": "CEF Name",
+                    "data_type": "string",
+                    "order": 4,
+                    "required": true,
+                    "value_list": [
+                        "act",
+                        "app",
+                        "applicationProtocol",
+                        "baseEventCount",
+                        "bytesIn",
+                        "bytesOut",
+                        "cat",
+                        "cn1",
+                        "cn1Label",
+                        "cn2",
+                        "cn2Label",
+                        "cn3",
+                        "cn3Label",
+                        "cnt",
+                        "cs1",
+                        "cs1Label",
+                        "cs2",
+                        "cs2Label",
+                        "cs3",
+                        "cs3Label",
+                        "cs4",
+                        "cs4Label",
+                        "cs5",
+                        "cs5Label",
+                        "cs6",
+                        "cs6Label",
+                        "destinationAddress",
+                        "destinationDnsDomain",
+                        "destinationHostName",
+                        "destinationMacAddress",
+                        "destinationNtDomain",
+                        "destinationPort",
+                        "destinationProcessName",
+                        "destinationServiceName",
+                        "destinationTranslatedAddress",
+                        "destinationTranslatedPort",
+                        "destinationUserId",
+                        "destinationUserName",
+                        "destinationUserPrivileges",
+                        "deviceAction",
+                        "deviceAddress",
+                        "deviceCustomDate1",
+                        "deviceCustomDate1Label",
+                        "deviceCustomDate2",
+                        "deviceCustomDate2Label",
+                        "deviceCustomNumber1",
+                        "deviceCustomNumber1Label",
+                        "deviceCustomNumber2",
+                        "deviceCustomNumber2Label",
+                        "deviceCustomNumber3",
+                        "deviceCustomNumber3Label",
+                        "deviceCustomString1",
+                        "deviceCustomString1Label",
+                        "deviceCustomString2",
+                        "deviceCustomString2Label",
+                        "deviceCustomString3",
+                        "deviceCustomString3Label",
+                        "deviceCustomString4",
+                        "deviceCustomString4Label",
+                        "deviceCustomString5",
+                        "deviceCustomString5Label",
+                        "deviceCustomString6",
+                        "deviceCustomString6Label",
+                        "deviceDirection",
+                        "deviceDnsDomain",
+                        "deviceEventCategory",
+                        "deviceExternalId",
+                        "deviceFacility",
+                        "deviceHostname",
+                        "deviceInboundInterface",
+                        "deviceMacAddress",
+                        "deviceOutboundInterface",
+                        "deviceProcessName",
+                        "deviceTranslatedAddress",
+                        "dhost",
+                        "dmac",
+                        "dntdom",
+                        "dpriv",
+                        "dproc",
+                        "dpt",
+                        "dst",
+                        "duid",
+                        "duser",
+                        "dvc",
+                        "dvchost",
+                        "end",
+                        "endTime",
+                        "eventOutcome",
+                        "externalId",
+                        "fileCreateTime",
+                        "fileHash",
+                        "fileHashMd5",
+                        "fileHashSha1",
+                        "fileHashSha256",
+                        "fileHashSha512",
+                        "fileId",
+                        "fileModificationTime",
+                        "fileName",
+                        "filePath",
+                        "filePermission",
+                        "fileSize",
+                        "fileType",
+                        "fname",
+                        "fsize",
+                        "in",
+                        "message",
+                        "msg",
+                        "oldfileCreateTime",
+                        "oldfileHash",
+                        "oldfileId",
+                        "oldfileModificationTime",
+                        "oldfileName",
+                        "oldfilePath",
+                        "oldfilePermission",
+                        "oldfileType",
+                        "oldfsize",
+                        "out",
+                        "outcome",
+                        "proto",
+                        "receiptTime",
+                        "request",
+                        "requestClientApplication",
+                        "requestCookies",
+                        "requestMethod",
+                        "requestURL",
+                        "rt",
+                        "shost",
+                        "smac",
+                        "sntdom",
+                        "sourceAddress",
+                        "sourceDnsDomain",
+                        "sourceHostName",
+                        "sourceMacAddress",
+                        "sourceNtDomain",
+                        "sourcePort",
+                        "sourceServiceName",
+                        "sourceTranslatedAddress",
+                        "sourceTranslatedPort",
+                        "sourceUserId",
+                        "sourceUserName",
+                        "sourceUserPrivileges",
+                        "spriv",
+                        "spt",
+                        "src",
+                        "start",
+                        "startTime",
+                        "suid",
+                        "suser",
+                        "transportProtocol"
+                    ]
+                },
+                "cef_value": {
+                    "description": "Value",
+                    "data_type": "string",
+                    "order": 5,
+                    "required": true,
+                    "primary": true,
+                    "contains": [
+                        "*"
+                    ]
+                }
             },
-            {
-              "data_path": "action_result.status",
-              "data_type": "string"
+            "render": {
+                "type": "custom",
+                "width": 10,
+                "height": 5,
+                "view": "phantom_views.add_artifact",
+                "title": "ADD ARTIFACT"
             },
-            {
-              "data_path": "action_result.message",
-              "data_type": "string"
+            "output": [
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.success",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.server",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.artifact id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.contains",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.cef_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.cef_value",
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.failed",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.existing_artifact_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.container id",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "deflate item",
+            "description": "Deflates an item from the vault",
+            "verbose": "Detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to it's vault, else to the current (the container whose context the action is executed) container. The app supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b> and <b>tgz</b> file types.",
+            "type": "generic",
+            "identifier": "deflate_item",
+            "read_only": false,
+            "parameters": {
+                "vault_id": {
+                    "description": "Vault ID",
+                    "data_type": "string",
+                    "order": 0,
+                    "contains": [
+                        "vault id"
+                    ],
+                    "required": true,
+                    "primary": true
+                },
+                "container_id": {
+                    "description": "Destination container id",
+                    "data_type": "numeric",
+                    "order": 1,
+                    "contains": [
+                        "phantom container id"
+                    ],
+                    "required": false
+                },
+                "recursive": {
+                    "description": "Extract recursively",
+                    "data_type": "boolean",
+                    "order": 2,
+                    "required": false,
+                    "default": false
+                }
             },
-            {
-              "data_path": "action_result.summary.server",
-              "data_type": "string"
+            "render": {
+                "type": "table",
+                "width": 10,
+                "height": 5,
+                "title": "Deflate Item"
             },
-            {
-              "data_path": "action_result.summary.artifacts found",
-              "data_type": "numeric"
+            "output": [
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.aka",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.hash",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1",
+                        "vault id"
+                    ],
+                    "column_name": "Vault ID",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.data.*.path",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.size",
+                    "data_type": "numeric",
+                    "column_name": "Size",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.contains",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.md5",
+                    "data_type": "string",
+                    "contains": [
+                        "md5"
+                    ],
+                    "column_name": "Md5",
+                    "column_order": 3
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sha1",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.sha256",
+                    "data_type": "string",
+                    "contains": [
+                        "sha256"
+                    ],
+                    "column_name": "Sha256",
+                    "column_order": 4
+                },
+                {
+                    "data_path": "action_result.data.*.metadata.contains",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.create_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.container_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.vault_document",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.total_vault_items",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1",
+                        "vault id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "string",
+                    "contains": [
+                        "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.recursive",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "create container",
+            "description": "Either create a new container or create a copy of an existing container",
+            "verbose": "By specifying an existing container ID, it will create a copy of that container including all of its artifacts. Otherwise, you need to include a container object as a JSON string, and optionally a list of artifact objects as JSON strings",
+            "type": "generic",
+            "identifier": "create_container",
+            "read_only": false,
+            "parameters": {
+                "container_id": {
+                    "description": "A Container ID",
+                    "order": 0,
+                    "data_type": "numeric",
+                    "required": false,
+                    "contains": [
+                      "phantom container id"
+                    ]
+                },
+                "container_json": {
+                    "description": "The container JSON object",
+                    "order": 1,
+                    "data_type": "string",
+                    "required": false
+                },
+                "container_artifacts": {
+                    "description": "List of artifact JSON objects",
+                    "order": 2,
+                    "data_type": "string",
+                    "required": false
+                }
             },
-            {
-              "data_path": "action_result.parameter.values",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.parameter.exact_match",
-              "data_type": "boolean"
-            },
-            {
-              "data_path": "summary.total_objects",
-              "data_type": "numeric"
-            },
-            {
-              "data_path": "summary.total_objects_successful",
-              "data_type": "numeric"
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Container id: 82, Artifact count: 3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.container_json",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"severity\": \"medium\", \"label\": \"events\", \"version\": 1, \"asset\": 7, \"status\": \"new\", \"description\": \"New Container from Phantom Helper\", \"tags\": [],  \"data\": {}, \"name\": \"This is a container\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.container_artifacts",
+                    "data_type": "string",
+                    "example_values": [
+                        "[{\"name\": \"A human friendly name for artifact (1)\", \"label\": \"event\", \"source_data_identifier\": 1},{\"name\": \"A human friendly name for artifact (2)\", \"label\": \"event\", \"source_data_identifier\": 2},{\"name\": \"A human friendly name for artifact (3)\", \"label\": \"event\", \"source_data_identifier\": 3}]"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.container_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        82,
+                        77
+                    ],
+                    "contains": [
+                      "phantom container id"
+                    ],
+                    "column_order": 0,
+                    "column_name": "New Container"
+                },
+                {
+                    "data_path": "action_result.summary.artifact_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        3,
+                        5
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "70"
+                    ],
+                    "contains": [
+                      "phantom container id"
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Create Container",
+                "type": "table",
+                "height": 5
             }
-        ],
-        "versions":"EQ(*)"
-      },
-      {
-        "action" : "add listitem",
-        "description": "Add value to a custom list",
-        "verbose": "To add a row containing a single value to a list simply pass the value. However, to pass multiple values in a row, format it like a JSON array (e.g. [\"item1\", \"item2\", \"item3\"])",
-        "type": "generic",
-        "identifier": "add_listitem",
-        "read_only": false,
-        "parameters": {
-          "list": {
-            "description": "Name or ID of a custom list",
-            "data_type": "string",
-            "order": 0,
-            "required": true
-          },
-          "new_row": {
-            "description": "New Row (string or JSON list)",
-            "data_type": "string",
-            "order": 1,
-            "required": true,
-            "primary": true,
-            "contains": ["*"]
-          },
-          "create": {
-            "description": "Create list if it does not exist",
-            "data_type": "boolean",
-            "order": 2,
-            "required": false,
-            "default": false
-          }
-        },
-        "render": {
-        },
-        "output": [
-            {
-              "data_path": "action_result.data.*.success",
-              "data_type": "boolean"
-            },
-            {
-              "data_path": "action_result.status",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.message",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.summary.server",
-              "data_type": "string",
-              "contains": [
-                "url"
-              ]
-            },
-            {
-              "data_path": "action_result.parameter.list",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.parameter.create",
-              "data_type": "boolean"
-            },
-            {
-              "data_path": "action_result.parameter.new_row",
-              "data_type": "string"
-            },
-            {
-              "data_path": "summary.total_objects",
-              "data_type": "numeric"
-            },
-            {
-              "data_path": "summary.total_objects_successful",
-              "data_type": "numeric"
-            },
-            {
-              "data_path": "action_result.data.*.failed",
-              "data_type": "boolean"
-            }
-        ],
-        "versions":"EQ(*)"
-      },
-      {
-        "action" : "find listitem",
-        "description": "Find value in a custom list",
-        "verbose": "Row and column coordinates for each matching value can be found in the result summary under \"locations\". The match is case sensitive.",
-        "type": "investigate",
-        "identifier": "find_listitem",
-        "read_only": true,
-        "parameters": {
-          "list": {
-            "description": "Name or ID of a custom list",
-            "data_type": "string",
-            "order": 0,
-            "required": true
-          },
-          "column_index": {
-            "description": "Search in column number (0 based)",
-            "data_type": "numeric",
-            "order": 1,
-            "required": false
-          },
-          "values": {
-            "description": "Value to search for",
-            "data_type": "string",
-            "order": 2,
-            "required": true,
-            "primary": true,
-            "contains": ["*"]
-          },
-          "exact_match": {
-            "description": "Exact match",
-            "data_type": "boolean",
-            "order": 3,
-            "required": false
-          }        },
-        "render": {
-          "type": "custom",
-          "width": 10,
-          "height": 5,
-          "view": "phantom_views.find_listitem",
-          "title": "FIND ARTIFACTS"
-        },
-        "output": [
-            {
-              "data_path": "action_result.status",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.message",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.summary.server",
-              "data_type": "string",
-              "contains": [
-                "url"
-              ]
-            },
-            {
-              "data_path": "action_result.summary.found matches",
-              "data_type": "numeric"
-            },
-            {
-              "data_path": "action_result.summary.locations",
-              "data_type": "numeric"
-            },
-            {
-              "data_path": "action_result.parameter.list",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.parameter.values",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.parameter.column_index",
-              "data_type": "numeric"
-            },
-            {
-              "data_path": "action_result.parameter.exact_match",
-              "data_type": "boolean"
-            },
-            {
-              "data_path": "summary.total_objects",
-              "data_type": "numeric"
-            },
-            {
-              "data_path": "summary.total_objects_successful",
-              "data_type": "numeric"
-            }
-        ],
-        "versions":"EQ(*)"
-      },
-      {
-        "action" : "add artifact",
-        "description": "Add a value as a new artifact",
-        "verbose": "",
-        "type": "generic",
-        "identifier": "add_artifact",
-        "read_only": false,
-        "parameters": {
-          "name": {
-            "description": "Name of the new artifact",
-            "data_type": "string",
-            "order": 0,
-            "required": false,
-            "default": "User created artifact"
-          },
-          "container_id": {
-            "description": "Numeric container ID for the new artifact",
-            "data_type": "numeric",
-            "order": 1,
-            "contains": [ "phantom container id" ],
-            "required": false
-          },
-          "label": {
-            "description": "Artifact label (default: event)",
-            "data_type": "string",
-            "order": 2,
-            "required": false,
-            "default": "event"
-          },
-          "contains": {
-            "description": "Data type (comma separated \"ip\", \"domain\", etc.)",
-            "data_type": "string",
-            "order": 3,
-            "required": false
-          },
-          "cef_name": {
-            "description": "CEF Name",
-            "data_type": "string",
-            "order": 4,
-            "required": true,
-            "value_list": [
-                 "act",
-                 "app",
-                 "applicationProtocol",
-                 "baseEventCount",
-                 "bytesIn",
-                 "bytesOut",
-                 "cat",
-                 "cn1",
-                 "cn1Label",
-                 "cn2",
-                 "cn2Label",
-                 "cn3",
-                 "cn3Label",
-                 "cnt",
-                 "cs1",
-                 "cs1Label",
-                 "cs2",
-                 "cs2Label",
-                 "cs3",
-                 "cs3Label",
-                 "cs4",
-                 "cs4Label",
-                 "cs5",
-                 "cs5Label",
-                 "cs6",
-                 "cs6Label",
-                 "destinationAddress",
-                 "destinationDnsDomain",
-                 "destinationHostName",
-                 "destinationMacAddress",
-                 "destinationNtDomain",
-                 "destinationPort",
-                 "destinationProcessName",
-                 "destinationServiceName",
-                 "destinationTranslatedAddress",
-                 "destinationTranslatedPort",
-                 "destinationUserId",
-                 "destinationUserName",
-                 "destinationUserPrivileges",
-                 "deviceAction",
-                 "deviceAddress",
-                 "deviceCustomDate1",
-                 "deviceCustomDate1Label",
-                 "deviceCustomDate2",
-                 "deviceCustomDate2Label",
-                 "deviceCustomNumber1",
-                 "deviceCustomNumber1Label",
-                 "deviceCustomNumber2",
-                 "deviceCustomNumber2Label",
-                 "deviceCustomNumber3",
-                 "deviceCustomNumber3Label",
-                 "deviceCustomString1",
-                 "deviceCustomString1Label",
-                 "deviceCustomString2",
-                 "deviceCustomString2Label",
-                 "deviceCustomString3",
-                 "deviceCustomString3Label",
-                 "deviceCustomString4",
-                 "deviceCustomString4Label",
-                 "deviceCustomString5",
-                 "deviceCustomString5Label",
-                 "deviceCustomString6",
-                 "deviceCustomString6Label",
-                 "deviceDirection",
-                 "deviceDnsDomain",
-                 "deviceEventCategory",
-                 "deviceExternalId",
-                 "deviceFacility",
-                 "deviceHostname",
-                 "deviceInboundInterface",
-                 "deviceMacAddress",
-                 "deviceOutboundInterface",
-                 "deviceProcessName",
-                 "deviceTranslatedAddress",
-                 "dhost",
-                 "dmac",
-                 "dntdom",
-                 "dpriv",
-                 "dproc",
-                 "dpt",
-                 "dst",
-                 "duid",
-                 "duser",
-                 "dvc",
-                 "dvchost",
-                 "end",
-                 "endTime",
-                 "eventOutcome",
-                 "externalId",
-                 "fileCreateTime",
-                 "fileHash",
-                 "fileHashMd5",
-                 "fileHashSha1",
-                 "fileHashSha256",
-                 "fileHashSha512",
-                 "fileId",
-                 "fileModificationTime",
-                 "fileName",
-                 "filePath",
-                 "filePermission",
-                 "fileSize",
-                 "fileType",
-                 "fname",
-                 "fsize",
-                 "in",
-                 "message",
-                 "msg",
-                 "oldfileCreateTime",
-                 "oldfileHash",
-                 "oldfileId",
-                 "oldfileModificationTime",
-                 "oldfileName",
-                 "oldfilePath",
-                 "oldfilePermission",
-                 "oldfileType",
-                 "oldfsize",
-                 "out",
-                 "outcome",
-                 "proto",
-                 "receiptTime",
-                 "request",
-                 "requestClientApplication",
-                 "requestCookies",
-                 "requestMethod",
-                 "requestURL",
-                 "rt",
-                 "shost",
-                 "smac",
-                 "sntdom",
-                 "sourceAddress",
-                 "sourceDnsDomain",
-                 "sourceHostName",
-                 "sourceMacAddress",
-                 "sourceNtDomain",
-                 "sourcePort",
-                 "sourceServiceName",
-                 "sourceTranslatedAddress",
-                 "sourceTranslatedPort",
-                 "sourceUserId",
-                 "sourceUserName",
-                 "sourceUserPrivileges",
-                 "spriv",
-                 "spt",
-                 "src",
-                 "start",
-                 "startTime",
-                 "suid",
-                 "suser",
-                 "transportProtocol"
-            ]
-          },
-          "cef_value": {
-            "description": "Value",
-            "data_type": "string",
-            "order": 5,
-            "required": true,
-            "primary": true,
-            "contains": ["*"]
-          }
-        },
-        "render": {
-          "type": "custom",
-          "width": 10,
-          "height": 5,
-          "view": "phantom_views.add_artifact",
-          "title": "ADD ARTIFACT"
-        },
-        "output": [
-            {
-              "data_path": "action_result.data.*.id",
-              "data_type": "numeric"
-            },
-            {
-              "data_path": "action_result.data.*.success",
-              "data_type": "boolean"
-            },
-            {
-              "data_path": "action_result.status",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.message",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.summary.server",
-              "data_type": "string",
-              "contains": [
-                "url"
-              ]
-            },
-            {
-              "data_path": "action_result.summary.artifact id",
-              "data_type": "numeric"
-            },
-            {
-              "data_path": "action_result.parameter.name",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.parameter.label",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.parameter.container_id",
-              "data_type": "numeric",
-              "contains": [ "phantom container id" ]
-            },
-            {
-              "data_path": "action_result.parameter.contains",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.parameter.cef_name",
-              "data_type": "string"
-            },
-            {
-              "data_path": "action_result.parameter.cef_value",
-              "data_type": "string",
-              "contains": ["*"]
-            },
-            {
-              "data_path": "summary.total_objects",
-              "data_type": "numeric"
-            },
-            {
-              "data_path": "summary.total_objects_successful",
-              "data_type": "numeric"
-            },
-            {
-              "data_path": "action_result.data.*.failed",
-              "data_type": "boolean"
-            },
-            {
-              "data_path": "action_result.data.*.existing_artifact_id",
-              "data_type": "numeric"
-            },
-            {
-              "data_path": "action_result.summary.container id",
-              "data_type": "numeric"
-            }
-        ],
-        "versions":"EQ(*)"
-      },
-      {
-        "action" : "deflate item",
-        "description": "Deflates an item from the vault",
-        "verbose": "Detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to it's vault, else to the current (the container whose context the action is executed) container. The app supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b> and <b>tgz</b> file types.",
-        "type": "generic",
-        "identifier": "deflate_item",
-        "read_only": false,
-        "parameters": {
-          "vault_id": {
-            "description": "Vault ID",
-            "data_type": "string",
-            "order": 0,
-            "contains": [ "vault id" ],
-            "required": true,
-            "primary": true
-          },
-          "container_id": {
-            "description": "Destination container id",
-            "data_type": "numeric",
-            "order": 1,
-            "contains": [ "phantom container id" ],
-            "required": false
-          },
-          "recursive": {
-            "description": "Extract recursively",
-            "data_type": "boolean",
-            "order": 2,
-            "required": false,
-            "default": false
-          }
-        },
-        "render": {
-          "type": "table",
-          "width": 10,
-          "height": 5,
-          "title": "Deflate Item"
-        },
-        "output": [
-          {
-            "data_path": "action_result.data.*.id",
-            "data_type": "numeric"
-          },
-          {
-            "data_path": "action_result.data.*.aka",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.hash",
-            "data_type": "string",
-            "contains": [ "sha1" ]
-          },
-          {
-            "data_path": "action_result.data.*.name",
-            "data_type": "string",
-            "column_name": "Name",
-            "column_order": 0
-          },
-          {
-            "data_path": "action_result.data.*.vault_id",
-            "data_type": "string",
-            "contains": [ "sha1", "vault id" ],
-            "column_name": "Vault ID",
-            "column_order": 1
-          },
-          {
-            "data_path": "action_result.data.*.path",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.size",
-            "data_type": "numeric",
-            "column_name": "Size",
-            "column_order": 2
-          },
-          {
-            "data_path": "action_result.data.*.user",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.contains",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.metadata.md5",
-            "data_type": "string",
-            "contains": [ "md5" ],
-            "column_name": "Md5",
-            "column_order": 3
-          },
-          {
-            "data_path": "action_result.data.*.metadata.sha1",
-            "data_type": "string",
-            "contains": [ "sha1" ]
-          },
-          {
-            "data_path": "action_result.data.*.metadata.size",
-            "data_type": "numeric"
-          },
-          {
-            "data_path": "action_result.data.*.metadata.sha256",
-            "data_type": "string",
-            "contains": [ "sha256" ],
-            "column_name": "Sha256",
-            "column_order": 4
-          },
-          {
-            "data_path": "action_result.data.*.metadata.contains",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.container",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.create_time",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.data.*.container_id",
-            "data_type": "numeric",
-            "contains": [ "phantom container id" ]
-          },
-          {
-            "data_path": "action_result.data.*.vault_document",
-            "data_type": "numeric"
-          },
-          {
-            "data_path": "action_result.status",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.message",
-            "data_type": "string"
-          },
-          {
-            "data_path": "action_result.summary.total_vault_items",
-            "data_type": "numeric"
-          },
-          {
-            "data_path": "action_result.parameter.vault_id",
-            "data_type": "string",
-            "contains": [ "sha1", "vault id" ]
-          },
-          {
-            "data_path": "action_result.parameter.container_id",
-            "data_type": "string",
-            "contains": [ "phantom container id" ]
-          },
-          {
-            "data_path": "action_result.parameter.recursive",
-            "data_type": "boolean"
-          },
-          {
-            "data_path": "summary.total_objects",
-            "data_type": "numeric"
-          },
-          {
-            "data_path": "summary.total_objects_successful",
-            "data_type": "numeric"
-          }
-        ],
-        "versions":"EQ(*)"
-      }
+        }
     ]
 }

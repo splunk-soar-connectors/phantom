@@ -548,6 +548,122 @@ class PhantomConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _add_artifact_list(self, action_result, artifacts):
+        """ Add a list of artifacts """
+        for artifact in artifacts:
+            self.debug_print(artifact)
+            ret_val, resp_json, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifact)
+            if phantom.is_fail(ret_val):
+                return action_result.set_status(phantom.APP_ERROR, "Error adding artifact: {}".format(action_result.get_message()))
+        return phantom.APP_SUCCESS
+
+    def _create_container_copy(self, action_result, container_id):
+        """ Create a copy of this existing container, including all of its artifacts """
+
+        # Retrieve original container
+        url = '/rest/container/{}'.format(container_id)
+        ret_val, response, resp_data = self._make_rest_call(url, action_result)
+
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        container = resp_data
+        # Remove data from original we dont want
+        container.pop('asset', None)
+        container.pop('artifact_count', None)
+        container.pop('start_time', None)
+        container.pop('source_data_identifier', None)
+        container['ingest_app_id'] = container.pop('ingest_app', None)
+
+        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container)
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        try:
+            new_container_id = resp_data['id']
+        except KeyError:
+            # The newly created container wont get cleaned up
+            return action_result.set_status(phantom.APP_ERROR, "Unable to retrieve ID of newly created container")
+
+        # Retrieve artifacts from old container
+        url = '/rest/container/{}/artifacts'.format(container_id)
+        params = {'sort': 'id', 'order': 'asc'}
+        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params)
+
+        artifacts = resp_data['data']
+        if artifacts:
+            for artifact in artifacts:
+                # Remove data from artifacts that we dont want
+                artifact.pop('update_time', None)
+                artifact.pop('create_time', None)
+                artifact.pop('start_time', None)
+                artifact.pop('end_time', None)
+                artifact.pop('asset_id', None)
+                artifact.pop('container', None)
+                artifact.pop('id', None)
+                artifact['run_automation'] = False
+                artifact['container_id'] = new_container_id
+            artifacts[-1]['run_automation'] = True
+
+            ret_val = self._add_artifact_list(action_result, artifacts)
+            if phantom.is_fail(ret_val):
+                return ret_val
+
+        action_result.update_summary({'container_id': new_container_id, 'artifact_count': len(artifacts)})
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _create_container_new(self, action_result, container_json, artifact_json_list):
+        try:
+            container = json.loads(container_json)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Error parsing container JSON: {}".format(str(e)))
+
+        if artifact_json_list:
+            try:
+                    artifacts = json.loads(artifact_json_list)
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Error parsing artifacts list JSON: {}".format(str(e)))
+        else:
+            artifacts = []
+
+        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container)
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        try:
+            new_container_id = resp_data['id']
+        except KeyError:
+            # The newly created container wont get cleaned up
+            return action_result.set_status(phantom.APP_ERROR, "Unable to retrieve ID of newly created container")
+
+        if artifacts:
+            for artifact in artifacts:
+                artifact['run_automation'] = False
+                artifact['container_id'] = new_container_id
+            artifacts[-1]['run_automation'] = True
+
+            ret_val = self._add_artifact_list(action_result, artifacts)
+            if phantom.is_fail(ret_val):
+                return ret_val
+
+        action_result.update_summary({'container_id': new_container_id, 'artifact_count': len(artifacts)})
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _create_container(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        container_id = param.get('container_id')
+        container_json = param.get('container_json')
+        if (container_id):
+            ret_val = self._create_container_copy(action_result, container_id)
+        elif (container_json):
+            ret_val = self._create_container_new(action_result, container_json, param.get('container_artifacts'))
+        else:
+            return action_result.set_status(phantom.APP_ERROR, "Need to specify either container ID or container JSON object")
+
+        return ret_val
+
     def initialize(self):
 
         # Validate that it is not localhost or 127.0.0.1,
@@ -610,6 +726,8 @@ class PhantomConnector(BaseConnector):
             result = self._deflate_item(param)
         elif (action == 'test_asset_connectivity'):
             result = self._test_connectivity(param)
+        elif (action == 'create_container'):
+            result = self._create_container(param)
 
         return result
 
