@@ -821,15 +821,26 @@
                       "phantom container id"
                     ]
                 },
+                "destination": {
+                    "description": "Copy TO the configured instance from this one, or vice versa",
+                    "order": 1,
+                    "data_type": "string",
+                    "required": false,
+                    "value_list": [
+                        "to",
+                        "from"
+                    ],
+                    "default": "to"
+                },
                 "container_json": {
                     "description": "The container JSON object",
-                    "order": 1,
+                    "order": 2,
                     "data_type": "string",
                     "required": false
                 },
                 "container_artifacts": {
                     "description": "List of artifact JSON objects",
-                    "order": 2,
+                    "order": 3,
                     "data_type": "string",
                     "required": false
                 }
@@ -914,6 +925,14 @@
                     ],
                     "contains": [
                       "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.destination",
+                    "data_type": "string",
+                    "example_values": [
+                        "to",
+                        "from"
                     ]
                 }
             ],

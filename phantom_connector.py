@@ -566,10 +566,13 @@ class PhantomConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Failed to add one or more artifacts")
         return phantom.APP_SUCCESS
 
-    def _create_container_copy(self, action_result, container_id):
+    def _create_container_copy(self, action_result, container_id, to_inst, from_inst):
+        """ from_inst : original container """
+        """ to_inst : where to copy to """
         """ Create a copy of this existing container, including all of its artifacts """
 
         # Retrieve original container
+        self._base_uri = from_inst
         url = '/rest/container/{}'.format(container_id)
         ret_val, response, resp_data = self._make_rest_call(url, action_result)
 
@@ -582,8 +585,10 @@ class PhantomConnector(BaseConnector):
         container.pop('artifact_count', None)
         container.pop('start_time', None)
         container.pop('source_data_identifier', None)
-        container['ingest_app_id'] = container.pop('ingest_app', None)
+        container.pop('ingest_app')
+        # container['ingest_app_id'] = container.pop('ingest_app', None)
 
+        self._base_uri = to_inst
         ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container)
         if phantom.is_fail(ret_val):
             return ret_val
@@ -597,6 +602,7 @@ class PhantomConnector(BaseConnector):
         # Retrieve artifacts from old container
         url = '/rest/container/{}/artifacts'.format(container_id)
         params = {'sort': 'id', 'order': 'asc', 'page_size': 0}
+        self._base_uri = from_inst
         ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params)
 
         artifacts = resp_data['data']
@@ -614,6 +620,7 @@ class PhantomConnector(BaseConnector):
                 artifact['container_id'] = new_container_id
             artifacts[-1]['run_automation'] = True
 
+            self._base_uri = to_inst
             ret_val = self._add_artifact_list(action_result, artifacts)
             if phantom.is_fail(ret_val):
                 return ret_val
@@ -665,7 +672,19 @@ class PhantomConnector(BaseConnector):
         container_id = param.get('container_id')
         container_json = param.get('container_json')
         if (container_id):
-            ret_val = self._create_container_copy(action_result, container_id)
+            dest = param.get('destination')
+            if not dest:
+                return action_result.set_status(phantom.APP_ERROR, "A destination must be specified")
+            dest = dest.lower()
+            if dest not in ('to', 'from'):
+                return action_result.set_status(phantom.APP_ERROR, "Destination must either be 'to' or 'from'")
+            if dest == 'to':
+                to_inst = self._base_uri
+                from_inst = 'https://127.0.0.1'
+            else:
+                to_inst = 'https://127.0.0.1'
+                from_inst = self._base_uri
+            ret_val = self._create_container_copy(action_result, container_id, to_inst, from_inst)
         elif (container_json):
             ret_val = self._create_container_new(action_result, container_json, param.get('container_artifacts'))
         else:
