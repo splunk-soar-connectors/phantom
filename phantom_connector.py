@@ -587,6 +587,7 @@ class PhantomConnector(BaseConnector):
         container.pop('start_time', None)
         container.pop('source_data_identifier', None)
         container.pop('ingest_app')
+        container['owner_id'] = container.pop('owner')
         # container['ingest_app_id'] = container.pop('ingest_app', None)
 
         self._base_uri = destination
