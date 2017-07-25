@@ -807,6 +807,7 @@
         {
             "action": "export container",
             "description": "Copy a local container to the configured phantom server",
+            "verbose": "If the original container has a label which doesn't exist on the destination, then this action will fail.",
             "type": "generic",
             "identifier": "export_container",
             "read_only": false,
@@ -886,6 +887,7 @@
         {
             "action": "import container",
             "description": "Copy a container from the configured phantom server",
+            "verbose": "If the original container has a label which doesn't exist on the destination, then this action will fail.",
             "type": "generic",
             "identifier": "import_container",
             "read_only": false,
@@ -971,7 +973,7 @@
         {
             "action": "create container",
             "description": "Create a new container",
-            "verbose": "You need to include a container object as a JSON string, and optionally a list of artifact objects as JSON strings. If you are copying a container which has a label that doesn't exist on the destination, then this action will end up failing",
+            "verbose": "You need to include a container object as a JSON string, and optionally a list of artifact objects as JSON strings. If you are creating a container which has a label that doesn't exist on the destination, then this action will end up failing.",
             "type": "generic",
             "identifier": "create_container",
             "read_only": false,
