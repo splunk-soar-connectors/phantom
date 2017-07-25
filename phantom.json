@@ -806,7 +806,8 @@
         },
         {
             "action": "export container",
-            "description": "Copy a local container to the configured phantom server",
+            "description": "Export local container to the configured Phantom asset",
+            "verbose": "This action exports a container (that matches the <b>container_id</b>) from the local Phantom instance to the configured Phantom asset (that the action is executed on).",
             "type": "generic",
             "identifier": "export_container",
             "read_only": false,
@@ -885,7 +886,8 @@
         },
         {
             "action": "import container",
-            "description": "Copy a container from the configured phantom server",
+            "description": "Import a container from an external Phantom instance",
+            "verbose": "This action imports a container (that matches the <b>container_id</b>) from the configured Phantom asset (that the action is executed on) into the local Phantom instance.",
             "type": "generic",
             "identifier": "import_container",
             "read_only": false,
@@ -970,8 +972,8 @@
         },
         {
             "action": "create container",
-            "description": "Create a new container",
-            "verbose": "You need to include a container object as a JSON string, and optionally a list of artifact objects as JSON strings. If you are copying a container which has a label that doesn't exist on the destination, then this action will end up failing",
+            "description": "Create a new container on a Phantom instance",
+            "verbose": "This action creates a new container on the Phantom asset that this action is executed on. If you wish to create a new container on the local Phantom instance, create an asset with the <b>phantom_server</b> asset configuration set to 127.0.0.1. The <b>container_json</b> parameter needs to be a JSON string. The <b>container_artifacts</b> is an optional parameter that needs to be a list of artifact objects as a JSON string. The action will fail if the <b>container_json</b> has a label that doesn't exist on the destination Phantom asset.",
             "type": "generic",
             "identifier": "create_container",
             "read_only": false,
