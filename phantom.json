@@ -805,42 +805,186 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "export container",
+            "description": "Copy a local container to the configured phantom server",
+            "type": "generic",
+            "identifier": "export_container",
+            "read_only": false,
+            "parameters": {
+                "container_id": {
+                    "description": "Container ID to copy",
+                    "contains": [
+                        "phantom container id"
+                    ],
+                    "order": 0,
+                    "data_type": "numeric",
+                    "required": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Container id: 94, Artifact count: 268"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "3"
+                    ],
+                    "contains": [
+                        "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.container_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        94
+                    ],
+                    "contains": [
+                        "phantom container id"
+                    ],
+                    "column_order": 0,
+                    "column_name": "New Container"
+                },
+                {
+                    "data_path": "action_result.summary.artifact_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        268
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "import container",
+            "description": "Copy a container from the configured phantom server",
+            "type": "generic",
+            "identifier": "import_container",
+            "read_only": false,
+            "parameters": {
+                "container_id": {
+                    "description": "Container ID to copy",
+                    "contains": [
+                        "phantom container id"
+                    ],
+                    "order": 0,
+                    "data_type": "numeric",
+                    "required": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Container id: 94, Artifact count: 268"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "3"
+                    ],
+                    "contains": [
+                        "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.container_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        94
+                    ],
+                    "contains": [
+                        "phantom container id"
+                    ],
+                    "column_order": 0,
+                    "column_name": "New Container"
+                },
+                {
+                    "data_path": "action_result.summary.artifact_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        268
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "width": 12,
+                "title": "Import Container",
+                "type": "table",
+                "height": 5
+            }
+        },
+        {
             "action": "create container",
-            "description": "Either create a new container or create a copy of an existing container",
-            "verbose": "By specifying an existing container ID, it will create a copy of that container including all of its artifacts. Otherwise, you need to include a container object as a JSON string, and optionally a list of artifact objects as JSON strings",
+            "description": "Create a new container",
+            "verbose": "You need to include a container object as a JSON string, and optionally a list of artifact objects as JSON strings. If you are copying a container which has a label that doesn't exist on the destination, then this action will end up failing",
             "type": "generic",
             "identifier": "create_container",
             "read_only": false,
             "parameters": {
-                "container_id": {
-                    "description": "A Container ID",
-                    "order": 0,
-                    "data_type": "numeric",
-                    "required": false,
-                    "contains": [
-                      "phantom container id"
-                    ]
-                },
-                "destination": {
-                    "description": "Copy TO the configured instance from this one, or vice versa",
-                    "order": 1,
-                    "data_type": "string",
-                    "required": false,
-                    "value_list": [
-                        "to",
-                        "from"
-                    ],
-                    "default": "to"
-                },
                 "container_json": {
                     "description": "The container JSON object",
-                    "order": 2,
+                    "order": 0,
                     "data_type": "string",
-                    "required": false
+                    "required": true
                 },
                 "container_artifacts": {
                     "description": "List of artifact JSON objects",
-                    "order": 3,
+                    "order": 1,
                     "data_type": "string",
                     "required": false
                 }
@@ -883,7 +1027,7 @@
                         77
                     ],
                     "contains": [
-                      "phantom container id"
+                        "phantom container id"
                     ],
                     "column_order": 0,
                     "column_name": "New Container"
@@ -915,24 +1059,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.container_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "70"
-                    ],
-                    "contains": [
-                      "phantom container id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.destination",
-                    "data_type": "string",
-                    "example_values": [
-                        "to",
-                        "from"
                     ]
                 }
             ],
