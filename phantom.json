@@ -6,7 +6,7 @@
     "publisher": "Phantom",
     "type": "information",
     "main_module"    : "phantom_connector.pyc",
-    "app_version": "2.0.13",
+    "app_version": "2.0.16",
     "utctime_updated": "2016-12-01T01:35:52.000000Z",
     "product_vendor": "Phantom",
     "product_name": "Phantom",
