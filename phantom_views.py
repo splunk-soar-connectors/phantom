@@ -46,6 +46,7 @@ def find_artifacts(provides, all_results, context):
                 row = []
 
                 c_link = base + '/mission/{}'.format(item.get('container'))
+                a_link = c_link + '/artifact_id/{}'.format(item.get('id'))
                 row.append({ 'value': c_link, 'link': item.get('container') })
                 row.append({ 'value': c_link, 'link': item.get('container_name') })
                 row.append({ 'value': item.get('id'), 'link': item.get('id') })
@@ -60,7 +61,6 @@ def find_artifacts(provides, all_results, context):
       "recordsFiltered": total,
     }
     return HttpResponse(json.dumps(content), content_type='text/javascript')
-
 
 def add_artifact(provides, all_results, context):
 
@@ -82,6 +82,8 @@ def add_artifact(provides, all_results, context):
         for result in action_results:
             summary = result.get_summary()
             base = summary.get('server')
+            container = summary.get('container')
+            param = result.get_param()
             data = result.get_data()
             total += len(data)
             for item in data:
@@ -93,6 +95,7 @@ def add_artifact(provides, all_results, context):
                 row = []
 
                 c_link = base + '/mission/{}'.format(summary.get('container id'))
+                a_link = c_link + '/artifact_id/{}'.format(summary.get('artifact id'))
                 row.append({ 'value': summary.get('artifact id'), 'link': summary.get('artifact id') })
                 row.append({ 'value': c_link, 'link': summary.get('container id') })
                 rows.append(row)
@@ -103,7 +106,6 @@ def add_artifact(provides, all_results, context):
       "recordsFiltered": total,
     }
     return HttpResponse(json.dumps(content), content_type='text/javascript')
-
 
 def find_listitem(provides, all_results, context):
 
@@ -124,6 +126,8 @@ def find_listitem(provides, all_results, context):
     for summary, action_results in all_results:
         for result in action_results:
             summary = result.get_summary()
+            base = summary.get('server')
+            container = summary.get('container')
             param = result.get_param()
             data = result.get_data()
             total += len(data)
@@ -153,3 +157,4 @@ def find_listitem(provides, all_results, context):
       "recordsFiltered": total,
     }
     return HttpResponse(json.dumps(content), content_type='text/javascript')
+
