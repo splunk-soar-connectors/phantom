@@ -12,7 +12,7 @@
     "product_name": "Phantom",
     "product_version_regex": ".*",
     "min_phantom_version": "2.0.270",
-    "license": "Copyright (c) Phantom Cyber Corporation 2016-2017",
+    "license": "Copyright (c) Phantom Cyber Corporation, 2016-2017",
     "logo": "phantom.png",
     "configuration": {
         "phantom_server": {
@@ -329,7 +329,7 @@
         {
             "action": "add artifact",
             "description": "Add a value as a new artifact",
-            "verbose": "",
+            "verbose": "If the <b>container_id</b> parameter is left empty, the artifact will be added to the container the action is running on.<br><br>CEF fields can be added to the artifact in two ways, either by using the <b>cef_name</b> and <b>cef_value</b> parameter or by using the <b>cef_dictionary</b> parameter. If the <b>cef_name</b>, <b>cef_value</b>, and <b>cef_dictionary</b> parameters are all included, the action will add the <b>cef_name</b> field to the <b>cef_dictionary</b>.<br><br>Using the <b>cef_name</b> and <b>cef_value</b> parameter will result in the artifact having one CEF field. When using these parameters the <b>contains</b> parameter will take a string representing the contains for the <b>cef_value</b> parameter.<br><br>The <b>cef_dictionary</b> parameter takes a JSON dictionary with key-value pairs representing CEF key-value pairs.<br><br>The <b>contains</b> parameter also takes a JSON dictionary, with the keys matching the keys of the <b>cef</b> dictionary and the values being lists of possible contains for the CEF field. If a given value in the <b>cef</b> dictionary is not also in the <b>contains</b> dictionary, the action will first check the list of default CEF fields. If not a default CEF field, the action will attempt to identify the appropriate contains value.<br><br>See the <b>REST API Documentation</b> for more information on artifacts, CEF fields, and contains.",
             "type": "generic",
             "identifier": "add_artifact",
             "read_only": false,
@@ -357,18 +357,19 @@
                     "required": false,
                     "default": "event"
                 },
-                "contains": {
-                    "description": "Data type (comma separated \"ip\", \"domain\", etc.)",
+                "source_data_identifier": {
+                    "description": "Source Data Idenitifier",
                     "data_type": "string",
                     "order": 3,
-                    "required": false
+                    "required": true
                 },
                 "cef_name": {
                     "description": "CEF Name",
                     "data_type": "string",
                     "order": 4,
-                    "required": true,
+                    "required": false,
                     "value_list": [
+                        "",
                         "act",
                         "app",
                         "applicationProtocol",
@@ -524,11 +525,23 @@
                     "description": "Value",
                     "data_type": "string",
                     "order": 5,
-                    "required": true,
+                    "required": false,
                     "primary": true,
                     "contains": [
                         "*"
                     ]
+                },
+                "cef_dictionary": {
+                    "description": "CEF JSON",
+                    "data_type": "string",
+                    "order": 6,
+                    "required": false
+                },
+                "contains": {
+                    "description": "Data type for each CEF field",
+                    "data_type": "string",
+                    "order": 7,
+                    "required": false
                 }
             },
             "render": {
@@ -1070,6 +1083,308 @@
                 "title": "Create Container",
                 "type": "table",
                 "height": 5
+            }
+        },
+        {
+            "action": "get action",
+            "description": "Find the results of a presviously run action",
+            "verbose": "This action returns the most recent results of an action with the given <b>action_name</b> launched with the given <b>parameters</b> within the given <b>time_limit</b>.<br><br>The action will limit the number of results returned to the value in <b>max_results</b>. By default, the limit is 10.<br><br>The <b>parameters</b> parameter takes a JSON string in the format:<br><br><pre>{<br>    &quot;parameter_name1&quot;: &quot;parameter_value1&quot;<br>    &quot;parameter_name2&quot;: &quot;parameter_value2&quot;<br>    ...<br>}</pre><br>The <b>app</b> parameter takes an app name, and if it is included, the action will only search for action results from that app. Similarly, the <b>asset</b> parameter takes an asset name, and if it is included, the action will only search for action results from that asset.",
+            "type": "investigate",
+            "identifier": "get_action",
+            "read_only": true,
+            "parameters": {
+                "action_name": {
+                    "description": "Action name",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "primary": true
+                },
+                "parameters": {
+                    "description": "JSON string of action parameters",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": false
+                },
+                "app": {
+                    "description": "App name",
+                    "data_type": "string",
+                    "order": 2,
+                    "required": false
+                },
+                "asset": {
+                    "description": "Asset name",
+                    "data_type": "string",
+                    "order": 3,
+                    "required": false
+                },
+                "time_limit": {
+                    "description": "Number of hours to search back",
+                    "data_type": "numeric",
+                    "order": 4,
+                    "required": false
+                },
+                "max_results": {
+                    "description": "Maximum number of action results to return",
+                    "data_type": "numeric",
+                    "order": 5,
+                    "required": false
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.end_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-11-06T20:30:27.991000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.action_run",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2724
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.extra_data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1154
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.app_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "Arbor APS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.start_time",
+                    "data_type": "string",
+                    "example_values": [
+                        "2017-11-06T20:30:04.879000Z"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.effective_user",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.playbook_run",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1056
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.version",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2761
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.result_data.*.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.result_data.*.data",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.result_data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "IP blacklisted successfully"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.result_data.*.parameter",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result_data.*.parameter.context.guid",
+                    "data_type": "string",
+                    "example_values": [
+                        "293d0369-4801-417d-a1af-a73cf1200d3d"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.result_data.*.parameter.context.artifact_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.result_data.*.parameter.context.parent_action_run",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.result_data.*.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "blacklist ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.result_summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.result_summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Successfully blacklisted IP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.app_version",
+                    "data_type": "string",
+                    "example_values": [
+                        "1.0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.exception_occured",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.app",
+                    "data_type": "numeric",
+                    "example_values": [
+                        121
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        137
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Action run id: 2761"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.app",
+                    "data_type": "string",
+                    "example_values": [
+                        "Arbor APS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.asset",
+                    "data_type": "string",
+                    "example_values": [
+                        "arboraps"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.parameters",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"ip\": \"1.8.9.0\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.action_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "blacklist ip"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.time_limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.action_run_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2761
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "json"
             }
         }
     ]
