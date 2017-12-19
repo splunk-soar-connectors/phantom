@@ -1,7 +1,7 @@
 # --
 # File: phantom_views.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2016-2017
+# Copyright (c) Phantom Cyber Corporation, 2016
 #
 # This unpublished material is proprietary to Phantom Cyber.
 # All rights reserved. The methods and
