@@ -36,6 +36,7 @@ import magic
 import tarfile
 import gzip
 import bz2
+import datetime
 
 TIMEOUT = 120
 INVALID_RESPONSE = 'Server did not return a valid JSON response.'
@@ -279,25 +280,52 @@ class PhantomConnector(BaseConnector):
 
         name = param.get('name')
         container_id = param.get('container_id', self.get_container_id())
+        sdi = param.get('source_data_identifier')
         label = param.get('label', 'event')
-        contains = param.get('contains', '').strip().split(',')
+        contains = param.get('contains')
         cef_name = param.get('cef_name')
         cef_value = param.get('cef_value')
+        cef_dict = param.get('cef_dictionary')
+
+        loaded_cef = {}
+        loaded_contains = {}
+
+        if cef_dict:
+
+            try:
+                loaded_cef = json.loads(cef_dict)
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF paramter", e)
+
+            if '{' in contains or '}' in contains:
+                try:
+                    loaded_contains = json.loads(contains)
+                except Exception as e:
+                    return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains paramter", e)
+
+        if cef_name and cef_value:
+            loaded_cef[cef_name] = cef_value
+            loaded_contains[cef_name] = contains
 
         artifact = {}
         artifact['name'] = name
         artifact['label'] = label
         artifact['container_id'] = container_id
-        artifact['cef'] = {
-            cef_name: cef_value,
-        }
+        artifact['cef'] = loaded_cef
+        artifact['cef_types'] = loaded_contains
+        artifact['source_data_identifier'] = sdi
 
-        if contains:
-            artifact['cef_types'] = {'cef_name': contains}
-        elif cef_name not in CEF_NAME_MAPPING:
-            contains = determine_contains(cef_value)
-            if contains:
-                artifact['cef_types'] = {'cef_name': [contains]}
+        for cef_name in loaded_cef:
+
+            if loaded_contains.get(cef_name):
+                continue
+
+            if cef_name not in CEF_NAME_MAPPING:
+                determined_contains = determine_contains(loaded_cef[cef_name])
+                if determined_contains:
+                    artifact['cef_types'][cef_name] = [determined_contains]
+            else:
+                artifact['cef_types'][cef_name] = [CEF_NAME_MAPPING[cef_name].get('contains')]
 
         success, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifact)
 
@@ -696,6 +724,105 @@ class PhantomConnector(BaseConnector):
 
         return self._create_container_copy(action_result, container_id, destination, source)
 
+    def _get_action(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        url_params = {
+                '_filter_action': '"{0}"'.format(param['action_name']),
+                'include_expensive': '',
+                'sort': 'start_time',
+                'order': 'desc',
+            }
+
+        parameters = {}
+        if 'parameters' in param:
+
+            try:
+                parameters = json.loads(param['parameters'])
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from 'parameters' parameter")
+
+            search_key, search_value = parameters.popitem()
+            url_params['_filter_result_data__regex'] = '"parameter.*\\"{0}\\": \\"{1}\\""'.format(search_key, search_value)
+
+        if 'time_limit' in param:
+            hours = int(param['time_limit'])
+            time_str = (datetime.datetime.utcnow() - datetime.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            url_params['_filter_start_time__gt'] = '"{0}"'.format(time_str)
+
+        if 'max_results' in param:
+            limit = int(param['max_results'])
+            url_params['page_size'] = limit
+
+        if 'app' in param:
+
+            app_params = {'_filter_name__iexact': '"{0}"'.format(param['app'])}
+            ret_val, response, resp_json = self._make_rest_call('/rest/app', action_result, params=app_params)
+
+            if phantom.is_fail(ret_val):
+                return ret_val
+
+            if resp_json['count'] == 0:
+                return action_result.set_status(phantom.APP_ERROR, "Could not find app with name '{0}'".format(param['app']))
+
+            url_params['_filter_app'] = resp_json['data'][0]['id']
+
+        if 'asset' in param:
+
+            asset_params = {'_filter_name__iexact': '"{0}"'.format(param['asset'])}
+            ret_val, response, resp_json = self._make_rest_call('/rest/asset', action_result, params=asset_params)
+
+            if phantom.is_fail(ret_val):
+                return ret_val
+
+            if resp_json['count'] == 0:
+                return action_result.set_status(phantom.APP_ERROR, "Could not find asset with name '{0}'".format(param['asset']))
+
+            url_params['_filter_asset'] = resp_json['data'][0]['id']
+
+        ret_val, response, resp_json = self._make_rest_call('/rest/app_run', action_result, params=url_params)
+
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        count = 0
+        if len(parameters) > 0:
+
+            for action_run in resp_json['data']:
+
+                for result in action_run['result_data']:
+
+                    cur_params = result['parameter']
+
+                    found = True
+                    for k, v in parameters.iteritems():
+
+                        if cur_params.get(k) != v:
+                            found = False
+                            break
+
+                    if found:
+                        count += 1
+                        action_result.add_data(action_run)
+                        return action_result.set_status(phantom.APP_SUCCESS)
+
+            return action_result.set_status(phantom.APP_SUCCESS, "No action results found matching given criteria")
+
+            action_result.set_summary({'num_results': count})
+            return action_result.set_status(phantom.APP_SUCCESS)
+
+        elif resp_json['count'] == 0:
+            return action_result.set_status(phantom.APP_SUCCESS, "No action results found matching given criteria")
+
+        for action_run in resp_json['data']:
+            action_result.add_data(action_run)
+
+        action_result.set_summary({'num_results': len(resp_json['data'])})
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def initialize(self):
 
         # Validate that it is not localhost or 127.0.0.1,
@@ -764,6 +891,8 @@ class PhantomConnector(BaseConnector):
             result = self._export_container(param)
         elif (action == 'import_container'):
             result = self._import_container(param)
+        elif (action == 'get_action'):
+            result = self._get_action(param)
 
         return result
 
