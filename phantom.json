@@ -12,7 +12,7 @@
     "product_name": "Phantom",
     "product_version_regex": ".*",
     "min_phantom_version": "2.0.270",
-    "license": "Copyright (c) Phantom Cyber Corporation 2016",
+    "license": "Copyright (c) Phantom Cyber Corporation 2016-2017",
     "logo": "phantom.png",
     "configuration": {
         "phantom_server": {
