@@ -1,2 +1,3 @@
 exclude_files.txt
-*.py.git*.git*.git*
+*.py
+.git*
