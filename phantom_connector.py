@@ -833,7 +833,9 @@ class PhantomConnector(BaseConnector):
 
         list_identifier = param.get('list_name')
         if not list_identifier:
-            list_identifier = param.get('id', '')
+            list_identifier = param.get('id')
+        if not list_identifier:
+            return action_result.set_status(phantom.APP_ERROR, "Either the custom list's name or id must be provided")
 
         row_values = [v.strip() for v in row_values_as_list.split(",")]
 
