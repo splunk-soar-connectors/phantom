@@ -845,7 +845,7 @@ class PhantomConnector(BaseConnector):
             }
         }
 
-        # # make rest call
+        # make rest call
         ret_val, response, resp_data = self._make_rest_call('/rest/decided_list/{}'.format(list_identifier), action_result, data=data, method="post")
 
         if (phantom.is_fail(ret_val)):
