@@ -823,6 +823,45 @@ class PhantomConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _update_list(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        row_number = str(param['row_number'])
+        row_values_as_list = param['row_values_as_list']
+
+        list_identifier = param.get('list_name')
+        if not list_identifier:
+            list_identifier = param.get('id', '')
+
+        row_values = [v.strip() for v in row_values_as_list.split(",")]
+
+        data = {
+            "update_rows": {
+                row_number: row_values
+            }
+        }
+
+        # # make rest call
+        ret_val, response, resp_data = self._make_rest_call('/rest/decided_list/{}'.format(list_identifier), action_result, data=data, method="post")
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        # Now post process the data,  uncomment code as you deem fit
+
+        # Add the response into the data section
+        action_result.add_data(resp_data)
+
+        # Add a dictionary that is made up of the most important values from data into the summary
+        summary = action_result.update_summary({})
+        summary['success'] = True
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
     def initialize(self):
 
         # Validate that it is not localhost or 127.0.0.1,
@@ -893,6 +932,8 @@ class PhantomConnector(BaseConnector):
             result = self._import_container(param)
         elif (action == 'get_action'):
             result = self._get_action(param)
+        elif (action == 'update_list'):
+            result = self._update_list(param)
 
         return result
 
