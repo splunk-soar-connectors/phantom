@@ -1400,8 +1400,9 @@
             "action": "update list",
             "identifier": "update_list",
             "description": "Update a list",
-            "type": "investigate",
-            "read_only": true,
+            "verbose": "Either the list's name or id is required",
+            "type": "generic",
+            "read_only": false,
             "parameters": {
                 "list_name": {
                     "description": "List name",
@@ -1415,7 +1416,7 @@
                     "data_type": "numeric",
                     "order": 0,
                     "required": false,
-                    "primary": false
+                    "primary": true
                 },
                 "row_number": {
                     "description": "Row number in list to be modified",
