@@ -6,12 +6,12 @@
     "publisher": "Phantom",
     "type": "information",
     "main_module": "phantom_connector.pyc",
-    "app_version": "2.1.5",
+    "app_version": "2.1.6",
     "utctime_updated": "2018-02-23T00:13:00.000000Z",
     "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
-    "min_phantom_version": "2.0.270",
+    "min_phantom_version": "3.0.284",
     "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
     "logo": "logo_phantom.svg",
     "logo_dark": "logo_phantom_dark.svg",
@@ -94,22 +94,16 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric",
-                    "column_name": "Artifact ID",
-                    "column_order": 0
+                    "data_path": "action_result.status",
+                    "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.name",
-                    "data_type": "string",
-                    "column_name": "Artifact Name",
-                    "column_order": 1
+                    "data_path": "action_result.parameter.exact_match",
+                    "data_type": "boolean"
                 },
                 {
-                    "data_path": "action_result.data.*.matched",
-                    "data_type": "string",
-                    "column_name": "Matched",
-                    "column_order": 3
+                    "data_path": "action_result.parameter.values",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.found in",
@@ -118,28 +112,34 @@
                     "column_order": 2
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric",
+                    "column_name": "Artifact ID",
+                    "column_order": 0
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.matched",
+                    "data_type": "string",
+                    "column_name": "Matched",
+                    "column_order": 3
                 },
                 {
-                    "data_path": "action_result.summary.server",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Artifact Name",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.summary.artifacts found",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.parameter.values",
+                    "data_path": "action_result.summary.server",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.exact_match",
-                    "data_type": "boolean"
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -187,16 +187,28 @@
             "render": {},
             "output": [
                 {
-                    "data_path": "action_result.data.*.success",
-                    "data_type": "boolean"
-                },
-                {
                     "data_path": "action_result.status",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.create",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.list",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.new_row",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.failed",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.success",
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.summary.server",
@@ -206,15 +218,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.list",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.create",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.parameter.new_row",
+                    "data_path": "action_result.message",
                     "data_type": "string"
                 },
                 {
@@ -224,10 +228,6 @@
                 {
                     "data_path": "summary.total_objects_successful",
                     "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.failed",
-                    "data_type": "boolean"
                 }
             ],
             "versions": "EQ(*)"
@@ -282,23 +282,12 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.server",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.found matches",
+                    "data_path": "action_result.parameter.column_index",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.summary.locations",
-                    "data_type": "numeric"
+                    "data_path": "action_result.parameter.exact_match",
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.parameter.list",
@@ -309,12 +298,23 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.column_index",
+                    "data_path": "action_result.summary.found matches",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.parameter.exact_match",
-                    "data_type": "boolean"
+                    "data_path": "action_result.summary.locations",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.server",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -554,49 +554,11 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.data.*.success",
-                    "data_type": "boolean"
-                },
-                {
                     "data_path": "action_result.status",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.server",
-                    "data_type": "string",
-                    "contains": [
-                        "url"
-                    ]
-                },
-                {
-                    "data_path": "action_result.summary.artifact id",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.parameter.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.label",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.container_id",
-                    "data_type": "numeric",
-                    "contains": [
-                        "phantom container id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.contains",
+                    "data_path": "action_result.parameter.cef_dictionary",
                     "data_type": "string"
                 },
                 {
@@ -611,11 +573,30 @@
                     ]
                 },
                 {
-                    "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "phantom container id"
+                    ]
                 },
                 {
-                    "data_path": "summary.total_objects_successful",
+                    "data_path": "action_result.parameter.contains",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.source_data_identifier",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.existing_artifact_id",
                     "data_type": "numeric"
                 },
                 {
@@ -623,11 +604,38 @@
                     "data_type": "boolean"
                 },
                 {
-                    "data_path": "action_result.data.*.existing_artifact_id",
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.success",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.summary.artifact id",
                     "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.summary.container id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.server",
+                    "data_type": "string",
+                    "contains": [
+                        "url"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
                     "data_type": "numeric"
                 }
             ],
@@ -676,11 +684,49 @@
             },
             "output": [
                 {
-                    "data_path": "action_result.data.*.id",
-                    "data_type": "numeric"
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "string",
+                    "contains": [
+                        "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.recursive",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1",
+                        "vault id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.aka",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.container_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.contains",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.create_time",
                     "data_type": "string"
                 },
                 {
@@ -691,37 +737,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.name",
-                    "data_type": "string",
-                    "column_name": "Name",
-                    "column_order": 0
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.data.*.vault_id",
-                    "data_type": "string",
-                    "contains": [
-                        "sha1",
-                        "vault id"
-                    ],
-                    "column_name": "Vault ID",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.data.*.path",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.size",
-                    "data_type": "numeric",
-                    "column_name": "Size",
-                    "column_order": 2
-                },
-                {
-                    "data_path": "action_result.data.*.user",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.contains",
+                    "data_path": "action_result.data.*.metadata.contains",
                     "data_type": "string"
                 },
                 {
@@ -741,10 +761,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.metadata.size",
-                    "data_type": "numeric"
-                },
-                {
                     "data_path": "action_result.data.*.metadata.sha256",
                     "data_type": "string",
                     "contains": [
@@ -754,58 +770,50 @@
                     "column_order": 4
                 },
                 {
-                    "data_path": "action_result.data.*.metadata.contains",
+                    "data_path": "action_result.data.*.metadata.size",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.name",
+                    "data_type": "string",
+                    "column_name": "Name",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.data.*.path",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.container",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.create_time",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.container_id",
+                    "data_path": "action_result.data.*.size",
                     "data_type": "numeric",
-                    "contains": [
-                        "phantom container id"
-                    ]
+                    "column_name": "Size",
+                    "column_order": 2
+                },
+                {
+                    "data_path": "action_result.data.*.user",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.vault_document",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.status",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_path": "action_result.data.*.vault_id",
+                    "data_type": "string",
+                    "contains": [
+                        "sha1",
+                        "vault id"
+                    ],
+                    "column_name": "Vault ID",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.summary.total_vault_items",
                     "data_type": "numeric"
                 },
                 {
-                    "data_path": "action_result.parameter.vault_id",
-                    "data_type": "string",
-                    "contains": [
-                        "sha1",
-                        "vault id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.container_id",
-                    "data_type": "string",
-                    "contains": [
-                        "phantom container id"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.recursive",
-                    "data_type": "boolean"
+                    "data_path": "action_result.message",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -846,13 +854,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Container id: 94, Artifact count: 268"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.container_id",
                     "data_type": "string",
                     "example_values": [
@@ -860,6 +861,13 @@
                     ],
                     "contains": [
                         "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.artifact_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        268
                     ]
                 },
                 {
@@ -875,10 +883,10 @@
                     "column_name": "New Container"
                 },
                 {
-                    "data_path": "action_result.summary.artifact_count",
-                    "data_type": "numeric",
+                    "data_path": "action_result.message",
+                    "data_type": "string",
                     "example_values": [
-                        268
+                        "Container id: 94, Artifact count: 268"
                     ]
                 },
                 {
@@ -926,13 +934,6 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Container id: 94, Artifact count: 268"
-                    ]
-                },
-                {
                     "data_path": "action_result.parameter.container_id",
                     "data_type": "string",
                     "example_values": [
@@ -940,6 +941,13 @@
                     ],
                     "contains": [
                         "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.artifact_count",
+                    "data_type": "numeric",
+                    "example_values": [
+                        268
                     ]
                 },
                 {
@@ -955,10 +963,10 @@
                     "column_name": "New Container"
                 },
                 {
-                    "data_path": "action_result.summary.artifact_count",
-                    "data_type": "numeric",
+                    "data_path": "action_result.message",
+                    "data_type": "string",
                     "example_values": [
-                        268
+                        "Container id: 94, Artifact count: 268"
                     ]
                 },
                 {
@@ -1015,10 +1023,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.container_artifacts",
                     "data_type": "string",
                     "example_values": [
-                        "Container id: 82, Artifact count: 3"
+                        "[{\"name\": \"A human friendly name for artifact (1)\", \"label\": \"event\", \"source_data_identifier\": 1},{\"name\": \"A human friendly name for artifact (2)\", \"label\": \"event\", \"source_data_identifier\": 2},{\"name\": \"A human friendly name for artifact (3)\", \"label\": \"event\", \"source_data_identifier\": 3}]"
                     ]
                 },
                 {
@@ -1029,10 +1037,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.container_artifacts",
-                    "data_type": "string",
+                    "data_path": "action_result.summary.artifact_count",
+                    "data_type": "numeric",
                     "example_values": [
-                        "[{\"name\": \"A human friendly name for artifact (1)\", \"label\": \"event\", \"source_data_identifier\": 1},{\"name\": \"A human friendly name for artifact (2)\", \"label\": \"event\", \"source_data_identifier\": 2},{\"name\": \"A human friendly name for artifact (3)\", \"label\": \"event\", \"source_data_identifier\": 3}]"
+                        3,
+                        5
                     ]
                 },
                 {
@@ -1049,18 +1058,17 @@
                     "column_name": "New Container"
                 },
                 {
-                    "data_path": "action_result.summary.artifact_count",
-                    "data_type": "numeric",
-                    "example_values": [
-                        3,
-                        5
-                    ]
-                },
-                {
                     "data_path": "action_result.summary.failed_artifact_count",
                     "data_type": "numeric",
                     "example_values": [
                         7
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Container id: 82, Artifact count: 3"
                     ]
                 },
                 {
@@ -1141,17 +1149,52 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.status",
+                    "data_path": "action_result.parameter.action_name",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "blacklist ip"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.end_time",
+                    "data_path": "action_result.parameter.app",
                     "data_type": "string",
                     "example_values": [
-                        "2017-11-06T20:30:27.991000Z"
+                        "Arbor APS"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.asset",
+                    "data_type": "string",
+                    "example_values": [
+                        "arboraps"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "5"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.parameters",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"ip\": \"1.8.9.0\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.time_limit",
+                    "data_type": "numeric",
+                    "example_values": [
+                        "24"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.action",
+                    "data_type": "string",
+                    "example_values": [
+                        "blacklist ip"
                     ]
                 },
                 {
@@ -1162,14 +1205,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.extra_data",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.container",
+                    "data_path": "action_result.data.*.app",
                     "data_type": "numeric",
                     "example_values": [
-                        1154
+                        121
                     ]
                 },
                 {
@@ -1180,10 +1219,24 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.start_time",
+                    "data_path": "action_result.data.*.app_version",
                     "data_type": "string",
                     "example_values": [
-                        "2017-11-06T20:30:04.879000Z"
+                        "1.0.0"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.asset",
+                    "data_type": "numeric",
+                    "example_values": [
+                        137
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1154
                     ]
                 },
                 {
@@ -1191,18 +1244,23 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.playbook_run",
-                    "data_type": "numeric",
+                    "data_path": "action_result.data.*.end_time",
+                    "data_type": "string",
                     "example_values": [
-                        1056
+                        "2017-11-06T20:30:27.991000Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.version",
-                    "data_type": "numeric",
+                    "data_path": "action_result.data.*.exception_occured",
+                    "data_type": "boolean",
                     "example_values": [
-                        1
+                        true,
+                        false
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.extra_data",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.id",
@@ -1212,10 +1270,17 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.result_data.*.status",
+                    "data_path": "action_result.data.*.message",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "Successfully blacklisted IP"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.playbook_run",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1056
                     ]
                 },
                 {
@@ -1234,13 +1299,6 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.result_data.*.parameter.context.guid",
-                    "data_type": "string",
-                    "example_values": [
-                        "293d0369-4801-417d-a1af-a73cf1200d3d"
-                    ]
-                },
-                {
                     "data_path": "action_result.data.*.result_data.*.parameter.context.artifact_id",
                     "data_type": "numeric",
                     "example_values": [
@@ -1248,19 +1306,26 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.result_data.*.parameter.context.guid",
+                    "data_type": "string",
+                    "example_values": [
+                        "293d0369-4801-417d-a1af-a73cf1200d3d"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.result_data.*.parameter.context.parent_action_run",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.data.*.result_data.*.summary",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.data.*.action",
+                    "data_path": "action_result.data.*.result_data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "blacklist ip"
+                        "success"
                     ]
+                },
+                {
+                    "data_path": "action_result.data.*.result_data.*.summary",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.result_summary.total_objects",
@@ -1277,88 +1342,24 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.message",
+                    "data_path": "action_result.data.*.start_time",
                     "data_type": "string",
                     "example_values": [
-                        "Successfully blacklisted IP"
+                        "2017-11-06T20:30:04.879000Z"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.app_version",
+                    "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "1.0.0"
+                        "success"
                     ]
                 },
                 {
-                    "data_path": "action_result.data.*.exception_occured",
-                    "data_type": "boolean",
-                    "example_values": [
-                        true,
-                        false
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.app",
+                    "data_path": "action_result.data.*.version",
                     "data_type": "numeric",
                     "example_values": [
-                        121
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.asset",
-                    "data_type": "numeric",
-                    "example_values": [
-                        137
-                    ]
-                },
-                {
-                    "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        "Action run id: 2761"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.app",
-                    "data_type": "string",
-                    "example_values": [
-                        "Arbor APS"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.asset",
-                    "data_type": "string",
-                    "example_values": [
-                        "arboraps"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.parameters",
-                    "data_type": "string",
-                    "example_values": [
-                        "{\"ip\": \"1.8.9.0\"}"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.action_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "blacklist ip"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.time_limit",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "24"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.max_results",
-                    "data_type": "numeric",
-                    "example_values": [
-                        "5"
+                        1
                     ]
                 },
                 {
@@ -1366,6 +1367,13 @@
                     "data_type": "numeric",
                     "example_values": [
                         2761
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Action run id: 2761"
                     ]
                 },
                 {
@@ -1386,6 +1394,119 @@
             "versions": "EQ(*)",
             "render": {
                 "type": "json"
+            }
+        },
+        {
+            "action": "update list",
+            "identifier": "update_list",
+            "description": "Update a list",
+            "verbose": "Either the list's name or id is required",
+            "type": "generic",
+            "read_only": false,
+            "parameters": {
+                "list_name": {
+                    "description": "List name",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": false,
+                    "primary": true
+                },
+                "id": {
+                    "description": "List id",
+                    "data_type": "numeric",
+                    "order": 0,
+                    "required": false,
+                    "primary": true
+                },
+                "row_number": {
+                    "description": "Row number in list to be modified",
+                    "data_type": "numeric",
+                    "order": 0,
+                    "required": true,
+                    "primary": false
+                },
+                "row_values_as_list": {
+                    "description": "New values for the row, separated by commas",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "primary": false
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.list_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "my first list"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.row_number",
+                    "data_type": "numeric",
+                    "example_values": [
+                        0
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.row_values_as_list",
+                    "data_type": "string",
+                    "example_values": [
+                        "this, is, a, test"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.success",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "table"
             }
         }
     ]
