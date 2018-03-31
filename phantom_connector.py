@@ -37,6 +37,7 @@ import tarfile
 import gzip
 import bz2
 import datetime
+import time
 
 TIMEOUT = 120
 INVALID_RESPONSE = 'Server did not return a valid JSON response.'
@@ -862,6 +863,21 @@ class PhantomConnector(BaseConnector):
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    def _no_op(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+        sleep_seconds = param['sleep_seconds']
+        remainder = sleep_seconds % 60
+
+        self.send_progress("Sleeping...")
+        for i in range(0, int(sleep_seconds / 60)):
+            time.sleep(60)
+            self.send_progress("Slept for {} minute{}...", i + 1, 's' if i else '')
+
+        if remainder:
+            time.sleep(remainder)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Slept for {} seconds".format(sleep_seconds))
+
     def initialize(self):
 
         # Validate that it is not localhost or 127.0.0.1,
@@ -934,6 +950,8 @@ class PhantomConnector(BaseConnector):
             result = self._get_action(param)
         elif (action == 'update_list'):
             result = self._update_list(param)
+        elif (action == 'no_op'):
+            return self._no_op(param)
 
         return result
 

@@ -298,6 +298,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary.found matches",
                     "data_type": "numeric"
                 },
@@ -864,6 +868,10 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary.artifact_count",
                     "data_type": "numeric",
                     "example_values": [
@@ -942,6 +950,10 @@
                     "contains": [
                         "phantom container id"
                     ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.artifact_count",
@@ -1035,6 +1047,10 @@
                     "example_values": [
                         "{\"severity\": \"medium\", \"label\": \"events\", \"version\": 1, \"asset\": 7, \"status\": \"new\", \"description\": \"New Container from Phantom Helper\", \"tags\": [],  \"data\": {}, \"name\": \"This is a container\"}"
                     ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary.artifact_count",
@@ -1455,6 +1471,20 @@
                     ]
                 },
                 {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
                     "data_path": "action_result.parameter.row_number",
                     "data_type": "numeric",
                     "example_values": [
@@ -1481,13 +1511,59 @@
                     "example_values": [
                         ""
                     ]
+                }
+            ],
+            "versions": "EQ(*)",
+            "render": {
+                "type": "json"
+            }
+        },
+        {
+            "action": "no op",
+            "description": "Wait for the specified number of seconds",
+            "type": "generic",
+            "identifier": "no_op",
+            "read_only": true,
+            "parameters": {
+                "sleep_seconds": {
+                    "description": "Sleep for this many seconds",
+                    "data_type": "numeric",
+                    "order": 0,
+                    "required": true,
+                    "primary": true
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "example_values": [
+                        "success"
+                    ],
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.sleep_seconds",
+                    "data_type": "numeric",
+                    "example_values": [
+                        15
+                    ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        ""
-                    ]
+                        "Slept for 15 seconds"
+                    ],
+                    "column_name": "Message",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
