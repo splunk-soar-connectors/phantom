@@ -162,7 +162,7 @@ class PhantomConnector(BaseConnector):
 
         return RetVal3(action_result.set_status(phantom.APP_ERROR, message), response, None)
 
-    def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="get"):
+    def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="get", ignore_auth=False):
 
         config = self.get_config()
 
@@ -190,9 +190,15 @@ class PhantomConnector(BaseConnector):
         if (not request_func):
             action_result.set_status(phantom.APP_ERROR, "Unsupported HTTP method '{0}' requested".format(method))
 
+        auth = self._auth
+
+        if (ignore_auth):
+            auth = None
+            del headers['ph-auth-token']
+
         try:
             response = request_func(self._base_uri + endpoint,
-                    auth=self._auth,
+                    auth=auth,
                     json=data,
                     headers=headers if (headers) else None,
                     verify=self._verify_cert,
@@ -587,9 +593,9 @@ class PhantomConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _add_artifact_list(self, action_result, artifacts):
+    def _add_artifact_list(self, action_result, artifacts, ignore_auth=False):
         """ Add a list of artifacts """
-        ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifacts)
+        ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifacts, ignore_auth=ignore_auth)
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, "Error adding artifact: {}".format(action_result.get_message()))
         failed = 0
@@ -602,7 +608,7 @@ class PhantomConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Failed to add one or more artifacts")
         return phantom.APP_SUCCESS
 
-    def _create_container_copy(self, action_result, container_id, destination, source):
+    def _create_container_copy(self, action_result, container_id, destination, source, source_local=False, destination_local=False):
         """ destination: where new container is being made """
         """ source: where the original container is """
         """ Create a copy of this existing container, including all of its artifacts """
@@ -610,7 +616,11 @@ class PhantomConnector(BaseConnector):
         # Retrieve original container
         self._base_uri = source
         url = '/rest/container/{}'.format(container_id)
-        ret_val, response, resp_data = self._make_rest_call(url, action_result)
+        ignore_auth = False
+        if (source_local):
+            ignore_auth = True
+
+        ret_val, response, resp_data = self._make_rest_call(url, action_result, ignore_auth=ignore_auth)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -626,7 +636,10 @@ class PhantomConnector(BaseConnector):
         # container['ingest_app_id'] = container.pop('ingest_app', None)
 
         self._base_uri = destination
-        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container)
+        ignore_auth = False
+        if (destination_local):
+            ignore_auth = True
+        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container, ignore_auth=ignore_auth)
         if phantom.is_fail(ret_val):
             return ret_val
 
@@ -640,7 +653,11 @@ class PhantomConnector(BaseConnector):
         url = '/rest/container/{}/artifacts'.format(container_id)
         params = {'sort': 'id', 'order': 'asc', 'page_size': 0}
         self._base_uri = source
-        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params)
+        ignore_auth = False
+        if (source_local):
+            ignore_auth = True
+
+        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params, ignore_auth=ignore_auth)
 
         artifacts = resp_data['data']
         if artifacts:
@@ -659,7 +676,10 @@ class PhantomConnector(BaseConnector):
             artifacts[-1]['run_automation'] = True
 
             self._base_uri = destination
-            ret_val = self._add_artifact_list(action_result, artifacts)
+            ignore_auth = False
+            if (destination_local):
+                ignore_auth = True
+            ret_val = self._add_artifact_list(action_result, artifacts, ignore_auth=ignore_auth)
             if phantom.is_fail(ret_val):
                 return ret_val
 
@@ -719,7 +739,7 @@ class PhantomConnector(BaseConnector):
         destination = self._base_uri
         source = 'https://127.0.0.1'
 
-        return self._create_container_copy(action_result, container_id, destination, source)
+        return self._create_container_copy(action_result, container_id, destination, source, source_local=True)
 
     def _import_container(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -729,7 +749,7 @@ class PhantomConnector(BaseConnector):
         destination = 'https://127.0.0.1'
         source = self._base_uri
 
-        return self._create_container_copy(action_result, container_id, destination, source)
+        return self._create_container_copy(action_result, container_id, destination, source, destination_local=True)
 
     def _get_action(self, param):
 
@@ -977,20 +997,64 @@ class PhantomConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import sys
-    # import simplejson as json
     import pudb
+    import argparse
 
     pudb.set_trace()
 
-    with open(sys.argv[1]) as f:
+    argparser = argparse.ArgumentParser()
+
+    argparser.add_argument('input_test_json', help='Input Test JSON file')
+    argparser.add_argument('-u', '--username', help='username', required=False)
+    argparser.add_argument('-p', '--password', help='password', required=False)
+
+    args = argparser.parse_args()
+    session_id = None
+
+    username = args.username
+    password = args.password
+
+    if (username is not None and password is None):
+
+        # User specified a username but not a password, so ask
+        import getpass
+        password = getpass.getpass("Password: ")
+
+    if (username and password):
+        try:
+            print ("Accessing the Login page")
+            r = requests.get("https://127.0.0.1/login", verify=False)
+            csrftoken = r.cookies['csrftoken']
+
+            data = dict()
+            data['username'] = username
+            data['password'] = password
+            data['csrfmiddlewaretoken'] = csrftoken
+
+            headers = dict()
+            headers['Cookie'] = 'csrftoken=' + csrftoken
+            headers['Referer'] = 'https://127.0.0.1/login'
+
+            print ("Logging into Platform to get the session id")
+            r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
+            session_id = r2.cookies['sessionid']
+        except Exception as e:
+            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            exit(1)
+
+    with open(args.input_test_json) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
         print(json.dumps(in_json, indent=4))
 
         connector = PhantomConnector()
         connector.print_progress_message = True
+
+        if (session_id is not None):
+            in_json['user_session_token'] = session_id
+            connector._set_csrf_info(csrftoken, headers['Referer'])
+
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print json.dumps(json.loads(ret_val), indent=4)
+        print (json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
