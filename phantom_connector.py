@@ -253,10 +253,20 @@ class PhantomConnector(BaseConnector):
             key, value = None, None
 
             for k, v in rec['cef'].iteritems():
-                if values in v.lower() or (exact_match and values.strip('"') == v.lower()):
+
+                curr_value = v
+
+                if ( isinstance(curr_value, dict)):
+                    curr_value = json.dumps(curr_value)
+
+                if (not isinstance(curr_value, basestring)):
+                    curr_value = str(curr_value)
+
+                if values in curr_value.lower() or (exact_match and values.strip('"') == curr_value.lower()):
                     key = k
-                    value = v
+                    value = curr_value
                     break
+
             result = {
                 "id": rec['id'],
                 "container": rec['container'],
