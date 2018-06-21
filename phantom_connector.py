@@ -864,8 +864,19 @@ class PhantomConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _no_op(self, param):
+
         action_result = self.add_action_result(ActionResult(dict(param)))
+
         sleep_seconds = param['sleep_seconds']
+
+        try:
+            sleep_seconds = int(sleep_seconds)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Error parsing the sleep seconds parameter. Reason: {0}".format(str(e)))
+
+        if (sleep_seconds < 0):
+            return action_result.set_status(phantom.APP_ERROR, "Invalid sleep_seconds value. Please specify a value greater than 0")
+
         remainder = sleep_seconds % 60
 
         self.send_progress("Sleeping...")
@@ -901,10 +912,12 @@ class PhantomConnector(BaseConnector):
                 return self.set_status(phantom.APP_ERROR, "Unable to do name to ip conversion on {0}".format(host))
 
         if unpacked.startswith('127.'):
-            return self.set_status(phantom.APP_ERROR, 'Accessing 127.0.0.1 is not allowed')
+            return self.set_status(phantom.APP_ERROR,
+                    'Accessing 127.0.0.1 is not allowed. Please specify the actual IP or hostname used by the Phantom instance in the Asset config')
 
         if '127.0.0.1' in host or 'localhost' in host:
-            return self.set_status(phantom.APP_ERROR, 'Accessing 127.0.0.1 is not allowed')
+            return self.set_status(phantom.APP_ERROR,
+                    'Accessing 127.0.0.1 is not allowed. Please specify the actual IP or hostname used by the Phantom instance in the Asset config')
 
         self._base_uri = 'https://{}'.format(config['phantom_server'])
         self._verify_cert = config.get('verify_certificate', False)
