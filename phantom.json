@@ -1007,7 +1007,7 @@
         {
             "action": "create container",
             "description": "Create a new container on a Phantom instance",
-            "verbose": "This action creates a new container on the Phantom asset that this action is executed on. If you wish to create a new container on the local Phantom instance, create an asset with the <b>phantom_server</b> asset configuration set to 127.0.0.1. The <b>container_json</b> parameter needs to be a JSON string. The <b>container_artifacts</b> is an optional parameter that needs to be a list of artifact objects as a JSON string. The action will fail if the <b>container_json</b> has a label that doesn't exist on the destination Phantom asset.",
+            "verbose": "This action creates a new container on the Phantom asset that this action is executed on. The <b>container_json</b> parameter needs to be a JSON string. The <b>container_artifacts</b> is an optional parameter that needs to be a list of artifact objects as a JSON string. The action will fail if the <b>container_json</b> has a label that doesn't exist on the destination Phantom asset.",
             "type": "generic",
             "identifier": "create_container",
             "read_only": false,
