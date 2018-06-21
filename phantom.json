@@ -1,7 +1,7 @@
 {
     "appid": "deb82aa9-22cc-4675-9cf1-534b8d006eb7",
     "name": "Phantom",
-    "description": "This App exposes various Phantom APIs as actions.",
+    "description": "This App exposes various Phantom APIs as actions",
     "package_name": "phantom_phantom",
     "publisher": "Phantom",
     "type": "information",
@@ -11,8 +11,8 @@
     "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
-    "min_phantom_version": "3.0.284",
-    "license": "Copyright (c) Phantom Cyber Corporation, 2016-2018",
+    "min_phantom_version": "3.5.180",
+    "license": "Copyright (c) 2016-2018 Splunk Inc.",
     "logo": "logo_phantom.svg",
     "logo_dark": "logo_phantom_dark.svg",
     "configuration": {
@@ -23,7 +23,7 @@
             "required": true
         },
         "auth_token": {
-            "data_type": "string",
+            "data_type": "password",
             "order": 1,
             "description": "Phantom Auth token",
             "required": false
