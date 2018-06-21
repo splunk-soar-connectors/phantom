@@ -23,7 +23,7 @@
             "required": true
         },
         "auth_token": {
-            "data_type": "string",
+            "data_type": "password",
             "order": 1,
             "description": "Phantom Auth token",
             "required": false
