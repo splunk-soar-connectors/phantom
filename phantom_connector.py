@@ -14,6 +14,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 from phantom.cef import CEF_NAME_MAPPING
+from phantom.cef import CEF_JSON
 from phantom.utils import CONTAINS_VALIDATORS
 import phantom.utils as ph_utils
 from phantom.vault import Vault
@@ -338,7 +339,10 @@ class PhantomConnector(BaseConnector):
                 if determined_contains:
                     artifact['cef_types'][cef_name] = [determined_contains]
             else:
-                artifact['cef_types'][cef_name] = [CEF_NAME_MAPPING[cef_name].get('contains')]
+                try:
+                    artifact['cef_types'][cef_name] = CEF_JSON[cef_name]['contains']
+                except:
+                    pass
 
         success, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifact)
 
