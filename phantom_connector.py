@@ -616,11 +616,8 @@ class PhantomConnector(BaseConnector):
         # Retrieve original container
         self._base_uri = source
         url = '/rest/container/{}'.format(container_id)
-        ignore_auth = False
-        if (source_local):
-            ignore_auth = True
 
-        ret_val, response, resp_data = self._make_rest_call(url, action_result, ignore_auth=ignore_auth)
+        ret_val, response, resp_data = self._make_rest_call(url, action_result, ignore_auth=source_local)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -636,10 +633,7 @@ class PhantomConnector(BaseConnector):
         # container['ingest_app_id'] = container.pop('ingest_app', None)
 
         self._base_uri = destination
-        ignore_auth = False
-        if (destination_local):
-            ignore_auth = True
-        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container, ignore_auth=ignore_auth)
+        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container, ignore_auth=destination_local)
         if phantom.is_fail(ret_val):
             return ret_val
 
@@ -653,11 +647,7 @@ class PhantomConnector(BaseConnector):
         url = '/rest/container/{}/artifacts'.format(container_id)
         params = {'sort': 'id', 'order': 'asc', 'page_size': 0}
         self._base_uri = source
-        ignore_auth = False
-        if (source_local):
-            ignore_auth = True
-
-        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params, ignore_auth=ignore_auth)
+        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params, ignore_auth=source_local)
 
         artifacts = resp_data['data']
         if artifacts:
@@ -676,10 +666,7 @@ class PhantomConnector(BaseConnector):
             artifacts[-1]['run_automation'] = True
 
             self._base_uri = destination
-            ignore_auth = False
-            if (destination_local):
-                ignore_auth = True
-            ret_val = self._add_artifact_list(action_result, artifacts, ignore_auth=ignore_auth)
+            ret_val = self._add_artifact_list(action_result, artifacts, ignore_auth=destination_local)
             if phantom.is_fail(ret_val):
                 return ret_val
 
