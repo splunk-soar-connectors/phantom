@@ -365,7 +365,7 @@ class PhantomConnector(BaseConnector):
 
         # if the path contains a directory
         if (os.path.dirname(save_as)):
-            save_as = '-'.join(os.path.split(save_as))
+            save_as = '-'.join(save_as.split(os.sep))
 
         save_path = os.path.join('/vault/tmp', save_as)
         with open(save_path, 'w') as uncompressed_file:
