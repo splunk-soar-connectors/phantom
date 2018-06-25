@@ -633,12 +633,20 @@ class PhantomConnector(BaseConnector):
         container.pop('start_time', None)
         container.pop('source_data_identifier', None)
         container.pop('ingest_app')
+        container.pop('tenant')
+        container.pop('id')
         container['owner_id'] = container.pop('owner')
+        if (destination_local):
+            container['asset_id'] = int(self.get_asset_id())
         # container['ingest_app_id'] = container.pop('ingest_app', None)
 
         self._base_uri = destination
         ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container, ignore_auth=destination_local)
         if phantom.is_fail(ret_val):
+            act_message = action_result.get_message()
+            if ('ingesting asset_id' in act_message):
+                act_message += 'If Multi-tenancy is enabled, please make sure the asset is assigned a tenant'
+                action_result.set_status(ret_val, act_message)
             return ret_val
 
         try:
