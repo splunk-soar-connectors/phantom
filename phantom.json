@@ -833,7 +833,7 @@
         {
             "action": "export container",
             "description": "Export local container to the configured Phantom asset",
-            "verbose": "This action exports a container (that matches the <b>container_id</b>) from the local Phantom instance to the configured Phantom asset (that the action is executed on).",
+            "verbose": "This action exports a container (that matches the <b>container_id</b>) from the local Phantom instance to the configured Phantom asset (that the action is executed on). Do not use this action to create a copy of the container from the local phantom instance, use <b>import container</b> instead.",
             "type": "generic",
             "identifier": "export_container",
             "read_only": false,

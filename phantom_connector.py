@@ -195,7 +195,8 @@ class PhantomConnector(BaseConnector):
 
         if (ignore_auth):
             auth = None
-            del headers['ph-auth-token']
+            if ('ph-auth_token' in headers):
+                del headers['ph-auth-token']
 
         try:
             response = request_func(self._base_uri + endpoint,
