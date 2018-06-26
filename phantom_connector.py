@@ -195,7 +195,7 @@ class PhantomConnector(BaseConnector):
 
         if (ignore_auth):
             auth = None
-            if ('ph-auth_token' in headers):
+            if ('ph-auth-token' in headers):
                 del headers['ph-auth-token']
 
         try:
