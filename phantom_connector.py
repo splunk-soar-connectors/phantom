@@ -1,15 +1,10 @@
 # --
 # File: phantom_connector.py
 #
-# Copyright (c) Phantom Cyber Corporation, 2016-2018
+# Copyright (c) 2016-2018 Splunk Inc.
 #
-# This unpublished material is proprietary to Phantom Cyber.
-# All rights reserved. The methods and
-# techniques described herein are considered trade secrets
-# and/or confidential. Reproduction or distribution, in whole
-# or in part, is forbidden except by express written permission
-# of Phantom Cyber.
-#
+# SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
+# without a valid written license from Splunk Inc. is PROHIBITED.
 # --
 
 # Phantom imports
@@ -19,6 +14,7 @@ from phantom.base_connector import BaseConnector
 from phantom.action_result import ActionResult
 
 from phantom.cef import CEF_NAME_MAPPING
+from phantom.cef import CEF_JSON
 from phantom.utils import CONTAINS_VALIDATORS
 import phantom.utils as ph_utils
 from phantom.vault import Vault
@@ -36,6 +32,8 @@ import magic
 import tarfile
 import gzip
 import bz2
+import datetime
+import time
 
 TIMEOUT = 120
 INVALID_RESPONSE = 'Server did not return a valid JSON response.'
@@ -165,7 +163,7 @@ class PhantomConnector(BaseConnector):
 
         return RetVal3(action_result.set_status(phantom.APP_ERROR, message), response, None)
 
-    def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="get"):
+    def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="get", ignore_auth=False):
 
         config = self.get_config()
 
@@ -193,9 +191,16 @@ class PhantomConnector(BaseConnector):
         if (not request_func):
             action_result.set_status(phantom.APP_ERROR, "Unsupported HTTP method '{0}' requested".format(method))
 
+        auth = self._auth
+
+        if (ignore_auth):
+            auth = None
+            if ('ph-auth-token' in headers):
+                del headers['ph-auth-token']
+
         try:
             response = request_func(self._base_uri + endpoint,
-                    auth=self._auth,
+                    auth=auth,
                     json=data,
                     headers=headers if (headers) else None,
                     verify=self._verify_cert,
@@ -217,11 +222,12 @@ class PhantomConnector(BaseConnector):
         ret_val, response, resp_data = self._make_rest_call('/rest/version', action_result)
 
         if (phantom.is_fail(ret_val)):
+            self.save_progress("Test Connectivity Failed")
             return self.set_status(phantom.APP_ERROR, 'Failed to connect: {}'.format(action_result.get_message()))
 
         version = resp_data['version']
         self.save_progress("Connected to Phantom appliance version {}".format(version))
-        self.save_progress("Test connectivity PASSED.")
+        self.save_progress("Test connectivity passed")
         return self.set_status(phantom.APP_SUCCESS, 'Request succeeded')
 
     def _find_artifacts(self, param):
@@ -255,10 +261,20 @@ class PhantomConnector(BaseConnector):
             key, value = None, None
 
             for k, v in rec['cef'].iteritems():
-                if values in v.lower() or (exact_match and values.strip('"') == v.lower()):
+
+                curr_value = v
+
+                if ( isinstance(curr_value, dict)):
+                    curr_value = json.dumps(curr_value)
+
+                if (not isinstance(curr_value, basestring)):
+                    curr_value = str(curr_value)
+
+                if values in curr_value.lower() or (exact_match and values.strip('"') == curr_value.lower()):
                     key = k
-                    value = v
+                    value = curr_value
                     break
+
             result = {
                 "id": rec['id'],
                 "container": rec['container'],
@@ -279,25 +295,55 @@ class PhantomConnector(BaseConnector):
 
         name = param.get('name')
         container_id = param.get('container_id', self.get_container_id())
+        sdi = param.get('source_data_identifier')
         label = param.get('label', 'event')
-        contains = param.get('contains', '').strip().split(',')
+        contains = param.get('contains')
         cef_name = param.get('cef_name')
         cef_value = param.get('cef_value')
+        cef_dict = param.get('cef_dictionary')
+
+        loaded_cef = {}
+        loaded_contains = {}
+
+        if cef_dict:
+
+            try:
+                loaded_cef = json.loads(cef_dict)
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF paramter", e)
+
+            if '{' in contains or '}' in contains:
+                try:
+                    loaded_contains = json.loads(contains)
+                except Exception as e:
+                    return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains paramter", e)
+
+        if cef_name and cef_value:
+            loaded_cef[cef_name] = cef_value
+            loaded_contains[cef_name] = contains
 
         artifact = {}
         artifact['name'] = name
         artifact['label'] = label
         artifact['container_id'] = container_id
-        artifact['cef'] = {
-            cef_name: cef_value,
-        }
+        artifact['cef'] = loaded_cef
+        artifact['cef_types'] = loaded_contains
+        artifact['source_data_identifier'] = sdi
 
-        if contains:
-            artifact['cef_types'] = {'cef_name': contains}
-        elif cef_name not in CEF_NAME_MAPPING:
-            contains = determine_contains(cef_value)
-            if contains:
-                artifact['cef_types'] = {'cef_name': [contains]}
+        for cef_name in loaded_cef:
+
+            if loaded_contains.get(cef_name):
+                continue
+
+            if cef_name not in CEF_NAME_MAPPING:
+                determined_contains = determine_contains(loaded_cef[cef_name])
+                if determined_contains:
+                    artifact['cef_types'][cef_name] = [determined_contains]
+            else:
+                try:
+                    artifact['cef_types'][cef_name] = CEF_JSON[cef_name]['contains']
+                except:
+                    pass
 
         success, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifact)
 
@@ -320,7 +366,7 @@ class PhantomConnector(BaseConnector):
 
         # if the path contains a directory
         if (os.path.dirname(save_as)):
-            save_as = '-'.join(os.path.split(save_as))
+            save_as = '-'.join(save_as.split(os.sep))
 
         save_path = os.path.join('/vault/tmp', save_as)
         with open(save_path, 'w') as uncompressed_file:
@@ -552,9 +598,9 @@ class PhantomConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _add_artifact_list(self, action_result, artifacts):
+    def _add_artifact_list(self, action_result, artifacts, ignore_auth=False):
         """ Add a list of artifacts """
-        ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifacts)
+        ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifacts, ignore_auth=ignore_auth)
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, "Error adding artifact: {}".format(action_result.get_message()))
         failed = 0
@@ -567,7 +613,7 @@ class PhantomConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Failed to add one or more artifacts")
         return phantom.APP_SUCCESS
 
-    def _create_container_copy(self, action_result, container_id, destination, source):
+    def _create_container_copy(self, action_result, container_id, destination, source, source_local=False, destination_local=False):
         """ destination: where new container is being made """
         """ source: where the original container is """
         """ Create a copy of this existing container, including all of its artifacts """
@@ -575,7 +621,8 @@ class PhantomConnector(BaseConnector):
         # Retrieve original container
         self._base_uri = source
         url = '/rest/container/{}'.format(container_id)
-        ret_val, response, resp_data = self._make_rest_call(url, action_result)
+
+        ret_val, response, resp_data = self._make_rest_call(url, action_result, ignore_auth=source_local)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -587,12 +634,20 @@ class PhantomConnector(BaseConnector):
         container.pop('start_time', None)
         container.pop('source_data_identifier', None)
         container.pop('ingest_app')
+        container.pop('tenant')
+        container.pop('id')
         container['owner_id'] = container.pop('owner')
+        if (destination_local):
+            container['asset_id'] = int(self.get_asset_id())
         # container['ingest_app_id'] = container.pop('ingest_app', None)
 
         self._base_uri = destination
-        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container)
+        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container, ignore_auth=destination_local)
         if phantom.is_fail(ret_val):
+            act_message = action_result.get_message()
+            if ('ingesting asset_id' in act_message):
+                act_message += 'If Multi-tenancy is enabled, please make sure the asset is assigned a tenant'
+                action_result.set_status(ret_val, act_message)
             return ret_val
 
         try:
@@ -605,7 +660,7 @@ class PhantomConnector(BaseConnector):
         url = '/rest/container/{}/artifacts'.format(container_id)
         params = {'sort': 'id', 'order': 'asc', 'page_size': 0}
         self._base_uri = source
-        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params)
+        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params, ignore_auth=source_local)
 
         artifacts = resp_data['data']
         if artifacts:
@@ -624,7 +679,7 @@ class PhantomConnector(BaseConnector):
             artifacts[-1]['run_automation'] = True
 
             self._base_uri = destination
-            ret_val = self._add_artifact_list(action_result, artifacts)
+            ret_val = self._add_artifact_list(action_result, artifacts, ignore_auth=destination_local)
             if phantom.is_fail(ret_val):
                 return ret_val
 
@@ -684,7 +739,7 @@ class PhantomConnector(BaseConnector):
         destination = self._base_uri
         source = 'https://127.0.0.1'
 
-        return self._create_container_copy(action_result, container_id, destination, source)
+        return self._create_container_copy(action_result, container_id, destination, source, source_local=True)
 
     def _import_container(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -694,7 +749,171 @@ class PhantomConnector(BaseConnector):
         destination = 'https://127.0.0.1'
         source = self._base_uri
 
-        return self._create_container_copy(action_result, container_id, destination, source)
+        return self._create_container_copy(action_result, container_id, destination, source, destination_local=True)
+
+    def _get_action(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        url_params = {
+                '_filter_action': '"{0}"'.format(param['action_name']),
+                'include_expensive': '',
+                'sort': 'start_time',
+                'order': 'desc',
+            }
+
+        parameters = {}
+        if 'parameters' in param:
+
+            try:
+                parameters = json.loads(param['parameters'])
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from 'parameters' parameter")
+
+            search_key, search_value = parameters.popitem()
+            url_params['_filter_result_data__regex'] = '"parameter.*\\"{0}\\": \\"{1}\\""'.format(search_key, search_value)
+
+        if 'time_limit' in param:
+            hours = int(param['time_limit'])
+            time_str = (datetime.datetime.utcnow() - datetime.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%SZ")
+            url_params['_filter_start_time__gt'] = '"{0}"'.format(time_str)
+
+        if 'max_results' in param:
+            limit = int(param['max_results'])
+            url_params['page_size'] = limit
+
+        if 'app' in param:
+
+            app_params = {'_filter_name__iexact': '"{0}"'.format(param['app'])}
+            ret_val, response, resp_json = self._make_rest_call('/rest/app', action_result, params=app_params)
+
+            if phantom.is_fail(ret_val):
+                return ret_val
+
+            if resp_json['count'] == 0:
+                return action_result.set_status(phantom.APP_ERROR, "Could not find app with name '{0}'".format(param['app']))
+
+            url_params['_filter_app'] = resp_json['data'][0]['id']
+
+        if 'asset' in param:
+
+            asset_params = {'_filter_name__iexact': '"{0}"'.format(param['asset'])}
+            ret_val, response, resp_json = self._make_rest_call('/rest/asset', action_result, params=asset_params)
+
+            if phantom.is_fail(ret_val):
+                return ret_val
+
+            if resp_json['count'] == 0:
+                return action_result.set_status(phantom.APP_ERROR, "Could not find asset with name '{0}'".format(param['asset']))
+
+            url_params['_filter_asset'] = resp_json['data'][0]['id']
+
+        ret_val, response, resp_json = self._make_rest_call('/rest/app_run', action_result, params=url_params)
+
+        if phantom.is_fail(ret_val):
+            return ret_val
+
+        count = 0
+        if len(parameters) > 0:
+
+            for action_run in resp_json['data']:
+
+                for result in action_run['result_data']:
+
+                    cur_params = result['parameter']
+
+                    found = True
+                    for k, v in parameters.iteritems():
+
+                        if cur_params.get(k) != v:
+                            found = False
+                            break
+
+                    if found:
+                        count += 1
+                        action_result.add_data(action_run)
+                        return action_result.set_status(phantom.APP_SUCCESS)
+
+            return action_result.set_status(phantom.APP_SUCCESS, "No action results found matching given criteria")
+
+            action_result.set_summary({'num_results': count})
+            return action_result.set_status(phantom.APP_SUCCESS)
+
+        elif resp_json['count'] == 0:
+            return action_result.set_status(phantom.APP_SUCCESS, "No action results found matching given criteria")
+
+        for action_run in resp_json['data']:
+            action_result.add_data(action_run)
+
+        action_result.set_summary({'num_results': len(resp_json['data'])})
+
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _update_list(self, param):
+
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        row_number = str(param['row_number'])
+        row_values_as_list = param['row_values_as_list']
+
+        list_identifier = param.get('list_name')
+        if not list_identifier:
+            list_identifier = param.get('id')
+        if not list_identifier:
+            return action_result.set_status(phantom.APP_ERROR, "Either the custom list's name or id must be provided")
+
+        row_values = [v.strip() for v in row_values_as_list.split(",")]
+
+        data = {
+            "update_rows": {
+                row_number: row_values
+            }
+        }
+
+        # make rest call
+        ret_val, response, resp_data = self._make_rest_call('/rest/decided_list/{}'.format(list_identifier), action_result, data=data, method="post")
+
+        if (phantom.is_fail(ret_val)):
+            return action_result.get_status()
+
+        # Add the response into the data section
+        action_result.add_data(resp_data)
+
+        # Add a dictionary that is made up of the most important values from data into the summary
+        summary = action_result.update_summary({})
+        summary['success'] = True
+
+        # Return success, no need to set the message, only the status
+        # BaseConnector will create a textual message based off of the summary dictionary
+        return action_result.set_status(phantom.APP_SUCCESS)
+
+    def _no_op(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        sleep_seconds = param['sleep_seconds']
+
+        try:
+            sleep_seconds = int(sleep_seconds)
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Error parsing the sleep seconds parameter. Reason: {0}".format(str(e)))
+
+        if (sleep_seconds < 0):
+            return action_result.set_status(phantom.APP_ERROR, "Invalid sleep_seconds value. Please specify a value greater than 0")
+
+        remainder = sleep_seconds % 60
+
+        self.send_progress("Sleeping...")
+        for i in range(0, int(sleep_seconds / 60)):
+            time.sleep(60)
+            self.send_progress("Slept for {} minute{}...", i + 1, 's' if i else '')
+
+        if remainder:
+            time.sleep(remainder)
+
+        return action_result.set_status(phantom.APP_SUCCESS, "Slept for {} seconds".format(sleep_seconds))
 
     def initialize(self):
 
@@ -719,10 +938,12 @@ class PhantomConnector(BaseConnector):
                 return self.set_status(phantom.APP_ERROR, "Unable to do name to ip conversion on {0}".format(host))
 
         if unpacked.startswith('127.'):
-            return self.set_status(phantom.APP_ERROR, 'Accessing 127.0.0.1 is not allowed')
+            return self.set_status(phantom.APP_ERROR,
+                    'Accessing 127.0.0.1 is not allowed. Please specify the actual IP or hostname used by the Phantom instance in the Asset config')
 
         if '127.0.0.1' in host or 'localhost' in host:
-            return self.set_status(phantom.APP_ERROR, 'Accessing 127.0.0.1 is not allowed')
+            return self.set_status(phantom.APP_ERROR,
+                    'Accessing 127.0.0.1 is not allowed. Please specify the actual IP or hostname used by the Phantom instance in the Asset config')
 
         self._base_uri = 'https://{}'.format(config['phantom_server'])
         self._verify_cert = config.get('verify_certificate', False)
@@ -764,26 +985,76 @@ class PhantomConnector(BaseConnector):
             result = self._export_container(param)
         elif (action == 'import_container'):
             result = self._import_container(param)
+        elif (action == 'get_action'):
+            result = self._get_action(param)
+        elif (action == 'update_list'):
+            result = self._update_list(param)
+        elif (action == 'no_op'):
+            return self._no_op(param)
 
         return result
 
 
 if __name__ == '__main__':
 
-    import sys
-    # import simplejson as json
     import pudb
+    import argparse
 
     pudb.set_trace()
 
-    with open(sys.argv[1]) as f:
+    argparser = argparse.ArgumentParser()
+
+    argparser.add_argument('input_test_json', help='Input Test JSON file')
+    argparser.add_argument('-u', '--username', help='username', required=False)
+    argparser.add_argument('-p', '--password', help='password', required=False)
+
+    args = argparser.parse_args()
+    session_id = None
+
+    username = args.username
+    password = args.password
+
+    if (username is not None and password is None):
+
+        # User specified a username but not a password, so ask
+        import getpass
+        password = getpass.getpass("Password: ")
+
+    if (username and password):
+        try:
+            print ("Accessing the Login page")
+            r = requests.get("https://127.0.0.1/login", verify=False)
+            csrftoken = r.cookies['csrftoken']
+
+            data = dict()
+            data['username'] = username
+            data['password'] = password
+            data['csrfmiddlewaretoken'] = csrftoken
+
+            headers = dict()
+            headers['Cookie'] = 'csrftoken=' + csrftoken
+            headers['Referer'] = 'https://127.0.0.1/login'
+
+            print ("Logging into Platform to get the session id")
+            r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
+            session_id = r2.cookies['sessionid']
+        except Exception as e:
+            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            exit(1)
+
+    with open(args.input_test_json) as f:
         in_json = f.read()
         in_json = json.loads(in_json)
         print(json.dumps(in_json, indent=4))
 
         connector = PhantomConnector()
         connector.print_progress_message = True
+
+        if (session_id is not None):
+            in_json['user_session_token'] = session_id
+            connector._set_csrf_info(csrftoken, headers['Referer'])
+
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print json.dumps(json.loads(ret_val), indent=4)
+        print (json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)
