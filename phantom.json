@@ -1114,7 +1114,7 @@
             "action": "get action result",
             "description": "Find the results of a presviously run action",
             "verbose": "This action returns the most recent results of an action with the given <b>action_name</b> launched with the given <b>parameters</b> within the given <b>time_limit</b>.<br><br>The action will limit the number of results returned to the value in <b>max_results</b>. By default, the limit is 10.<br><br>The <b>parameters</b> parameter takes a JSON string in the format:<br><br><pre>{<br>    &quot;parameter_name1&quot;: &quot;parameter_value1&quot;<br>    &quot;parameter_name2&quot;: &quot;parameter_value2&quot;<br>    ...<br>}</pre><br>The <b>app</b> parameter takes an app name, and if it is included, the action will only search for action results from that app. Similarly, the <b>asset</b> parameter takes an asset name, and if it is included, the action will only search for action results from that asset.",
-            "type": "investigate",
+            "type": "generic",
             "identifier": "get_action",
             "read_only": true,
             "parameters": {
