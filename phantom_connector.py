@@ -901,7 +901,7 @@ class PhantomConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Error parsing the sleep seconds parameter. Reason: {0}".format(str(e)))
 
         if (sleep_seconds < 0):
-            return action_result.set_status(phantom.APP_ERROR, "Invalid sleep_seconds value. Please specify a value greater than 0")
+            return action_result.set_status(phantom.APP_ERROR, "Invalid sleep_seconds value. Please specify a value greater or equal to 0")
 
         remainder = sleep_seconds % 60
 
