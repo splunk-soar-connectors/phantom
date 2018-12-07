@@ -230,6 +230,51 @@ class PhantomConnector(BaseConnector):
         self.save_progress("Test connectivity passed")
         return self.set_status(phantom.APP_SUCCESS, 'Request succeeded')
 
+    def load_dirty_json(self,dirty_json):
+        import re
+        regex_replace = [(r"([ \{,:\[])(u)?'([^']+)'", r'\1"\3"'), (r" False([, \}\]])", r' false\1'),
+                         (r" True([, \}\]])", r' true\1')]
+        for r, s in regex_replace:
+            dirty_json = re.sub(r, s, dirty_json)
+        clean_json = json.loads(dirty_json)
+        with open('/tmp/cleanJson', 'wb')as f:
+            f.write(str(clean_json))
+        return clean_json
+
+    def _update_artifact(self, param):
+        import ast
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        artifact_id = param.get('artifact_id', '')
+
+        cef_json = param.get('cef_json', '')
+
+        endpoint = "/rest/artifact/"+artifact_id
+        # First get the artifacts json
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
+
+        if (phantom.is_fail(ret_val)):
+            self.save_progress("Unable to get artifact, please check the artifact id")
+            return self.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
+
+        # Get the CEF JSON and update the artifact
+        myData = resp_data['cef']
+        clean_json = self.load_dirty_json(str(cef_json))
+        myData.update(clean_json)
+        myData = self.load_dirty_json(str(myData))
+        myJson = {"cef": myData}
+        myCleanJson = self.load_dirty_json(str(myJson))
+
+
+
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=myCleanJson, method="post")
+
+        if (phantom.is_fail(ret_val)):
+            self.save_progress("Unable to modify artifact")
+            return self.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
+        return self.set_status(phantom.APP_SUCCESS, "Artifact Updated")
+
     def _find_artifacts(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -991,6 +1036,8 @@ class PhantomConnector(BaseConnector):
             result = self._update_list(param)
         elif (action == 'no_op'):
             return self._no_op(param)
+        elif (action == "update_artifact"):
+            return self._update_artifact(param)
 
         return result
 
