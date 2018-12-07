@@ -237,8 +237,7 @@ class PhantomConnector(BaseConnector):
         for r, s in regex_replace:
             dirty_json = re.sub(r, s, dirty_json)
         clean_json = json.loads(dirty_json)
-        with open('/tmp/cleanJson', 'wb')as f:
-            f.write(str(clean_json))
+
         return clean_json
 
     def _update_artifact(self, param):
