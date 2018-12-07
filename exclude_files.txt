@@ -1,3 +1,6 @@
+docker-compose.yml
 exclude_files.txt
-*.py
+Makefile
 .git*
+.gitlab-ci.yml
+*.py
