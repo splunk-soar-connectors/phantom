@@ -368,7 +368,12 @@ class PhantomConnector(BaseConnector):
         if (os.path.dirname(save_as)):
             save_as = '-'.join(save_as.split(os.sep))
 
-        save_path = os.path.join('/vault/tmp', save_as)
+        if hasattr(Vault, 'get_vault_tmp_dir'):
+            vault_tmp_dir = Vault.get_vault_tmp_dir()
+        else:
+            vault_tmp_dir = '/opt/phantom/vault/tmp'
+
+        save_path = os.path.join(vault_tmp_dir, save_as)
         with open(save_path, 'w') as uncompressed_file:
             uncompressed_file.write(data_stream)
 
@@ -737,7 +742,7 @@ class PhantomConnector(BaseConnector):
         container_id = param['container_id']
 
         destination = self._base_uri
-        source = 'https://127.0.0.1'
+        source = self.get_phantom_base_url()
 
         return self._create_container_copy(action_result, container_id, destination, source, source_local=True)
 
@@ -746,7 +751,7 @@ class PhantomConnector(BaseConnector):
 
         container_id = param['container_id']
 
-        destination = 'https://127.0.0.1'
+        destination = self.get_phantom_base_url()
         source = self._base_uri
 
         return self._create_container_copy(action_result, container_id, destination, source, destination_local=True)
@@ -924,6 +929,8 @@ class PhantomConnector(BaseConnector):
         config = self.get_config()
 
         host = config['phantom_server']
+        # Split hostname from port
+        host = host.split(':')[0]
 
         if (ph_utils.is_ip(host)):
             try:
@@ -1023,7 +1030,7 @@ if __name__ == '__main__':
     if (username and password):
         try:
             print ("Accessing the Login page")
-            r = requests.get("https://127.0.0.1/login", verify=False)
+            r = requests.get(self.get_phantom_base_url() + "login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -1033,10 +1040,10 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = 'https://127.0.0.1/login'
+            headers['Referer'] = self.get_phantom_base_url() + 'login'
 
             print ("Logging into Platform to get the session id")
-            r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
+            r2 = requests.post(self.get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print ("Unable to get session id from the platfrom. Error: " + str(e))
