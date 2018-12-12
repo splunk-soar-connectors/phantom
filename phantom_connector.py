@@ -605,7 +605,7 @@ class PhantomConnector(BaseConnector):
 
     def _add_artifact_list(self, action_result, artifacts, ignore_auth=False):
         """ Add a list of artifacts """
-        ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifacts, ignore_auth=ignore_auth)
+        ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifacts)
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, "Error adding artifact: {}".format(action_result.get_message()))
         failed = 0
@@ -627,7 +627,7 @@ class PhantomConnector(BaseConnector):
         self._base_uri = source
         url = '/rest/container/{}'.format(container_id)
 
-        ret_val, response, resp_data = self._make_rest_call(url, action_result, ignore_auth=source_local)
+        ret_val, response, resp_data = self._make_rest_call(url, action_result)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -647,7 +647,7 @@ class PhantomConnector(BaseConnector):
         # container['ingest_app_id'] = container.pop('ingest_app', None)
 
         self._base_uri = destination
-        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container, ignore_auth=destination_local)
+        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container)
         if phantom.is_fail(ret_val):
             act_message = action_result.get_message()
             if ('ingesting asset_id' in act_message):
@@ -665,7 +665,7 @@ class PhantomConnector(BaseConnector):
         url = '/rest/container/{}/artifacts'.format(container_id)
         params = {'sort': 'id', 'order': 'asc', 'page_size': 0}
         self._base_uri = source
-        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params, ignore_auth=source_local)
+        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params)
 
         artifacts = resp_data['data']
         if artifacts:
@@ -684,7 +684,7 @@ class PhantomConnector(BaseConnector):
             artifacts[-1]['run_automation'] = True
 
             self._base_uri = destination
-            ret_val = self._add_artifact_list(action_result, artifacts, ignore_auth=destination_local)
+            ret_val = self._add_artifact_list(action_result, artifacts)
             if phantom.is_fail(ret_val):
                 return ret_val
 
