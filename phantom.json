@@ -648,7 +648,7 @@
         {
             "action": "deflate item",
             "description": "Deflates an item from the vault",
-            "verbose": "Detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to it's vault, else to the current (the container whose context the action is executed) container. The app supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b> and <b>tgz</b> file types.",
+            "verbose": "Detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to its vault, else to the current (the container whose context the action is executed) container. The app supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types.",
             "type": "generic",
             "identifier": "deflate_item",
             "read_only": false,
