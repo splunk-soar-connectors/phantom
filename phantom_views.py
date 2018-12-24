@@ -136,11 +136,11 @@ def find_listitem(provides, all_results, context):
 
                 row.append({ 'value': param.get('list') })
                 row.append({ 'value': json.dumps(item) })
-                l = len(locations) > idx and locations[idx] or 'Missing Data'
-                if type(l) == str:
-                    row.append({ 'value': l})
+                len_of_list = len(locations) > idx and locations[idx] or 'Missing Data'
+                if type(len_of_list) == str:
+                    row.append({ 'value': len_of_list})
                 else:
-                    row.append({ 'value': 'Row {}, Column {}'.format(l[0], l[1])})
+                    row.append({ 'value': 'Row {}, Column {}'.format(len_of_list[0], len_of_list[1])})
                 rows.append(row)
 
     content = {

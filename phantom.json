@@ -103,7 +103,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.values",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.found in",
@@ -200,7 +203,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.new_row",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.failed",
@@ -295,7 +301,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.values",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "contains": [
+                        "*"
+                    ]
                 },
                 {
                     "data_path": "action_result.data",
@@ -658,6 +667,7 @@
                     "data_type": "string",
                     "order": 0,
                     "contains": [
+                        "sha1",
                         "vault id"
                     ],
                     "required": true,
