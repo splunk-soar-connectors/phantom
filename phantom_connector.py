@@ -158,7 +158,7 @@ class PhantomConnector(BaseConnector):
             return RetVal3(phantom.APP_SUCCESS, response, action_result)
 
         # everything else is actually an error at this point
-        message = "Can't process resonse from server. Status Code: {0} Data from server: {1}".format(
+        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
                 response.status_code, response.text.replace('{', ' ').replace('}', ' '))
 
         return RetVal3(action_result.set_status(phantom.APP_ERROR, message), response, None)
@@ -206,6 +206,7 @@ class PhantomConnector(BaseConnector):
                     verify=self._verify_cert,
                     params=params,
                     timeout=TIMEOUT)
+
         except Timeout as e:
             return RetVal3(action_result.set_status(phantom.APP_ERROR, "Request timed out", e), None, None)
         except SSLError as e:
@@ -346,6 +347,9 @@ class PhantomConnector(BaseConnector):
                     pass
 
         success, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifact)
+
+        if not resp_data:
+            return action_result.get_status()
 
         if (phantom.is_fail(success)):
             artifact_id = resp_data.get('existing_artifact_id')
