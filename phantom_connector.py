@@ -1,7 +1,5 @@
-# --
 # File: phantom_connector.py
-#
-# Copyright (c) 2016-2018 Splunk Inc.
+# Copyright (c) 2016-2019 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -158,7 +156,7 @@ class PhantomConnector(BaseConnector):
             return RetVal3(phantom.APP_SUCCESS, response, action_result)
 
         # everything else is actually an error at this point
-        message = "Can't process resonse from server. Status Code: {0} Data from server: {1}".format(
+        message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
                 response.status_code, response.text.replace('{', ' ').replace('}', ' '))
 
         return RetVal3(action_result.set_status(phantom.APP_ERROR, message), response, None)
@@ -206,6 +204,7 @@ class PhantomConnector(BaseConnector):
                     verify=self._verify_cert,
                     params=params,
                     timeout=TIMEOUT)
+
         except Timeout as e:
             return RetVal3(action_result.set_status(phantom.APP_ERROR, "Request timed out", e), None, None)
         except SSLError as e:
@@ -347,6 +346,9 @@ class PhantomConnector(BaseConnector):
 
         success, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifact)
 
+        if not resp_data:
+            return action_result.get_status()
+
         if (phantom.is_fail(success)):
             artifact_id = resp_data.get('existing_artifact_id')
             if not artifact_id:
@@ -368,7 +370,12 @@ class PhantomConnector(BaseConnector):
         if (os.path.dirname(save_as)):
             save_as = '-'.join(save_as.split(os.sep))
 
-        save_path = os.path.join('/vault/tmp', save_as)
+        if hasattr(Vault, 'get_vault_tmp_dir'):
+            vault_tmp_dir = Vault.get_vault_tmp_dir()
+        else:
+            vault_tmp_dir = '/opt/phantom/vault/tmp'
+
+        save_path = os.path.join(vault_tmp_dir, save_as)
         with open(save_path, 'w') as uncompressed_file:
             uncompressed_file.write(data_stream)
 
@@ -600,7 +607,7 @@ class PhantomConnector(BaseConnector):
 
     def _add_artifact_list(self, action_result, artifacts, ignore_auth=False):
         """ Add a list of artifacts """
-        ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifacts, ignore_auth=ignore_auth)
+        ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifacts)
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, "Error adding artifact: {}".format(action_result.get_message()))
         failed = 0
@@ -622,7 +629,7 @@ class PhantomConnector(BaseConnector):
         self._base_uri = source
         url = '/rest/container/{}'.format(container_id)
 
-        ret_val, response, resp_data = self._make_rest_call(url, action_result, ignore_auth=source_local)
+        ret_val, response, resp_data = self._make_rest_call(url, action_result)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -642,7 +649,7 @@ class PhantomConnector(BaseConnector):
         # container['ingest_app_id'] = container.pop('ingest_app', None)
 
         self._base_uri = destination
-        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container, ignore_auth=destination_local)
+        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container)
         if phantom.is_fail(ret_val):
             act_message = action_result.get_message()
             if ('ingesting asset_id' in act_message):
@@ -660,7 +667,7 @@ class PhantomConnector(BaseConnector):
         url = '/rest/container/{}/artifacts'.format(container_id)
         params = {'sort': 'id', 'order': 'asc', 'page_size': 0}
         self._base_uri = source
-        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params, ignore_auth=source_local)
+        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params)
 
         artifacts = resp_data['data']
         if artifacts:
@@ -679,7 +686,7 @@ class PhantomConnector(BaseConnector):
             artifacts[-1]['run_automation'] = True
 
             self._base_uri = destination
-            ret_val = self._add_artifact_list(action_result, artifacts, ignore_auth=destination_local)
+            ret_val = self._add_artifact_list(action_result, artifacts)
             if phantom.is_fail(ret_val):
                 return ret_val
 
@@ -737,7 +744,7 @@ class PhantomConnector(BaseConnector):
         container_id = param['container_id']
 
         destination = self._base_uri
-        source = 'https://127.0.0.1'
+        source = self.get_phantom_base_url()
 
         return self._create_container_copy(action_result, container_id, destination, source, source_local=True)
 
@@ -746,7 +753,7 @@ class PhantomConnector(BaseConnector):
 
         container_id = param['container_id']
 
-        destination = 'https://127.0.0.1'
+        destination = self.get_phantom_base_url()
         source = self._base_uri
 
         return self._create_container_copy(action_result, container_id, destination, source, destination_local=True)
@@ -901,7 +908,7 @@ class PhantomConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Error parsing the sleep seconds parameter. Reason: {0}".format(str(e)))
 
         if (sleep_seconds < 0):
-            return action_result.set_status(phantom.APP_ERROR, "Invalid sleep_seconds value. Please specify a value greater than 0")
+            return action_result.set_status(phantom.APP_ERROR, "Invalid sleep_seconds value. Please specify a value greater or equal to 0")
 
         remainder = sleep_seconds % 60
 
@@ -924,6 +931,8 @@ class PhantomConnector(BaseConnector):
         config = self.get_config()
 
         host = config['phantom_server']
+        # Split hostname from port
+        host = host.split(':')[0]
 
         if (ph_utils.is_ip(host)):
             try:
@@ -1023,7 +1032,7 @@ if __name__ == '__main__':
     if (username and password):
         try:
             print ("Accessing the Login page")
-            r = requests.get("https://127.0.0.1/login", verify=False)
+            r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -1033,10 +1042,10 @@ if __name__ == '__main__':
 
             headers = dict()
             headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = 'https://127.0.0.1/login'
+            headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
 
             print ("Logging into Platform to get the session id")
-            r2 = requests.post("https://127.0.0.1/login", verify=False, data=data, headers=headers)
+            r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print ("Unable to get session id from the platfrom. Error: " + str(e))
