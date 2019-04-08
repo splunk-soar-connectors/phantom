@@ -60,6 +60,35 @@
             "versions": "EQ(*)"
         },
         {
+          "action": "update artifact",
+          "description": "Update an artifact",
+          "verbose": "",
+          "type": "generic",
+          "identifier": "update_artifact",
+          "read_only": false,
+          "parameters":{
+            "artifact_id": {
+              "description": "The artifact id",
+              "data_type": "string",
+              "order": 0,
+              "required": true,
+              "contains": [],
+              "primary": true
+            },
+            "cef_json": {
+              "description": "JSON of the CEF Fields you want in the artifact",
+              "data_type": "string",
+              "order": 1,
+              "required": true,
+              "contains": [],
+              "primary": false
+            }
+          },
+          "render": {},
+          "output": [],
+          "versions": "EQ(*)"
+        },
+        {
             "action": "find artifacts",
             "description": "Find artifacts containing a CEF value",
             "verbose": "",
