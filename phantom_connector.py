@@ -408,6 +408,9 @@ class PhantomConnector(BaseConnector):
 
     def _add_file_to_vault(self, action_result, data_stream, file_name, recursive, container_id):
 
+        # Adding files to the vault can fail with invalid unicode
+        file_name = file_name.decode('utf-8', 'replace')
+
         save_as = file_name or '_invalid_file_name_'
 
         # if the path contains a directory
@@ -428,7 +431,7 @@ class PhantomConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault", e)
 
-        if (vault_info.get('failed', False)):
+        if not vault_info.get('succeeded', False):
             return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault, {0}".format(vault_info.get('message', 'NA')))
 
         try:
@@ -479,7 +482,7 @@ class PhantomConnector(BaseConnector):
                     ret_val = self._add_file_to_vault(action_result, vault_file.read(compressed_file), save_as, recursive, container_id)
 
                     if phantom.is_fail(ret_val):
-                        return action_result.set_status(phantom.APP_ERROR, "Error decompressing zip file.")
+                        return ret_val
 
             return (phantom.APP_SUCCESS)
 
