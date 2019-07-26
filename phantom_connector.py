@@ -161,7 +161,7 @@ class PhantomConnector(BaseConnector):
 
         return RetVal3(action_result.set_status(phantom.APP_ERROR, message), response, None)
 
-    def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="get", ignore_auth=False):
+    def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="get", ignore_auth=False, ignore_basic_auth=False):
 
         config = self.get_config()
 
@@ -195,7 +195,10 @@ class PhantomConnector(BaseConnector):
             auth = None
             if ('ph-auth-token' in headers):
                 del headers['ph-auth-token']
-
+        
+        if ignore_basic_auth:
+            auth = None
+        
         try:
             response = request_func(self._base_uri + endpoint,
                     auth=auth,
@@ -204,13 +207,14 @@ class PhantomConnector(BaseConnector):
                     verify=self._verify_cert,
                     params=params,
                     timeout=TIMEOUT)
-
         except Timeout as e:
             return RetVal3(action_result.set_status(phantom.APP_ERROR, "Request timed out", e), None, None)
         except SSLError as e:
             return (action_result.set_status(phantom.APP_ERROR, "HTTPS SSL validation failed", e), None, None)
         except Exception as e:
             return (action_result.set_status(phantom.APP_ERROR, "Error connecting to server", e), None, None)
+
+        self.debug_print('gagagag', str(response))
 
         return self._process_response(response, action_result)
 
@@ -239,39 +243,292 @@ class PhantomConnector(BaseConnector):
 
         return clean_json
 
-    def _update_artifact(self, param):
-        import ast
+    # def _update_artifact(self, param):
+    #     import ast
+
+    #     action_result = self.add_action_result(ActionResult(dict(param)))
+
+    #     artifact_id = param.get('artifact_id', '')
+
+    #     cef_json = param.get('cef_json', '')
+
+    #     endpoint = "/rest/artifact/"+artifact_id
+    #     # First get the artifacts json
+    #     ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
+
+    #     if (phantom.is_fail(ret_val)):
+    #         self.save_progress("Unable to get artifact, please check the artifact id")
+    #         return self.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
+
+    #     # Get the CEF JSON and update the artifact
+    #     myData = resp_data['cef']
+    #     clean_json = self.load_dirty_json(str(cef_json))
+    #     myData.update(clean_json)
+    #     myData = self.load_dirty_json(str(myData))
+    #     myJson = {"cef": myData}
+    #     myCleanJson = self.load_dirty_json(str(myJson))
+
+
+
+    #     ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=myCleanJson, method="post")
+
+    #     if (phantom.is_fail(ret_val)):
+    #         self.save_progress("Unable to modify artifact")
+    #         return self.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
+    #     return self.set_status(phantom.APP_SUCCESS, "Artifact Updated")
+
+    def _get_ioc(self, action_result, ioc_value, ioc_id):
+        if ioc_id:
+            endpoint = '/rest/indicator/{0}'.format(ioc_id)
+        else:
+            params = {
+                'indicator_value': ioc_value
+            }
+            endpoint = '/rest/indicator_by_value'
+
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, params=params, method='get', ignore_basic_auth=True)
+        
+        if phantom.is_fail(ret_val):
+            raise Exception('Unable to retrieve IOC information - ' + str(response) + ' ' + str(resp_data) + ' ' + endpoint + ' ' + str(params))
+
+        return resp_data
+    
+    def _get_artifact_data_with_ioc(self, action_result, page_size, order, ioc_id):
+        params = {
+            'indicator_id': ioc_id,
+            'order': order,
+            'page': 0,
+            'page_size': page_size
+        }
+        endpoint = '/rest/indicator_artifact'
+
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, params=params, method='get')
+
+        if phantom.is_fail(ret_val):
+            raise Exception('Unable to retrieve artifact data associated with IOC - ' + str(response))
+
+        return resp_data
+    
+    def _handle_get_ioc(self, param):
+        ioc_value = param.get('ioc_value')
+        ioc_id = param.get('ioc_id')
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        artifact_id = param.get('artifact_id', '')
+        if not(ioc_value or ioc_id):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Either and ioc_value or ioc_id must be provided'
+            )
 
-        cef_json = param.get('cef_json', '')
+        try:
+            resp_data = self._get_ioc(action_result, ioc_value, ioc_id)
+        except Exception as err:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                err.message
+            )
 
-        endpoint = "/rest/artifact/"+artifact_id
-        # First get the artifacts json
-        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
+        if 'id' not in resp_data:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Unable to find indicator'
+            )
 
-        if (phantom.is_fail(ret_val)):
-            self.save_progress("Unable to get artifact, please check the artifact id")
-            return self.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
+        if param.get('include_artifact_data'):
+            try:
+                artifact_resp_data = self._get_artifact_data_with_ioc(action_result, param.get('artifact_limit', 10), param.get('artifact_sort', 'desc'), resp_data['id'])
+            except Exception as err:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    err.message
+                )
+            if 'data' not in artifact_resp_data:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    'Unable to get artifact data related to indicator'
+                )
 
-        # Get the CEF JSON and update the artifact
-        myData = resp_data['cef']
-        clean_json = self.load_dirty_json(str(cef_json))
-        myData.update(clean_json)
-        myData = self.load_dirty_json(str(myData))
-        myJson = {"cef": myData}
-        myCleanJson = self.load_dirty_json(str(myJson))
+            resp_data['artifacts'] = artifact_resp_data['data']
 
+        summary = {
+            'ioc_id': resp_data['id'],
+            'ioc_value': resp_data['value'],
+            'tags': resp_data['tags']
+        }
 
+        resp_data['tags'] = [{'tag': tag} for tag in resp_data['tags']]
 
-        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=myCleanJson, method="post")
+        action_result.update_summary(summary)
 
-        if (phantom.is_fail(ret_val)):
-            self.save_progress("Unable to modify artifact")
-            return self.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
-        return self.set_status(phantom.APP_SUCCESS, "Artifact Updated")
+        action_result.add_data(resp_data)
+
+        return action_result.set_status(
+                phantom.APP_SUCCESS,
+                'Successfully retrieved indicator (' + resp_data['value'] + ')'
+            )
+    
+    def _modify_ioc_tag(self, param):
+        ioc_value = param.get('ioc_value')
+        ioc_id = param.get('ioc_id')
+
+        tags_to_add = param.get('tags_to_add','').split(',')
+        tags_to_remove = param.get('tags_to_remove', '').split(',')
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if not(ioc_value or ioc_id):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Either an ioc_value or ioc_id must be provided'
+            )
+        
+        if not(tags_to_add or tags_to_remove):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Either tags_to_add or tags_to_remove must be provided'
+            )
+        try:
+            resp_data = self._get_ioc(action_result, ioc_value, ioc_id)
+        except Exception as err:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                err.message
+            )
+
+        if 'id' not in resp_data:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Unable to find indicator'
+            )
+
+        endpoint = '/rest/indicator/{0}'.format(resp_data['id'])
+
+        tags = [tag for tag in list(set(tags_to_add + resp_data['tags'])) if tag not in tags_to_remove]
+
+        payload = {
+            'tags': tags
+        }
+
+        ret_val, response, tag_resp_data = self._make_rest_call(endpoint, action_result, data=payload, method='post')
+
+        if phantom.is_fail(ret_val) or not(tag_resp_data.get('success')):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Unable to add tag: ' + str(response)
+            )
+        
+        summary = {
+            'ioc_id': resp_data['id'],
+            'ioc_value': resp_data['value'],
+            'tags': tags
+        }
+
+        action_result.update_summary(summary)
+
+        return action_result.set_status(
+                phantom.APP_SUCCESS,
+                'Successfully updated tags (' + str(tags) + ') to indicator (' + resp_data['value'] + ')'
+            )
+
+    def _get_pin(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        container_id = param['container_id']
+        query = param.get('query', '')
+
+        endpoint = (
+            '/rest/container_pin?_filter_container_id=' 
+            + str(container_id)
+            + ('&' + query if query else '')
+        )
+
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, method='get')
+
+        if phantom.is_fail(ret_val) or 'data' not in resp_data:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Unable to retreive pins - ' + str(response)
+            )
+
+        for data in resp_data['data']:
+            action_result.add_data({
+                'pin_type': data['pin_type'],
+                'container_id': data['container'],
+                'author': data['author'],
+                'modified_time': data['modified_time'],
+                'create_time': data['create_time'],
+                'playbook': data['playbook'],
+                'message': data['message'],
+                'data': data['data'],
+                'id': data['id'],
+                'pin_style': data['pin_style']
+            })
+
+        action_result.update_summary({
+            'pins_found': resp_data['count']
+        })
+            
+        return action_result.set_status(
+            phantom.APP_SUCCESS,
+            'Successfully retrieved pins'
+        )
+
+    def _field_updater(self, data, update_data, overwrite):
+        if type(update_data) == list:
+            if not(overwrite):
+                return(list(set((data or []) + update_data)))
+            else:
+                return(update_data)
+        elif type(update_data) == dict:
+            for keya in update_data.keys():
+                data[keya] = self._field_updater(data.get(keya, {}), update_data[keya], overwrite)
+        else:
+            if (overwrite and data) or not(data):
+                return update_data
+        
+        return data
+
+    def _update_artifact(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        artifact_id = param['artifact_id']
+        data = param['data']
+        overwrite = param.get('overwrite')
+
+        try:
+            data = json.loads(data)
+        except Exception as err:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Unable to parse "data" field - ' + err.message
+            )
+
+        ret_val, response, artifact_data = self._make_rest_call('/rest/artifact/{}'.format(artifact_id), action_result, method='get')
+        
+        if phantom.is_fail(ret_val) or not(artifact_data):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Artifact not found with id {} - {}'.format(artifact_id, str(response))
+            )
+        
+        update_data = {}
+
+        for key in data.keys():
+            update_data[key] = self._field_updater(artifact_data.get(key, {}), data[key], overwrite)
+
+        ret_val, response, post_data = self._make_rest_call('/rest/artifact/{}'.format(artifact_id), action_result, data=update_data, method='post')
+        if phantom.is_fail(ret_val) or not(post_data.get('success')):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Unable to save artifact data - ' + str(response)
+            )
+
+        return action_result.set_status(
+                phantom.APP_SUCCESS,
+                'Successfully updated artifact (ID: {})'.format(artifact_id)
+            )
 
     def _find_artifacts(self, param):
 
@@ -1022,7 +1279,7 @@ class PhantomConnector(BaseConnector):
 
         result = None
         action = self.get_action_identifier()
-
+        self.debug_print('action_name',action)
         if (action == 'find_artifacts'):
             result = self._find_artifacts(param)
         elif (action == 'add_artifact'):
@@ -1049,6 +1306,12 @@ class PhantomConnector(BaseConnector):
             return self._no_op(param)
         elif (action == "update_artifact"):
             return self._update_artifact(param)
+        elif (action == "get_pin"):
+            return self._get_pin(param)
+        elif (action == "get_indicator"):
+            self._handle_get_ioc(param)
+        elif (action == "modify_indicator_tag"):
+            self._modify_ioc_tag(param)
 
         return result
 

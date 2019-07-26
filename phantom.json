@@ -60,32 +60,457 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "get indicator",
+            "description": "Adds tag to indicator",
+            "type": "generic",
+            "identifier": "get_indicator",
+            "read_only": false,
+            "parameters": {
+                "ioc_value": {
+                    "description": "ioc value",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": false
+                },
+                "ioc_id": {
+                    "description": "ioc id",
+                    "data_type": "numeric",
+                    "order": 1,
+                    "required": false
+                },
+                "include_artifact_data": {
+                    "description": "include artifact data",
+                    "data_type": "boolean",
+                    "order": 2
+                },
+                "artifact_limit": {
+                    "description": "artifact limit",
+                    "data_type": "numeric",
+                    "order": 3
+                },
+                "artifact_sort": {
+                    "description": "artifact sort",
+                    "data_type": "string",
+                    "order": 4,
+                    "value_list": [
+                        "desc",
+                        "asc"
+                    ]
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status"
+                },
+                {
+                    "data_path": "action_result.parameter.artifact_limit",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.artifact_sort",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.include_artifact_data",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.ioc_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.ioc_value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.cef",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.cef_types",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.container",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.container_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.create_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.description",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.end_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.has_note",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.hash",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.in_case",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.ingest_app",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.kill_chain",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.label",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.owner",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.parent_artifact",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.parent_container",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.playbook_run",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.severity",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.source_data_identifier",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.start_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.update_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.artifacts.*.version",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.earliest_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.latest_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.open_events",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_counts.*.count",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.severity_counts.*.name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tags.*.tag",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.tenant",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.total_events",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.ioc_id",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.ioc_value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.tags",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "modify indicator tag",
+            "description": "modifies indicator tags",
+            "type": "generic",
+            "identifier": "modify_indicator_tag",
+            "read_only": false,
+            "parameters": {
+                "ioc_value": {
+                    "description": "ioc value",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": false
+                },
+                "ioc_id": {
+                    "description": "ioc id",
+                    "data_type": "numeric",
+                    "order": 1,
+                    "required": false
+                },
+                "tags_to_add": {
+                    "description": "tags to add (comma separated)",
+                    "data_type": "string",
+                    "order": 2,
+                    "required": false
+                },
+                "tags_to_remove": {
+                    "description": "tags to remove (comma separated)",
+                    "data_type": "string",
+                    "order": 3,
+                    "required": false
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status"
+                },
+                {
+                    "data_path": "action_result.parameter.ioc_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.ioc_value",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tags_to_add",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.tags_to_remove",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
             "action": "update artifact",
-            "description": "Update an artifact",
-            "verbose": "",
+            "description": "Update artifact fields",
+            "verbose": "Updates data fields based on json data provided. Example: The following (assuming \"overwrite is set to true\" will change the artifact label to \"new_label\" will add a new CEF field called \"new_field\" and will replace what is currently in requestURL with \"http://www.google.com\" {\"label\": \"new_label\", \"cef\": {\"new_field\": \"new_field_value\", \"requestUrl\": \"http://www.google.com\"}}.",
             "type": "generic",
             "identifier": "update_artifact",
             "read_only": false,
             "parameters": {
                 "artifact_id": {
-                    "description": "The artifact id",
-                    "data_type": "string",
-                    "order": 0,
+                    "description": "artifact_id",
+                    "data_type": "numeric",
                     "required": true,
-                    "contains": [],
                     "primary": true
                 },
-                "cef_json": {
-                    "description": "JSON of the CEF Fields you want in the artifact",
+                "data": {
+                    "description": "update data (json formatted)",
                     "data_type": "string",
-                    "order": 1,
-                    "required": true,
-                    "contains": [],
-                    "primary": false
+                    "required": true
+                },
+                "overwrite": {
+                    "description": "overwrite existing",
+                    "data_type": "boolean",
+                    "required": false
                 }
             },
-            "render": {},
-            "output": [],
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "column_name": "Status"
+                },
+                {
+                    "data_path": "action_result.parameter.artifact_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.overwrite",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "column_name": "Message"
+                }
+            ],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "get pin",
+            "description": "Gets pins from HUD",
+            "verbose": "User django style filtering to look for specific pin qualities. See Phantom REST API documentation for details.",
+            "type": "generic",
+            "identifier": "get_pin",
+            "read_only": true,
+            "parameters": {
+                "container_id": {
+                    "description": "ID of container",
+                    "data_type": "numeric",
+                    "order": 0,
+                    "required": true,
+                    "contains": [
+                        "phantom container id"
+                    ],
+                    "primary": true
+                },
+                "query": {
+                    "description": "Query to get specific pins",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": false
+                }
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.parameter.query",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.container_id",
+                    "data_type": "numeric",
+                    "contains": [
+                        "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.create_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.id",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.data.*.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.modified_time",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.pin_style",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.pin_type",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.data.*.playbook",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "summary.pins_found",
+                    "data_type": "numeric"
+                }
+            ],
             "versions": "EQ(*)"
         },
         {
