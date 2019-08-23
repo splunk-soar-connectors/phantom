@@ -408,8 +408,10 @@ class PhantomConnector(BaseConnector):
 
     def _add_file_to_vault(self, action_result, data_stream, file_name, recursive, container_id):
 
-        # Adding files to the vault can fail with invalid unicode
-        file_name = file_name.decode('utf-8', 'replace')
+        try:
+            file_name = file_name.decode('utf-8', 'replace')
+        except UnicodeEncodeError:
+            file_name = unicodedata.normalize('NFKD', file_name).encode('utf-8', 'ignore')
 
         save_as = file_name or '_invalid_file_name_'
 
