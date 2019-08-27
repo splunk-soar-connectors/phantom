@@ -32,6 +32,7 @@ import gzip
 import bz2
 import datetime
 import time
+import urllib
 
 TIMEOUT = 120
 INVALID_RESPONSE = 'Server did not return a valid JSON response.'
@@ -288,6 +289,8 @@ class PhantomConnector(BaseConnector):
 
         if exact_match:
             values = '"{}"'.format(values)
+
+        values = urllib.quote(values, safe=':/')
 
         endpoint = '/rest/artifact?_filter_cef__{}={}&page_size=0&pretty'.format(flt, repr(values))
 
