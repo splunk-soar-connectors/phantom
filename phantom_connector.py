@@ -20,6 +20,7 @@ from phantom.vault import Vault
 import ast
 import json
 import requests
+import unicodedata
 from requests.exceptions import Timeout, SSLError
 
 import socket
