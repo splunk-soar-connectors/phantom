@@ -118,7 +118,7 @@
                     "contains": [
                         "phantom container id"
                     ],
-                    "primary": false
+                    "primary": true
                 },
                 "phase_id": {
                     "description": "Phase the note will be associated with",
