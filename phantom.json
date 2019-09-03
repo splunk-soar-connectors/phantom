@@ -101,15 +101,13 @@
                     "data_type": "string",
                     "order": 0,
                     "required": true,
-                    "contains": [],
-                    "primary": true
+                    "primary": false
                 },
                 "content": {
                     "description": "Note content",
                     "data_type": "string",
                     "order": 1,
                     "required": false,
-                    "contains": [],
                     "primary": false
                 },
                 "container_id": {
@@ -127,7 +125,6 @@
                     "data_type": "string",
                     "order": 3,
                     "required": false,
-                    "contains": [],
                     "primary": false
                 }
             },
@@ -148,7 +145,6 @@
                     "data_type": "string",
                     "order": 0,
                     "required": true,
-                    "contains": [],
                     "primary": true
                 },
                 "add_tags": {
@@ -156,7 +152,6 @@
                     "data_type": "string",
                     "order": 1,
                     "required": false,
-                    "contains": [],
                     "primary": false,
                     "allow_list": true
                 },
@@ -165,7 +160,6 @@
                     "data_type": "string",
                     "order": 2,
                     "required": false,
-                    "contains": [],
                     "primary": false,
                     "allow_list": true
                 }
