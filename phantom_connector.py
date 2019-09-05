@@ -284,7 +284,7 @@ class PhantomConnector(BaseConnector):
 
         # //// Start workaround for PPS-18970 ////
         ''' Use this once PPS-18970 is fixed
-        if overwrite is False:   
+        if overwrite is False:
             # Get the existing artifact to append provided parameters to existing values
             ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
 

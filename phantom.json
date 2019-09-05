@@ -11,7 +11,7 @@
     "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.0.1068",
+    "min_phantom_version": "4.2.7532",
     "license": "Copyright (c) 2016-2019 Splunk Inc.",
     "logo": "logo_phantom.svg",
     "logo_dark": "logo_phantom_dark.svg",
@@ -132,7 +132,12 @@
                     "primary": false
                 }
             },
-            "render": {},
+            "render": {
+                "type": "table",
+                "width": 10,
+                "height": 5,
+                "title": "Update Artifact"
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -146,7 +151,9 @@
                     "data_type": "string",
                     "example_values": [
                         "2388"
-                    ]
+                    ],
+                    "column_name": "Artifact ID",
+                    "column_order": 0
                 },
                 {
                     "data_path": "action_result.parameter.artifact_json",
@@ -288,7 +295,9 @@
                     "example_values": [
                         true,
                         false
-                    ]
+                    ],
+                    "column_name": "Success",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.summary",
