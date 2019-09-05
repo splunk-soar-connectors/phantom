@@ -281,7 +281,10 @@ class PhantomConnector(BaseConnector):
             output_artifact['severity'] = severity
 
         existing_artifact = {}  # If overwriting, this will be used.
-        if overwrite is False:
+
+        # //// Start workaround for PPS-18970 ////
+        ''' Use this once PPS-18970 is fixed
+        if overwrite is False:   
             # Get the existing artifact to append provided parameters to existing values
             ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
 
@@ -290,6 +293,19 @@ class PhantomConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
 
             existing_artifact = resp_data
+        '''
+
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
+
+        if phantom.is_fail(ret_val):
+            self.save_progress('Unable to find artifact, please check the artifact id.')
+            return action_result.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
+
+        if overwrite is False:
+            existing_artifact = resp_data
+        if 'label' not in output_artifact:
+            output_artifact['label'] = resp_data.get('label')
+        # //// End workaround for PPS-18970 ////
 
         if cef_json:
             # If overwrite is False, need to update existing CEF verses replacing whole thing

@@ -133,7 +133,189 @@
                 }
             },
             "render": {},
-            "output": [],
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "2388"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.artifact_json",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"severity\": \"high\", \"label\": \"test label\", \"description\": \"Artifact added by Me\", \"source_data_identifier\": \"my_custom_sdi\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.cef_json",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"new_field\": \"new_value\", \"deleted_field\": \"\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.cef_types_json",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"new_field\": [\"new contains\"]}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "test label"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "New Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.overwrite",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "[\"tag2\"]"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.cef.deleted_field",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.cef.new_field",
+                    "data_type": "string",
+                    "example_values": [
+                        "new_value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.cef.test",
+                    "data_type": "string",
+                    "example_values": [
+                        "fff"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.cef_types.new_field",
+                    "data_type": "string",
+                    "example_values": [
+                        "new contains"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Artifact added by Me"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "test label"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "New Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.source_data_identifier",
+                    "data_type": "string",
+                    "example_values": [
+                        "my_custom_sdi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "tag2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2388
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.success",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Artifact updated successfully."
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
             "versions": "EQ(*)"
         },
         {
