@@ -275,10 +275,75 @@ class PhantomConnector(BaseConnector):
             return self.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
         return self.set_status(phantom.APP_SUCCESS, "Artifact Updated")
 
+    def _tag_artifact(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        artifact_id = param.get('artifact_id', '')
+        add_tags = param.get('add_tags', '')
+        remove_tags = param.get('remove_tags', '')
+
+        # These come in as str, so split, then convert to set
+        add_tags = set(add_tags.split(','))
+        remove_tags = set(remove_tags.split(','))
+
+        endpoint = "/rest/artifact/" + artifact_id
+        # First get the artifacts json
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
+
+        if (phantom.is_fail(ret_val)):
+            self.save_progress("Unable to get artifact, please check the artifact id")
+            return self.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
+
+        # Label has to be included or it gets clobbered in POST
+        fields = ['tags', 'label']
+        art_data = {f: response.json().get(f) for f in fields}
+
+        # Set union first to add, then difference to remove, then cast back to list to update
+        _tags = (set(art_data['tags']) | add_tags) - remove_tags
+        art_data['tags'] = list(_tags)
+
+        # Post our changes
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=art_data, method="post")
+
+        if (phantom.is_fail(ret_val)):
+            self.save_progress("Unable to modify artifact")
+            return self.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
+        return self.set_status(phantom.APP_SUCCESS, "Artifact Updated")
+
+    def _add_note(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        endpoint = '/rest/container_note'
+
+        note_data = {
+            'container_id': param.get('container_id', self.get_container_id()),
+            'title': param.get('title', ''),
+            'content': param.get('content', ''),
+            'phase_id': param.get('phase_id', None)
+        }
+
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=note_data, method="post")
+
+        if phantom.is_fail(ret_val):
+            self.save_progress('Unable to create note')
+            return self.set_status(phantom.APP_ERROR, "Failed to create note: {}".format(action_result.get_message()))
+        return self.set_status(phantom.APP_SUCCESS, "Note created")
+
     def _find_artifacts(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
-
+        limit_search = param.get("limit_search", False)
+        container_ids = param.get("container_ids", "current")
+        if limit_search:
+            container_ids = list(set([a for a in
+                [int(z) if isinstance(z, int) or z.isdigit() else None for z in 
+                    [self.get_container_id() if y == "current" else y for y in 
+                        [x.strip() for x in container_ids.replace(",", " ").split()]
+                    ]
+                ]
+                if a
+            ]))
+        action_result.update_param({"container_ids": str(sorted(container_ids)).strip("[]")})
         values = param.get('values', '')
 
         if param.get('is_regex'):
@@ -300,7 +365,10 @@ class PhantomConnector(BaseConnector):
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, 'Error retrieving records: {0}'.format(action_result.get_message()))
 
-        records = resp_data['data']
+        if limit_search:
+            records = [x for x in resp_data['data'] if int(x['container']) in container_ids]
+        else:
+            records = resp_data['data']
 
         values = values.lower()
 
@@ -348,6 +416,7 @@ class PhantomConnector(BaseConnector):
         cef_name = param.get('cef_name')
         cef_value = param.get('cef_value')
         cef_dict = param.get('cef_dictionary')
+        run_automation = param.get('run_automation', "true")
 
         loaded_cef = {}
         loaded_contains = {}
@@ -376,6 +445,7 @@ class PhantomConnector(BaseConnector):
         artifact['cef'] = loaded_cef
         artifact['cef_types'] = loaded_contains
         artifact['source_data_identifier'] = sdi
+        artifact['run_automation'] = run_automation
 
         for cef_name in loaded_cef:
 
@@ -1055,6 +1125,11 @@ class PhantomConnector(BaseConnector):
             return self._no_op(param)
         elif (action == "update_artifact"):
             return self._update_artifact(param)
+        elif (action == "add_note"):
+            return self._add_note(param)
+        elif (action == "tag_artifact"):
+            return self._tag_artifact(param)
+
 
         return result
 

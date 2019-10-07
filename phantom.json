@@ -89,6 +89,86 @@
             "versions": "EQ(*)"
         },
         {
+            "action": "add note",
+            "description": "Add a note to an artifact",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "add_note",
+            "read_only": false,
+            "parameters": {
+                "title": {
+                    "description": "Title for the note",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "primary": false
+                },
+                "content": {
+                    "description": "Note content",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": false,
+                    "primary": false
+                },
+                "container_id": {
+                    "description": "The container id (defaults to current container)",
+                    "data_type": "numeric",
+                    "order": 2,
+                    "required": false,
+                    "contains": [
+                        "phantom container id"
+                    ],
+                    "primary": true
+                },
+                "phase_id": {
+                    "description": "Phase the note will be associated with",
+                    "data_type": "string",
+                    "order": 3,
+                    "required": false,
+                    "primary": false
+                }
+            },
+            "render": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
+            "action": "update artifact tags",
+            "description": "Add/Remove tags from an artifact",
+            "verbose": "",
+            "type": "generic",
+            "identifier": "tag_artifact",
+            "read_only": false,
+            "parameters": {
+                "artifact_id": {
+                    "description": "The artifact id",
+                    "data_type": "string",
+                    "order": 0,
+                    "required": true,
+                    "primary": true
+                },
+                "add_tags": {
+                    "description": "Comma-separated list of tags to add to the artifact",
+                    "data_type": "string",
+                    "order": 1,
+                    "required": false,
+                    "primary": false,
+                    "allow_list": true
+                },
+                "remove_tags": {
+                    "description": "Comma-separated list of tags to remove from the artifact",
+                    "data_type": "string",
+                    "order": 2,
+                    "required": false,
+                    "primary": false,
+                    "allow_list": true
+                }
+            },
+            "render": {},
+            "output": [],
+            "versions": "EQ(*)"
+        },
+        {
             "action": "find artifacts",
             "description": "Find artifacts containing a CEF value",
             "verbose": "",
@@ -112,6 +192,20 @@
                     "order": 1,
                     "required": false,
                     "default": true
+                },
+                "limit_search": {
+                    "description": "Limit search to specified containers",
+                    "data_type": "boolean",
+                    "order": 3,
+                    "required": false,
+                    "default": false
+                },
+                "container_ids": {
+                    "description": "List of space or comma separate container ids; the word \"current\" will be replaced by the current container id",
+                    "data_type": "string",
+                    "order": 4,
+                    "required": false,
+                    "default": "current"
                 }
             },
             "render": {
@@ -121,8 +215,7 @@
                 "view": "phantom_views.find_artifacts",
                 "title": "FIND ARTIFACTS"
             },
-            "output": [
-                {
+            "output": [{
                     "data_path": "action_result.status",
                     "data_type": "string"
                 },
@@ -136,6 +229,14 @@
                     "contains": [
                         "*"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit_search",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.container_ids",
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.data.*.found in",
@@ -585,6 +686,13 @@
                     "data_type": "string",
                     "order": 7,
                     "required": false
+                },
+                "run_automation": {
+                    "description": "Run automation on newly created artifact(s)",
+                    "data_type": "boolean",
+                    "order": 8,
+                    "required": false ,
+                    "default": true 
                 }
             },
             "render": {
@@ -635,6 +743,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.source_data_identifier",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.run_automation",
                     "data_type": "string"
                 },
                 {
