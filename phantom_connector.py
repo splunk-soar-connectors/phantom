@@ -257,7 +257,7 @@ class PhantomConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             self.save_progress("Unable to get artifact, please check the artifact id")
-            return self.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
 
         # Get the CEF JSON and update the artifact
         myData = resp_data['cef']
@@ -271,8 +271,8 @@ class PhantomConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             self.save_progress("Unable to modify artifact")
-            return self.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
-        return self.set_status(phantom.APP_SUCCESS, "Artifact Updated")
+            return action_result.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
+        return action_result.set_status(phantom.APP_SUCCESS, "Artifact Updated")
 
     def _tag_artifact(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -291,7 +291,7 @@ class PhantomConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             self.save_progress("Unable to get artifact, please check the artifact id")
-            return self.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
 
         # Label has to be included or it gets clobbered in POST
         fields = ['tags', 'label']
@@ -306,8 +306,8 @@ class PhantomConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             self.save_progress("Unable to modify artifact")
-            return self.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
-        return self.set_status(phantom.APP_SUCCESS, "Artifact Updated")
+            return action_result.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
+        return action_result.set_status(phantom.APP_SUCCESS, "Artifact Updated")
 
     def _add_note(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -325,8 +325,8 @@ class PhantomConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             self.save_progress('Unable to create note')
-            return self.set_status(phantom.APP_ERROR, "Failed to create note: {}".format(action_result.get_message()))
-        return self.set_status(phantom.APP_SUCCESS, "Note created")
+            return action_result.set_status(phantom.APP_ERROR, "Failed to create note: {}".format(action_result.get_message()))
+        return action_result.set_status(phantom.APP_SUCCESS, "Note created")
 
     def _find_artifacts(self, param):
 
@@ -335,8 +335,8 @@ class PhantomConnector(BaseConnector):
         container_ids = param.get("container_ids", "current")
         if limit_search:
             container_ids = list(set([a for a in
-                [int(z) if isinstance(z, int) or z.isdigit() else None for z in 
-                    [self.get_container_id() if y == "current" else y for y in 
+                [int(z) if isinstance(z, int) or z.isdigit() else None for z in
+                    [self.get_container_id() if y == "current" else y for y in
                         [x.strip() for x in container_ids.replace(",", " ").split()]
                     ]
                 ]
