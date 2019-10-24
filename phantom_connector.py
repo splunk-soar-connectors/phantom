@@ -237,6 +237,7 @@ class PhantomConnector(BaseConnector):
                          (r" True([, \}\]])", r' true\1')]
         for r, s in regex_replace:
             dirty_json = re.sub(r, s, dirty_json)
+        dirty_json = dirty_json.replace(": ''", ': ""')
         clean_json = json.loads(dirty_json)
 
         return clean_json
@@ -262,11 +263,9 @@ class PhantomConnector(BaseConnector):
         myData = resp_data['cef']
         clean_json = self.load_dirty_json(str(cef_json))
         myData.update(clean_json)
-        myData = self.load_dirty_json(str(myData))
+        myData = dict((k, v) for k, v in myData.iteritems() if v)
         myJson = {"cef": myData}
         myCleanJson = self.load_dirty_json(str(myJson))
-
-
 
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=myCleanJson, method="post")
 
