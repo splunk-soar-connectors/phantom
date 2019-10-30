@@ -264,14 +264,16 @@ class PhantomConnector(BaseConnector):
         clean_json = self.load_dirty_json(str(cef_json))
         myData.update(clean_json)
         # this whole section doesn't make sense. This is python dictionary, no need to much with its innards; just upload myData
-        myCleanJson = myData
         '''
         myData = self.load_dirty_json(str(myData))
         myJson = {"cef": myData}
         myCleanJson = self.load_dirty_json(str(myJson))
         '''
 
-        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=myCleanJson, method="post")
+        # fix broken update artifact rest call
+        resp_data['cef'] = myData
+
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=resp_data, method="post")
 
         if (phantom.is_fail(ret_val)):
             self.save_progress("Unable to modify artifact")
