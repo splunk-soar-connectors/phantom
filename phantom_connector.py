@@ -214,6 +214,7 @@ class PhantomConnector(BaseConnector):
         except Exception as e:
             return (action_result.set_status(phantom.APP_ERROR, "Error connecting to server", e), None, None)
 
+        self._r = response
         return self._process_response(response, action_result)
 
     def _test_connectivity(self, param):
@@ -262,11 +263,13 @@ class PhantomConnector(BaseConnector):
         myData = resp_data['cef']
         clean_json = self.load_dirty_json(str(cef_json))
         myData.update(clean_json)
+        # this whole section doesn't make sense. This is python dictionary, no need to much with its innards; just upload myData
+        myCleanJson = myData
+        '''
         myData = self.load_dirty_json(str(myData))
         myJson = {"cef": myData}
         myCleanJson = self.load_dirty_json(str(myJson))
-
-
+        '''
 
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=myCleanJson, method="post")
 
@@ -412,11 +415,12 @@ class PhantomConnector(BaseConnector):
         container_id = param.get('container_id', self.get_container_id())
         sdi = param.get('source_data_identifier')
         label = param.get('label', 'event')
-        contains = param.get('contains')
+        contains = param.get('contains', "{}")
         cef_name = param.get('cef_name')
         cef_value = param.get('cef_value')
         cef_dict = param.get('cef_dictionary')
         run_automation = param.get('run_automation', "true")
+        dedup_is_success = param.get('dedup_is_success')
 
         loaded_cef = {}
         loaded_contains = {}
@@ -428,15 +432,16 @@ class PhantomConnector(BaseConnector):
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF paramter", e)
 
-            if '{' in contains or '}' in contains:
-                try:
-                    loaded_contains = json.loads(contains)
-                except Exception as e:
-                    return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains paramter", e)
+        if contains.strip().startswith('{'):
+            try:
+                loaded_contains = json.loads(contains)
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains paramter", e)
+        elif cef_name and cef_value:
+            loaded_contains[cef_name] = [contains]
 
         if cef_name and cef_value:
             loaded_cef[cef_name] = cef_value
-            loaded_contains[cef_name] = contains
 
         artifact = {}
         artifact['name'] = name
@@ -464,6 +469,29 @@ class PhantomConnector(BaseConnector):
 
         success, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifact)
 
+        # existing semantics is to fail if add_artifact encounters a duplicate artifact.
+        # added option to return success in this case
+        artifact_id = None
+        summary = {'artifact id': artifact_id, 'container id': container_id, 'server': self._base_uri, 'duplicate': False}
+
+        if resp_data:
+            artifact_id = resp_data.get('id')
+
+        elif dedup_is_success:
+            try:
+                resp_json = self._r.json()
+                artifact_id = resp_json.get('existing_artifact_id')
+                if artifact_id:
+                    resp_data = { "id": artifact_id, "success": True, "message": "artifact already exists" }
+                    summary['duplicate'] = True
+            except:
+                pass
+
+        if not artifact_id:
+            return action_result.get_status()
+
+        # This code is supposed to return success if a duplicated artifact was found. This doesn't work and is commented out.
+        '''
         if not resp_data:
             return action_result.get_status()
 
@@ -473,11 +501,11 @@ class PhantomConnector(BaseConnector):
                 return action_result.get_status()
         else:
             artifact_id = resp_data.get('id')
+        '''
 
+        summary['artifact id'] = artifact_id
+        action_result.update_summary(summary)
         action_result.add_data(resp_data)
-
-        action_result.update_summary({'artifact id': artifact_id, 'container id': container_id, 'server': self._base_uri})
-
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _add_file_to_vault(self, action_result, data_stream, file_name, recursive, container_id):
@@ -1084,6 +1112,8 @@ class PhantomConnector(BaseConnector):
 
         if config.get('username') and config.get('password'):
             self._auth = (config['username'], config['password'])
+
+        self._r = None
 
         return (phantom.APP_SUCCESS)
 

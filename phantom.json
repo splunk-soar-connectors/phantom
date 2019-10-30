@@ -685,6 +685,7 @@
                 "contains": {
                     "description": "Data type for each CEF field",
                     "data_type": "string",
+                    "default":"{}",
                     "order": 7,
                     "required": false
                 },
@@ -694,6 +695,13 @@
                     "order": 8,
                     "required": false,
                     "default": true
+                },
+                "dedup_is_success": {
+                    "description": "Return success instead of failure on duplicate artifact",
+                    "data_type": "boolean",
+                    "order": 9,
+                    "required": false,
+                    "default": false
                 }
             },
             "render": {
@@ -729,6 +737,14 @@
                     "contains": [
                         "phantom container id"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.cef_name",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.dedup_is_success",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.contains",
