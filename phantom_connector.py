@@ -305,6 +305,9 @@ class PhantomConnector(BaseConnector):
             existing_artifact = resp_data
         if 'label' not in output_artifact:
             output_artifact['label'] = resp_data.get('label')
+            if not output_artifact['label']:
+                output_artifact['label'] = 'event'
+
         # //// End workaround for PPS-18970 ////
 
         if cef_json:
@@ -401,14 +404,16 @@ class PhantomConnector(BaseConnector):
         limit_search = param.get("limit_search", False)
         container_ids = param.get("container_ids", "current")
         if limit_search:
-            container_ids = list(set([a for a in
-                [int(z) if isinstance(z, int) or z.isdigit() else None for z in 
-                    [self.get_container_id() if y == "current" else y for y in 
-                        [x.strip() for x in container_ids.replace(",", " ").split()]
-                    ]
-                ]
-                if a
-            ]))
+            container_ids = list(
+                set([
+                    a for a in [
+                        int(z) if isinstance(z, int) or z.isdigit() else None for z in [
+                            self.get_container_id() if y == "current" else y for y in
+                            [x.strip() for x in container_ids.replace(",", " ").split()]
+                        ]
+                    ] if a
+                ])
+            )
         action_result.update_param({"container_ids": str(sorted(container_ids)).strip("[]")})
         values = param.get('values', '')
 
@@ -1195,7 +1200,6 @@ class PhantomConnector(BaseConnector):
             return self._add_note(param)
         elif (action == "tag_artifact"):
             return self._tag_artifact(param)
-
 
         return result
 
