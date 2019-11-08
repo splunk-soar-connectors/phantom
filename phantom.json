@@ -72,6 +72,7 @@
                     "data_type": "string",
                     "order": 0,
                     "required": true,
+                    "contains": ["phantom artifact id"],
                     "primary": true
                 },
                 "name": {
