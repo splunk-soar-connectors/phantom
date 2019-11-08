@@ -150,6 +150,7 @@
                 {
                     "data_path": "action_result.parameter.artifact_id",
                     "data_type": "string",
+                    "contains": ["phantom artifact id"],
                     "example_values": [
                         "2388"
                     ],
