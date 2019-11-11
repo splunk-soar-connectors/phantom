@@ -428,15 +428,14 @@ class PhantomConnector(BaseConnector):
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF paramter", e)
 
-            if '{' in contains or '}' in contains:
-                try:
-                    loaded_contains = json.loads(contains)
-                except Exception as e:
-                    return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains paramter", e)
+            try:
+                loaded_contains = json.loads(contains)
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains paramter", e)
 
         if cef_name and cef_value:
             loaded_cef[cef_name] = cef_value
-            loaded_contains[cef_name] = contains
+            loaded_contains[cef_name] = [contains]
 
         artifact = {}
         artifact['name'] = name
