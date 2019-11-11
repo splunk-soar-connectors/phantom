@@ -273,6 +273,10 @@ class PhantomConnector(BaseConnector):
         # fix broken update artifact rest call
         resp_data['cef'] = myData
 
+        # fix broken null label error from rest call: if label:null is in artifact json, it will result in an error during post
+        if 'label' in resp_data and resp_data.get('label') == None:
+            del resp_data['label']
+
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=resp_data, method="post")
 
         if (phantom.is_fail(ret_val)):
