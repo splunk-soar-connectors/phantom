@@ -510,9 +510,19 @@ class PhantomConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault, {0}".format(vault_info.get('message', 'NA')))
 
         try:
-            vault_info = Vault.get_file_info(vault_id=vault_info['vault_id'])[0]
+            query_params = {
+                '_filter_vault_document__hash': '"{}"'.format(vault_info['vault_id'].lower()),
+                'page_size': 1,
+                'pretty': ''
+            }
+            ret_val, response, resp_data = self._make_rest_call('/rest/container_attachment', action_result, params=query_params)
+            vault_info = resp_data['data'][0]
+            for k in vault_info.keys():
+                if k.startswith('_pretty_'):
+                    name = k[8:]
+                    vault_info[name] = vault_info.pop(k)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to add file info of file added to vault", e)
+            return action_result.set_status(phantom.APP_ERROR, "Failed to retrieve info about file added to vault", e)
 
         action_result.add_data(vault_info)
 
@@ -611,9 +621,19 @@ class PhantomConnector(BaseConnector):
         vault_id = param['vault_id']
 
         try:
-            vault_info = Vault.get_file_info(vault_id=vault_id)
-            file_path = vault_info[0]['path']
-            file_name = vault_info[0]['name']
+            query_params = {
+                '_filter_vault_document__hash': '"{}"'.format(vault_id),
+                'page_size': 1,
+                'pretty': ''
+            }
+            ret_val, response, resp_data = self._make_rest_call('/rest/container_attachment', action_result, params=query_params)
+            vault_info = resp_data['data'][0]
+            for k in vault_info.keys():
+                if k.startswith('_pretty_'):
+                    name = k[8:]
+                    vault_info[name] = vault_info.pop(k)
+            file_path = vault_info['path']
+            file_name = vault_info['name']
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Failed to get vault item info", e)
 
