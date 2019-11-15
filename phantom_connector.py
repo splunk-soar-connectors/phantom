@@ -41,6 +41,9 @@ SUPPORTED_FILES = ['application/zip', 'application/x-gzip', 'application/x-tar',
 
 
 def determine_contains(value):
+    if isinstance(value, dict) or isinstance(value, list):
+        return None
+
     for c, f in CONTAINS_VALIDATORS.items():
         if f(value):
             return c
