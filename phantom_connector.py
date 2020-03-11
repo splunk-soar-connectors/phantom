@@ -34,6 +34,8 @@ import bz2
 import datetime
 import time
 import urllib
+import random
+import string
 
 TIMEOUT = 120
 INVALID_RESPONSE = 'Server did not return a valid JSON response.'
@@ -486,6 +488,9 @@ class PhantomConnector(BaseConnector):
             file_name = unicodedata.normalize('NFKD', file_name).encode('utf-8', 'ignore')
 
         save_as = file_name or '_invalid_file_name_'
+
+        # PAPP-9543 append a random string to the filename to make concurrent action runs succeed
+        save_as = save_as + '_' + ''.join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16))
 
         # if the path contains a directory
         if (os.path.dirname(save_as)):
