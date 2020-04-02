@@ -241,6 +241,7 @@ class PhantomConnector(BaseConnector):
         ]
         for r, s in regex_replace:
             dirty_json = re.sub(r, s, dirty_json)
+        dirty_json = dirty_json.replace(": ''", ': ""')
         clean_json = json.loads(dirty_json)
 
         return clean_json
@@ -361,7 +362,7 @@ class PhantomConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             self.save_progress("Unable to get artifact, please check the artifact id")
-            return self.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
 
         # Label has to be included or it gets clobbered in POST
         fields = ['tags', 'label']
@@ -376,8 +377,8 @@ class PhantomConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             self.save_progress("Unable to modify artifact")
-            return self.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
-        return self.set_status(phantom.APP_SUCCESS, "Artifact Updated")
+            return action_result.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
+        return action_result.set_status(phantom.APP_SUCCESS, "Artifact Updated")
 
     def _add_note(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -395,8 +396,8 @@ class PhantomConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             self.save_progress('Unable to create note')
-            return self.set_status(phantom.APP_ERROR, "Failed to create note: {}".format(action_result.get_message()))
-        return self.set_status(phantom.APP_SUCCESS, "Note created")
+            return action_result.set_status(phantom.APP_ERROR, "Failed to create note: {}".format(action_result.get_message()))
+        return action_result.set_status(phantom.APP_SUCCESS, "Note created")
 
     def _find_artifacts(self, param):
 
@@ -499,15 +500,14 @@ class PhantomConnector(BaseConnector):
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF paramter", e)
 
-            if '{' in contains or '}' in contains:
-                try:
-                    loaded_contains = json.loads(contains)
-                except Exception as e:
-                    return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains paramter", e)
+            try:
+                loaded_contains = json.loads(contains)
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains paramter", e)
 
         if cef_name and cef_value:
             loaded_cef[cef_name] = cef_value
-            loaded_contains[cef_name] = contains
+            loaded_contains[cef_name] = [contains]
 
         artifact = {}
         artifact['name'] = name
@@ -582,9 +582,19 @@ class PhantomConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault, {0}".format(vault_info.get('message', 'NA')))
 
         try:
-            vault_info = Vault.get_file_info(vault_id=vault_info['vault_id'])[0]
+            query_params = {
+                '_filter_vault_document__hash': '"{}"'.format(vault_info['vault_id'].lower()),
+                'page_size': 1,
+                'pretty': ''
+            }
+            ret_val, response, resp_data = self._make_rest_call('/rest/container_attachment', action_result, params=query_params)
+            vault_info = resp_data['data'][0]
+            for k in vault_info.keys():
+                if k.startswith('_pretty_'):
+                    name = k[8:]
+                    vault_info[name] = vault_info.pop(k)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to add file info of file added to vault", e)
+            return action_result.set_status(phantom.APP_ERROR, "Failed to retrieve info about file added to vault", e)
 
         action_result.add_data(vault_info)
 
@@ -683,9 +693,19 @@ class PhantomConnector(BaseConnector):
         vault_id = param['vault_id']
 
         try:
-            vault_info = Vault.get_file_info(vault_id=vault_id)
-            file_path = vault_info[0]['path']
-            file_name = vault_info[0]['name']
+            query_params = {
+                '_filter_vault_document__hash': '"{}"'.format(vault_id),
+                'page_size': 1,
+                'pretty': ''
+            }
+            ret_val, response, resp_data = self._make_rest_call('/rest/container_attachment', action_result, params=query_params)
+            vault_info = resp_data['data'][0]
+            for k in vault_info.keys():
+                if k.startswith('_pretty_'):
+                    name = k[8:]
+                    vault_info[name] = vault_info.pop(k)
+            file_path = vault_info['path']
+            file_name = vault_info['name']
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Failed to get vault item info", e)
 
