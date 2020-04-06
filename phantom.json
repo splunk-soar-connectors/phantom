@@ -72,7 +72,6 @@
                     "data_type": "string",
                     "order": 0,
                     "required": true,
-                    "contains": [],
                     "primary": true
                 },
                 "cef_json": {
@@ -80,18 +79,63 @@
                     "data_type": "string",
                     "order": 1,
                     "required": true,
-                    "contains": [],
                     "primary": false
                 }
             },
-            "render": {},
-            "output": [],
+            "render": {
+                "type": "table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Artifact Updated"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.cef_json",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"ip\": \"1.1.2.5\"}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "94"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
             "versions": "EQ(*)"
         },
         {
             "action": "add note",
             "description": "Add a note to an artifact",
-            "verbose": "",
             "type": "generic",
             "identifier": "add_note",
             "read_only": false,
@@ -128,8 +172,66 @@
                     "primary": false
                 }
             },
-            "render": {},
-            "output": [],
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Note created"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Note test",
+                        "Testing note"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.content",
+                    "data_type": "string",
+                    "example_values": [
+                        "Adding a note via app action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        35
+                    ],
+                    "contains": [
+                        "phantom container id"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {
@@ -164,8 +266,62 @@
                     "allow_list": true
                 }
             },
-            "render": {},
-            "output": [],
+            "render": {
+                "type": "table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Artifact Updated"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.remove_tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "hello"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "94"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.add_tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "splunk"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
             "versions": "EQ(*)"
         },
         {
