@@ -183,7 +183,7 @@ class PhantomConnector(BaseConnector):
         auth_token = config.get('auth_token')
 
         if ((auth_token) and ('ph-auth-token' not in headers)):
-                headers['ph-auth-token'] = auth_token
+            headers['ph-auth-token'] = auth_token
 
         if ('Content-Type' not in headers):
             headers.update({'Content-Type': 'application/json'})
@@ -233,7 +233,7 @@ class PhantomConnector(BaseConnector):
         self.save_progress("Test connectivity passed")
         return self.set_status(phantom.APP_SUCCESS, 'Request succeeded')
 
-    def load_dirty_json(self,dirty_json):
+    def load_dirty_json(self, dirty_json):
         import re
         regex_replace = [(r"([ \{,:\[])(u)?'([^']+)'", r'\1"\3"'), (r" False([, \}\]])", r' false\1'),
                          (r" True([, \}\]])", r' true\1')]
@@ -245,7 +245,6 @@ class PhantomConnector(BaseConnector):
         return clean_json
 
     def _update_artifact(self, param):
-        import ast
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
@@ -253,7 +252,7 @@ class PhantomConnector(BaseConnector):
 
         cef_json = param.get('cef_json', '')
 
-        endpoint = "/rest/artifact/"+artifact_id
+        endpoint = "/rest/artifact/" + artifact_id
         # First get the artifacts json
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
 
@@ -340,8 +339,8 @@ class PhantomConnector(BaseConnector):
                 [int(z) if isinstance(z, int) or z.isdigit() else None for z in
                     [self.get_container_id() if y == "current" else y for y in
                         [x.strip() for x in container_ids.replace(",", " ").split()]
-                    ]
-                ]
+                     ]
+                 ]
                 if a
             ]))
         action_result.update_param({"container_ids": str(sorted(container_ids)).strip("[]")})
@@ -847,7 +846,7 @@ class PhantomConnector(BaseConnector):
 
         if artifact_json_list:
             try:
-                    artifacts = json.loads(artifact_json_list)
+                artifacts = json.loads(artifact_json_list)
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR, "Error parsing artifacts list JSON: {}".format(str(e)))
         else:
@@ -1152,7 +1151,6 @@ class PhantomConnector(BaseConnector):
             return self._add_note(param)
         elif (action == "tag_artifact"):
             return self._tag_artifact(param)
-
 
         return result
 
