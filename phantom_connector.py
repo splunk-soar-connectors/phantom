@@ -1,5 +1,5 @@
 # File: phantom_connector.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -34,6 +34,11 @@ import bz2
 import datetime
 import time
 import urllib
+try:
+    from urllib.parse import urlparse
+except ImportError:
+    from urlparse import urlparse
+from bs4 import UnicodeDammit
 
 TIMEOUT = 120
 INVALID_RESPONSE = 'Server did not return a valid JSON response.'
@@ -242,6 +247,292 @@ class PhantomConnector(BaseConnector):
 
         return clean_json
 
+    def _get_ioc(self, action_result, ioc_value, ioc_id):
+        if ioc_id:
+            endpoint = '/rest/indicator/{0}'.format(ioc_id)
+            params = {}
+        else:
+            params = {
+                'indicator_value': ioc_value
+            }
+            endpoint = '/rest/indicator_by_value'
+
+        return self._make_rest_call(endpoint, action_result, params=params, method='get')
+
+    def _get_artifact_data_with_ioc(self, action_result, page_size, order, ioc_id):
+        params = {
+            'indicator_id': ioc_id,
+            'order': order,
+            'page': 0,
+            'page_size': page_size
+        }
+        endpoint = '/rest/indicator_artifact'
+
+        return self._make_rest_call(endpoint, action_result, params=params, method='get') 
+
+    def _handle_get_ioc(self, param):
+        ioc_value = param.get('ioc_value')
+        ioc_id = param.get('ioc_id')
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        if not(ioc_value or ioc_id):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Either and ioc_value or ioc_id must be provided'
+            )
+
+        config = self.get_config()
+
+        ret_val, response, resp_data = self._get_ioc(action_result, ioc_value, ioc_id)
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        elif 'id' not in resp_data:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Unable to find indicator'
+            )
+
+        if param.get('include_artifact_data'):
+            ret_val, response, artifact_resp_data = self._get_artifact_data_with_ioc(action_result, param.get('artifact_limit', 10), param.get('artifact_sort', 'desc'), resp_data['id'])
+            if phantom.is_fail(ret_val):
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    'Unable to get artifact data related to indicator. Details - {}'.format(str(response))
+                )
+            resp_data['artifacts'] = artifact_resp_data['data']
+
+        summary = {
+            'ioc_id': resp_data['id'],
+            'ioc_value': resp_data['value'],
+            'tags': resp_data['tags']
+        }
+
+        resp_data['tags'] = [{'tag': tag} for tag in resp_data['tags']]
+
+        action_result.update_summary(summary)
+
+        action_result.add_data(resp_data)
+
+        return action_result.set_status(
+                phantom.APP_SUCCESS,
+                'Successfully retrieved indicator (' + resp_data['value'] + ')'
+            )
+
+    def _modify_ioc_tag(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        ioc_list = param.get('ioc_list')
+        ioc_value = param.get('ioc_value')
+        ioc_id = param.get('ioc_id')
+
+        if ioc_list:
+            try:
+                ioc_list = json.loads(ioc_list)
+            except Exception as err:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    'Could not load ioc_list parmater. Details - {}'.format(str(err))
+                )
+        
+        if not(ioc_value or ioc_id or ioc_list):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Either an ioc_value, ioc_id, ioc_list must be provided'
+            )
+
+        if ioc_list and (ioc_value or ioc_id):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Cannot supply ioc list and either ioc_id or ioc_value.'
+            )
+
+        if ioc_value:
+            ioc_list = [{'ioc_value': ioc_value}]
+        elif ioc_id:
+            ioc_list = [{'ioc_id': ioc_id}]
+
+        tags_to_add = param.get('tags_to_add', '').split(',')
+        tags_to_remove = param.get('tags_to_remove', '').split(',')
+
+        for item in ioc_list:
+            if not(item.get('tags_to_add') or item.get('tags_to_remove') or tags_to_add or tags_to_remove):
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    'Either tags_to_add or tags_to_remove must be provided. If using the ioc_list parameter these can be provided in list (e.g. {"ioc_value": "http://www.splunk.com", "tags_to_add": "tag_name"})'
+                )
+                
+            if not(item.get('tags_to_add')):
+                item['tags_to_add'] = tags_to_add
+            if not(item.get('tags_to_remove')):
+                item['tags_to_remove'] = tags_to_remove
+
+            ret_val, response, resp_data = self._get_ioc(action_result, item.get('ioc_value'), item.get('ioc_id'))
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            if 'id' not in resp_data:
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    'Unable to find indicator - {}'.format((item.get('ioc_value') or item.get('ioc_id')))
+                )
+
+            endpoint = '/rest/indicator/{0}'.format(resp_data['id'])
+            item['tags_to_remove'] = [remover for remover in item['tags_to_remove'] if remover not in item['tags_to_add']]
+            tags = [tag for tag in list(set(item['tags_to_add'] + resp_data['tags'])) if tag not in item['tags_to_remove']]
+
+            payload = {
+                'tags': tags
+            }
+            
+            ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=payload, method='post')
+
+            if phantom.is_fail(ret_val):
+                return action_result.set_status(
+                    phantom.APP_ERROR,
+                    'Unable to add tag. Details - {}'.format(str(response))
+                )
+
+        return action_result.set_status(
+                phantom.APP_SUCCESS,
+                'Successfully updated tags'
+            )
+
+    def _set_current_phase(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        phase_name = param.get('phase_name')
+        phase_id = param.get('phase_id')
+        container_id = param.get('container_id', self.get_container_id())
+
+        if not(phase_name or phase_id):
+            return action_result.set_status(phantom.APP_ERROR, 'Either phase name or phase id must be provided')
+
+        if phase_name:
+            params = {
+                "_filter_container_id": container_id,
+                "_filter_name__iexact": '"{}"'.format(phase_name)
+            }
+
+            endpoint = '/rest/workflow_phase'
+            ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, params=params, method='get')
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+            elif resp_data['count'] < 1:
+                return action_result.set_status(phantom.APP_ERROR, 'Unable to find the requested phase.')
+            
+            phase_id = resp_data['data'][0]['id']
+
+        data = {
+            'current_phase_id': phase_id
+        }
+
+        endpoint = '/rest/container/{}'.format(container_id)
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=data, method='post')
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, 'Current successfully phase set to {}'.format(phase_name))
+
+    def _update_task(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        status_map = {
+            'incomplete': 0,
+            'complete': 1,
+            'in progress': 2
+        }
+        
+        phase_name = param.get('phase_name')
+        task_name = param.get('task_name')
+        task_id = param.get('task_id')
+        container_id = param.get('container_id', self.get_container_id())
+        status = param.get('status')
+        note = param.get('note')
+        note_title = param.get('note_title')
+        username = param.get('username')
+        role_id = param.get('role_id')
+
+        if username and role_id:
+            return action_result.set_status(phantom.APP_ERROR, 'A task cannot be assigned to a user and a role. Choose one or the other.')
+
+        if status and status_map.get(status.lower()) is None:
+            return action_result.set_status(phantom.APP_ERROR, 'The status - {status} - is invalid. Please choose from "incomplete," "complete," or "in progress."'.format(status=status))
+        else:
+            status = status_map.get(status)
+
+        if status == 1:
+            self.save_progress('Setting title to "Closing Comments."')
+            note_title = 'Closing Comments'
+
+        if (note and not(note_title)) or (note_title and not(note)):
+            return action_result.set_status(phantom.APP_ERROR, 'Both title and note must be provided when updating either.') 
+
+
+        if not(phase_name or task_name or task_id):
+            return action_result.set_status(phantom.APP_ERROR, 'A phase name and task name, or a task ID must be provided.')
+        elif not(task_id) and not(phase_name and task_name):
+            return action_result.set_status(phantom.APP_ERROR, 'If not using task ID, phase name AND task name must be provided.')
+
+        if phase_name:
+            params = {
+                '_filter_phase__name__iexact': '"{}"'.format(phase_name.replace('"', '\\"')),
+                '_filter_name__iexact': '"{}"'.format(task_name.replace('"', '\\"')),
+                '_filter_container': container_id
+            }
+            endpoint = '/rest/workflow_task'
+
+            ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, params=params, method='get')
+
+            if phantom.is_fail(ret_val):
+                return action_result.set_status('Unable to retrieve workbook task. Details - {}'.format(str(response)))
+            elif resp_data['count'] < 1:
+                return action_result.set_status('Unable to retrieve workbook task. No results found.')
+            task_id = resp_data['data'][0]['id']
+            is_note_required = resp_data['data'][0]['is_note_required']
+
+            # are they trying to set the status without saving a closing note
+            if is_note_required and status and status == 1 and not(note):
+                return action_result.set_status(phantom.APP_ERROR, 'This task requires a closing note.')
+
+        
+        if note and status != 1:
+            note_data = {}
+            note_data['content'] = note
+            note_data['title'] = note_title
+            note_data['task_id'] = task_id
+            endpoint = '/rest/workbook_note'
+
+            ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=note_data, method='post')
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+        data = {}
+        if status is not None:
+            data['status'] = status
+            if status == 1 and note:
+                data['note'] = note
+                data['title'] = note_title
+        if username:
+            data['owner'] = username
+        if role_id:
+            data['role'] = role_id
+        
+        endpoint = '/rest/workflow_task/{}'.format(task_id)
+
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=data, method="post")
+
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        return action_result.set_status(phantom.APP_SUCCESS, 'Task successfully updated.')
+
     def _update_artifact(self, param):
         import ast
 
@@ -273,6 +564,169 @@ class PhantomConnector(BaseConnector):
             self.save_progress("Unable to modify artifact")
             return action_result.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
         return action_result.set_status(phantom.APP_SUCCESS, "Artifact Updated")
+
+    def _update_artifact_fields(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        artifact_id = param['artifact_id']
+        data = param['data']
+        overwrite = param.get('overwrite')
+
+        try:
+            data = json.loads(data)
+        except Exception as err:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Unable to parse "data" field - ' + err.message
+            )
+
+        ret_val, response, artifact_data = self._make_rest_call('/rest/artifact/{}'.format(artifact_id), action_result, method='get')
+        
+        if phantom.is_fail(ret_val) or not(artifact_data):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Artifact not found with id {} - {}'.format(artifact_id, str(response))
+            )
+        
+        update_data = {}
+
+        for key in data.keys():
+            update_data[key] = self._field_updater(artifact_data.get(key, {}), data[key], overwrite)
+
+        ret_val, response, post_data = self._make_rest_call('/rest/artifact/{}'.format(artifact_id), action_result, data=update_data, method='post')
+        if phantom.is_fail(ret_val) or not(post_data.get('success')):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                'Unable to save artifact data - ' + str(response)
+            )
+
+        return action_result.set_status(
+                phantom.APP_SUCCESS,
+                'Successfully updated artifact (ID: {})'.format(artifact_id)
+            )
+    
+    def _field_updater(self, data, update_data, overwrite):
+        if type(update_data) == list:
+            if not(overwrite):
+                return(list(set((data or []) + update_data)))
+            else:
+                return(update_data)
+        elif type(update_data) == dict:
+            for keya in update_data.keys():
+                data[keya] = self._field_updater(data.get(keya, {}), update_data[keya], overwrite)
+        else:
+            if (overwrite and data) or not(data):
+                return update_data
+        
+        return data
+
+    def _get_user(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        user_filter = {
+            '_filter_username': '"{}"'.format(param['username'])
+        }
+
+        endpoint = "/rest/ph_user"
+        
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, params=user_filter)
+        
+        if phantom.is_fail(ret_val):
+            return action_result.set_status(phantom.APP_ERROR, 'Failed to get user: {}'.format(action_result.get_message()))
+        elif 'data' not in resp_data:
+            return action_result.set_status(phantom.APP_ERROR, 'Failed to get user: {}'.format(str(resp_data)))
+
+        try:
+            self._dictify(resp_data['data'], 'data')
+        except Exception as err:
+            return action_result.set_status(phantom.APP_ERROR, 'Unable to get user: {}'.format(str(err)))
+
+        action_result.update_summary({'count': resp_data['count']})
+        action_result.add_data({'user_details': resp_data['data']})
+        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully retrieved user')
+
+    def _domain_in_list(self, param):
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        custom_list = param['custom_list']
+        url = param['url']
+
+        domain = urlparse(url).netloc.lower()
+
+        endpoint = '/rest/decided_list/{}/formatted_content?_output_format=json'.format(custom_list)
+
+        try:
+            ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
+        except Exception as err:
+            return action_result.set_status(phantom.APP_ERROR, 'Unable to retrieve custom list data. Details - {}'.format(str(err)))
+
+        if phantom.is_fail(ret_val):
+            return action_result.set_status(phantom.APP_ERROR, 'Unable to retrieve custom list data. Details - {}'.format(str(resp_data)))
+
+        match = False
+        matched_domain = None
+        for row in resp_data['content']:
+            if row[0] and domain.endswith(row[0]):
+                matched_domain = row[0]
+                match = True
+                break
+
+        action_result.add_data({
+            'matched_domain': matched_domain,
+            'match': match
+        })
+
+        return action_result.set_status(phantom.APP_SUCCESS, 'Domain{}matched'.format((' ' if match else ' not ')))
+
+    def _list_playbooks(self, param):
+
+        action_result = self.add_action_result(ActionResult(dict(param)))
+
+        playbook_filter = {}
+        repos = [repo.strip() for repo in param.get('repo').split(',')]
+        if repos:
+            playbook_filter['_filter_scm__name__in'] = '["{}"]'.format('","'.join(repos))
+        
+        tags = [tag.strip() for tag in param.get('tag').split(',')]
+        
+        if tags:
+            playbook_filter['_filter_tags__iregex'] = '"(\\\"{}\\\")"'.format('\\\"|\\\"'.join(tags))
+
+        endpoint = "/rest/playbook"
+        
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, params=playbook_filter)
+        
+        if phantom.is_fail(ret_val):
+            return action_result.set_status(phantom.APP_ERROR, 'Failed to list playbooks: {}'.format(action_result.get_message()))
+        elif 'data' not in resp_data:
+            return action_result.set_status(phantom.APP_ERROR, 'Failed to list playbooks: {}'.format(str(resp_data)))
+
+        try:
+            self._dictify(resp_data['data'], 'data')
+        except Exception as err:
+            return action_result.set_status(phantom.APP_ERROR, 'Unable to normalize playbook output: {}'.format(str(err)))
+
+        action_result.update_summary({'count': resp_data['count']})
+        action_result.add_data({'playbooks': resp_data['data']})
+        return action_result.set_status(phantom.APP_SUCCESS, 'Successfully retrieved playbooks')
+        
+    # Helper method - fixes output that ends in a list (e.g. "tags": ["tag1","tag2"] is changed to "tags": [{"tag": "tag1", "tag": "tag2"}])
+    def _dictify(self, data, key, prev_key=None):
+        if isinstance(data, dict):
+            for k in data.keys():
+                data[k] = self._dictify(data[k], k, key)
+            return data
+        elif isinstance(data, list):
+            for i,v in enumerate(data):
+                data[i] = self._dictify(v, None, key)
+            return data
+        else:
+            if prev_key is not None:
+                new_key = (prev_key[0:-1] if (prev_key.endswith('s') and len(prev_key) > 1) else prev_key)
+                return {new_key: data}
+            else: 
+                return data
 
     def _tag_artifact(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -1147,6 +1601,20 @@ class PhantomConnector(BaseConnector):
             return self._add_note(param)
         elif (action == "tag_artifact"):
             return self._tag_artifact(param)
+        elif (action == "update_artifact_fields"):
+            return self._update_artifact_fields(param)
+        elif (action == "list_playbooks"):
+            return self._list_playbooks(param)
+        elif (action == "get_user"):
+            return self._get_user(param)
+        elif (action == "update_task"):
+            return self._update_task(param)
+        elif (action == "modify_indicator_tag"):
+            return self._modify_ioc_tag(param)
+        elif (action == "get_indicator"):
+            return self._handle_get_ioc(param)
+        elif (action == "set_current_phase"):
+            return self._set_current_phase(param)
 
 
         return result
