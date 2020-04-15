@@ -1,0 +1,304 @@
+2020-04-14 23:09:21,534 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error from server. Status code: 404, Details: Requested item not found ; Exception: None
+2020-04-14 23:09:21,534 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: Unable to retrieve worbook task. Details - <Response [404]>; Message: None; Exception: None
+2020-04-14 23:09:48,249 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error from server. Status code: 400, Details: Failed to parse filter value 'DetECtion'. Avoid newlines, semicolons: malformed string ; Exception: None
+2020-04-14 23:09:48,250 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: Unable to retrieve workbook task. Details - <Response [400]>; Message: None; Exception: None
+2020-04-14 23:14:45,912 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error from server. Status code: 404, Details: Requested item not found ; Exception: None
+2020-04-14 23:14:45,912 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: Unable to retrieve workbook task. Details - <Response [404]>; Message: None; Exception: None
+2020-04-14 23:17:06,349 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error from server. Status code: 404, Details: Requested item not found ; Exception: None
+2020-04-14 23:17:06,350 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: Unable to retrieve workbook task. Details - <Response [404]>; Message: None; Exception: None
+2020-04-14 23:17:38,070 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error connecting to server; Exception: HTTPSConnectionPool(host='192.168.7.225rest', port=443): Max retries exceeded with url: /worklow_task?_filter_phase__name__iexact=%5C%22DetECtion%5C%22&_filter_name__iexact=%5C%22Analyze+precursors+and+indicators%5C%22&_filter_container=190 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x102aa8990>: Failed to establish a new connection: [Errno 8] nodename nor servname provided, or not known'))
+2020-04-14 23:17:38,071 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: Unable to retrieve workbook task. Details - None; Message: None; Exception: None
+2020-04-14 23:18:03,616 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error from server. Status code: 404, Details: Requested item not found ; Exception: None
+2020-04-14 23:18:03,616 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: Unable to retrieve workbook task. Details - <Response [404]>; Message: None; Exception: None
+2020-04-14 23:18:51,996 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error from server. Status code: 404, Details: Requested item not found ; Exception: None
+2020-04-14 23:18:51,997 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: Unable to retrieve workbook task. Details - <Response [404]>; Message: None; Exception: None
+2020-04-14 23:19:15,224 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Status Code: 500. Data from server:
+body  
+direction: ltr;
+font-family: 'Source Sans Pro', sans-serif;
+font-style: normal;
+font-weight: normal;
+height: 100%;
+min-height: 100%;
+margin: 0px;
+color: rgb(51,51,51);
+ 
+.header  
+position: relative;
+height: 60px;
+min-width: 1024px;
+width: 100%;
+margin: 0px auto;
+background-color: black;
+ 
+.header .logo  
+display: block;
+position: absolute;
+top: 18px;
+left: 32px;
+cursor: pointer;
+ 
+.header .logo img  
+width:145px;
+height: 26px;
+ 
+.content  
+margin: 25px;
+ 
+.content h3  
+font-size: 24px;
+font-weight: 500;
+margin-top: 20px;
+margin-bottom: 10px;
+ 
+.content p  
+margin: 0 0 10px;
+font-size: 16px;
+ 
+Phantom Server Error
+500: Server Error
+Sorry, something went wrong with your request.
+; Exception: None
+2020-04-14 23:19:15,225 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: Unable to retrieve workbook task. Details - <Response [500]>; Message: None; Exception: None
+2020-04-14 23:19:26,993 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error connecting to server; Exception: HTTPSConnectionPool(host='192.168.7.225worklow_task', port=443): Max retries exceeded with url: /?_filter_phase__name__iexact=%22DetECtion%22&_filter_name__iexact=%22Analyze+precursors+and+indicators%22&_filter_container=190 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x10af787d0>: Failed to establish a new connection: [Errno 8] nodename nor servname provided, or not known'))
+2020-04-14 23:19:26,993 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: Unable to retrieve workbook task. Details - None; Message: None; Exception: None
+2020-04-14 23:20:30,761 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error connecting to server; Exception: HTTPSConnectionPool(host='192.168.7.225worklow_task', port=443): Max retries exceeded with url: /?_filter_phase__name__iexact=DetECtion&_filter_name__iexact=Analyze+precursors+and+indicators&_filter_container=190 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x105698810>: Failed to establish a new connection: [Errno 8] nodename nor servname provided, or not known'))
+2020-04-14 23:20:30,761 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: Unable to retrieve workbook task. Details - None; Message: None; Exception: None
+2020-04-14 23:22:31,773 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error connecting to server; Exception: HTTPSConnectionPool(host='192.168.7.225workflow_task', port=443): Max retries exceeded with url: /?_filter_phase__name__iexact=%22DetECtion%22&_filter_name__iexact=%22Analyze+precursors+and+indicators%22&_filter_container=190 (Caused by NewConnectionError('<urllib3.connection.VerifiedHTTPSConnection object at 0x10b9a3910>: Failed to establish a new connection: [Errno 8] nodename nor servname provided, or not known'))
+2020-04-14 23:22:31,773 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: Unable to retrieve workbook task. Details - None; Message: None; Exception: None
+2020-04-14 23:23:11,528 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:24:27,368 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: The status - incomplete - is invalid. Please choose from "incomplete," "complete," or "in progress."; Exception: None
+2020-04-14 23:25:20,107 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:26:01,953 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:26:24,734 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:26:50,365 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:27:18,105 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:27:39,251 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:28:11,955 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:29:00,044 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error connecting to server; Exception: Object of type bytes is not JSON serializable
+2020-04-14 23:29:00,044 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Unable to update task. Details - None; Exception: None
+2020-04-14 23:29:00,044 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:29:29,421 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error connecting to server; Exception: Object of type bytes is not JSON serializable
+2020-04-14 23:29:29,422 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Unable to update task. Details - None; Exception: None
+2020-04-14 23:29:29,425 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:30:40,431 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:38:02,751 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:38:43,306 phantom.base_connector.BaseConnector INFO BaseConnector.save_progress - Progress: Setting title to "Closing Comments."; More: None
+2020-04-14 23:38:43,446 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error from server. Status code: 400, Details: Invalid status transition from "0" to "1" ; Exception: None
+2020-04-14 23:38:43,446 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Unable to update task. Details - <Response [400]>; Exception: None
+2020-04-14 23:39:04,714 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:39:32,283 phantom.base_connector.BaseConnector INFO BaseConnector.save_progress - Progress: Setting title to "Closing Comments."; More: None
+2020-04-14 23:39:32,518 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-14 23:39:58,696 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Task successfully updated.; Exception: None
+2020-04-15 00:02:18,100 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Current successfully phase set to Eradicate; Exception: None
+2020-04-15 00:18:19,643 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error from server. Status code: 400, Details: invalid literal for int() with base 10: 'Eradicate' ; Exception: None
+2020-04-15 00:18:34,178 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Current successfully phase set to Eradicate; Exception: None
+2020-04-15 00:20:01,133 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Current successfully phase set to Eradicate; Exception: None
+2020-04-15 00:20:57,129 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Either and ioc_value or ioc_id must be provided; Exception: None
+2020-04-15 00:22:30,696 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Error from server. Status code: 404, Details: Requested item not found ; Exception: None
+2020-04-15 00:22:58,482 phantom.base_connector.BaseConnector INFO ActionResult.update_summary() - Summary (next line):
+{   'ioc_id': 641,
+    'ioc_value': 'http://familiapaixao.coconet-us.com/tmMTo.exe',
+    'tags': []}
+2020-04-15 00:22:58,483 phantom.base_connector.BaseConnector INFO ActionResult.add_data() - Data (next line):
+[   {   'earliest_time': '2020-04-13T22:29:31.797610Z',
+        'id': 641,
+        'latest_time': '2020-04-13T22:29:31.797610Z',
+        'open_events': 1,
+        'severity_counts': [   {'count': 0, 'name': 'high'},
+                               {'count': 0, 'name': 'medium'},
+                               {'count': 1, 'name': 'low'}],
+        'tags': [],
+        'tenant': 0,
+        'total_events': 1,
+        'value': 'http://familiapaixao.coconet-us.com/tmMTo.exe'}]
+2020-04-15 00:22:58,483 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Successfully retrieved indicator (http://familiapaixao.coconet-us.com/tmMTo.exe); Exception: None
+2020-04-15 00:23:14,112 phantom.base_connector.BaseConnector INFO ActionResult.update_summary() - Summary (next line):
+{   'ioc_id': 641,
+    'ioc_value': 'http://familiapaixao.coconet-us.com/tmMTo.exe',
+    'tags': []}
+2020-04-15 00:23:14,112 phantom.base_connector.BaseConnector INFO ActionResult.add_data() - Data (next line):
+[   {   'earliest_time': '2020-04-13T22:29:31.797610Z',
+        'id': 641,
+        'latest_time': '2020-04-13T22:29:31.797610Z',
+        'open_events': 1,
+        'severity_counts': [   {'count': 0, 'name': 'high'},
+                               {'count': 0, 'name': 'medium'},
+                               {'count': 1, 'name': 'low'}],
+        'tags': [],
+        'tenant': 0,
+        'total_events': 1,
+        'value': 'http://familiapaixao.coconet-us.com/tmMTo.exe'}]
+2020-04-15 00:23:14,112 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Successfully retrieved indicator (http://familiapaixao.coconet-us.com/tmMTo.exe); Exception: None
+2020-04-15 00:23:43,602 phantom.base_connector.BaseConnector INFO ActionResult.update_summary() - Summary (next line):
+{   'ioc_id': 641,
+    'ioc_value': 'http://familiapaixao.coconet-us.com/tmMTo.exe',
+    'tags': []}
+2020-04-15 00:23:43,604 phantom.base_connector.BaseConnector INFO ActionResult.add_data() - Data (next line):
+[   {   'artifacts': [   {   'cef': {   'requestURL': 'http://familiapaixao.coconet-us.com/tmMTo.exe'},
+                             'cef_types': {'requestURL': []},
+                             'container': 187,
+                             'container_name': 'Fun with Filtering Example 2',
+                             'create_time': '2020-04-13T22:29:31.797610Z',
+                             'description': None,
+                             'end_time': None,
+                             'has_note': False,
+                             'hash': '4c9d3e31d37cf6f032204b5a75d828ee',
+                             'id': 758,
+                             'in_case': False,
+                             'ingest_app': None,
+                             'kill_chain': None,
+                             'label': 'event',
+                             'name': 'URL Artifact',
+                             'owner': 1,
+                             'parent_artifact': None,
+                             'parent_container': None,
+                             'playbook_run': None,
+                             'severity': 'medium',
+                             'source_data_identifier': '84178c81-b715-401a-90ee-a26cfd1b55c5',
+                             'start_time': '2020-04-13T22:29:31.803505Z',
+                             'tags': [],
+                             'type': None,
+                             'update_time': '2020-04-13T22:29:31.799096Z',
+                             'version': 1}],
+        'earliest_time': '2020-04-13T22:29:31.797610Z',
+        'id': 641,
+        'latest_time': '2020-04-13T22:29:31.797610Z',
+        'open_events': 1,
+        'severity_counts': [   {'count': 0, 'name': 'high'},
+                               {'count': 0, 'name': 'medium'},
+                               {'count': 1, 'name': 'low'}],
+        'tags': [],
+        'tenant': 0,
+        'total_events': 1,
+        'value': 'http://familiapaixao.coconet-us.com/tmMTo.exe'}]
+2020-04-15 00:23:43,630 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Successfully retrieved indicator (http://familiapaixao.coconet-us.com/tmMTo.exe); Exception: None
+2020-04-15 00:24:55,829 phantom.base_connector.BaseConnector INFO ActionResult.update_summary() - Summary (next line):
+{   'ioc_id': 641,
+    'ioc_value': 'http://familiapaixao.coconet-us.com/tmMTo.exe',
+    'tags': []}
+2020-04-15 00:24:55,833 phantom.base_connector.BaseConnector INFO ActionResult.add_data() - Data (next line):
+[   {   'artifacts': [   {   'cef': {   'requestURL': 'http://familiapaixao.coconet-us.com/tmMTo.exe'},
+                             'cef_types': {'requestURL': []},
+                             'container': 187,
+                             'container_name': 'Fun with Filtering Example 2',
+                             'create_time': '2020-04-13T22:29:31.797610Z',
+                             'description': None,
+                             'end_time': None,
+                             'has_note': False,
+                             'hash': '4c9d3e31d37cf6f032204b5a75d828ee',
+                             'id': 758,
+                             'in_case': False,
+                             'ingest_app': None,
+                             'kill_chain': None,
+                             'label': 'event',
+                             'name': 'URL Artifact',
+                             'owner': 1,
+                             'parent_artifact': None,
+                             'parent_container': None,
+                             'playbook_run': None,
+                             'severity': 'medium',
+                             'source_data_identifier': '84178c81-b715-401a-90ee-a26cfd1b55c5',
+                             'start_time': '2020-04-13T22:29:31.803505Z',
+                             'tags': [],
+                             'type': None,
+                             'update_time': '2020-04-13T22:29:31.799096Z',
+                             'version': 1}],
+        'earliest_time': '2020-04-13T22:29:31.797610Z',
+        'id': 641,
+        'latest_time': '2020-04-13T22:29:31.797610Z',
+        'open_events': 1,
+        'severity_counts': [   {'count': 0, 'name': 'high'},
+                               {'count': 0, 'name': 'medium'},
+                               {'count': 1, 'name': 'low'}],
+        'tags': [],
+        'tenant': 0,
+        'total_events': 1,
+        'value': 'http://familiapaixao.coconet-us.com/tmMTo.exe'}]
+2020-04-15 00:24:55,850 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Successfully retrieved indicator (http://familiapaixao.coconet-us.com/tmMTo.exe); Exception: None
+2020-04-15 00:25:06,359 phantom.base_connector.BaseConnector INFO ActionResult.update_summary() - Summary (next line):
+{   'ioc_id': 641,
+    'ioc_value': 'http://familiapaixao.coconet-us.com/tmMTo.exe',
+    'tags': []}
+2020-04-15 00:25:06,359 phantom.base_connector.BaseConnector INFO ActionResult.add_data() - Data (next line):
+[   {   'earliest_time': '2020-04-13T22:29:31.797610Z',
+        'id': 641,
+        'latest_time': '2020-04-13T22:29:31.797610Z',
+        'open_events': 1,
+        'severity_counts': [   {'count': 0, 'name': 'high'},
+                               {'count': 0, 'name': 'medium'},
+                               {'count': 1, 'name': 'low'}],
+        'tags': [],
+        'tenant': 0,
+        'total_events': 1,
+        'value': 'http://familiapaixao.coconet-us.com/tmMTo.exe'}]
+2020-04-15 00:25:06,360 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Successfully retrieved indicator (http://familiapaixao.coconet-us.com/tmMTo.exe); Exception: None
+2020-04-15 00:25:12,806 phantom.base_connector.BaseConnector INFO ActionResult.update_summary() - Summary (next line):
+{   'ioc_id': 641,
+    'ioc_value': 'http://familiapaixao.coconet-us.com/tmMTo.exe',
+    'tags': []}
+2020-04-15 00:25:12,807 phantom.base_connector.BaseConnector INFO ActionResult.add_data() - Data (next line):
+[   {   'earliest_time': '2020-04-13T22:29:31.797610Z',
+        'id': 641,
+        'latest_time': '2020-04-13T22:29:31.797610Z',
+        'open_events': 1,
+        'severity_counts': [   {'count': 0, 'name': 'high'},
+                               {'count': 0, 'name': 'medium'},
+                               {'count': 1, 'name': 'low'}],
+        'tags': [],
+        'tenant': 0,
+        'total_events': 1,
+        'value': 'http://familiapaixao.coconet-us.com/tmMTo.exe'}]
+2020-04-15 00:25:12,808 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Successfully retrieved indicator (http://familiapaixao.coconet-us.com/tmMTo.exe); Exception: None
+2020-04-15 00:26:39,338 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Unable to find indicator - http://familiapaixao.coconet-us.com/tmMTo.exe; Exception: None
+2020-04-15 00:27:31,978 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Unable to find indicator - http://familiapaixao.coconet-us.com/tmMTo.exe; Exception: None
+2020-04-15 00:29:07,332 phantom.base_connector.BaseConnector INFO ActionResult.update_summary() - Summary (next line):
+{   'ioc_id': 641,
+    'ioc_value': 'http://familiapaixao.coconet-us.com/tmMTo.exe',
+    'tags': []}
+2020-04-15 00:29:07,335 phantom.base_connector.BaseConnector INFO ActionResult.add_data() - Data (next line):
+[   {   'artifacts': [   {   'cef': {   'requestURL': 'http://familiapaixao.coconet-us.com/tmMTo.exe'},
+                             'cef_types': {'requestURL': []},
+                             'container': 187,
+                             'container_name': 'Fun with Filtering Example 2',
+                             'create_time': '2020-04-13T22:29:31.797610Z',
+                             'description': None,
+                             'end_time': None,
+                             'has_note': False,
+                             'hash': '4c9d3e31d37cf6f032204b5a75d828ee',
+                             'id': 758,
+                             'in_case': False,
+                             'ingest_app': None,
+                             'kill_chain': None,
+                             'label': 'event',
+                             'name': 'URL Artifact',
+                             'owner': 1,
+                             'parent_artifact': None,
+                             'parent_container': None,
+                             'playbook_run': None,
+                             'severity': 'medium',
+                             'source_data_identifier': '84178c81-b715-401a-90ee-a26cfd1b55c5',
+                             'start_time': '2020-04-13T22:29:31.803505Z',
+                             'tags': [],
+                             'type': None,
+                             'update_time': '2020-04-13T22:29:31.799096Z',
+                             'version': 1}],
+        'earliest_time': '2020-04-13T22:29:31.797610Z',
+        'id': 641,
+        'latest_time': '2020-04-13T22:29:31.797610Z',
+        'open_events': 1,
+        'severity_counts': [   {'count': 0, 'name': 'high'},
+                               {'count': 0, 'name': 'medium'},
+                               {'count': 1, 'name': 'low'}],
+        'tags': [],
+        'tenant': 0,
+        'total_events': 1,
+        'value': 'http://familiapaixao.coconet-us.com/tmMTo.exe'}]
+2020-04-15 00:29:07,351 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Successfully retrieved indicator (http://familiapaixao.coconet-us.com/tmMTo.exe); Exception: None
+2020-04-15 00:29:23,897 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Unable to find indicator - http://familiapaixao.coconet-us.com/tmMTo.exe; Exception: None
+2020-04-15 00:30:40,767 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: False; Message: Unable to find indicator - http://familiapaixao.coconet-us.com/tmMTo.exe; Exception: None
+2020-04-15 00:33:20,105 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Successfully updated tags; Exception: None
+2020-04-15 00:33:36,913 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Successfully updated tags; Exception: None
+2020-04-15 00:37:11,921 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Successfully updated tags; Exception: None
+2020-04-15 00:37:59,314 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Successfully updated tags; Exception: None
+2020-04-15 00:43:44,388 phantom.base_connector.BaseConnector INFO ActionResult.set_status() - Status: True; Message: Successfully updated tags; Exception: None

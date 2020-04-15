@@ -4,3 +4,5 @@ Makefile
 .git*
 .gitlab-ci.yml
 *.py
+*testme.py
+*testme.pyc

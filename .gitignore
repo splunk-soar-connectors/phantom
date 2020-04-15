@@ -1,0 +1,7 @@
+*testme.py
+*testme.pyc
+debug_log.debug_log
+docker-compose.yml
+exclude_files.txt
+Makefile
+*.pyc
