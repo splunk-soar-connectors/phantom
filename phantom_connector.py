@@ -233,14 +233,22 @@ class PhantomConnector(BaseConnector):
         self.save_progress("Test connectivity passed")
         return self.set_status(phantom.APP_SUCCESS, 'Request succeeded')
 
-    def load_dirty_json(self, dirty_json):
+    def load_dirty_json(self, dirty_json, action_result):
         import re
         regex_replace = [(r"([ \{,:\[])(u)?'([^']+)'", r'\1"\3"'), (r" False([, \}\]])", r' false\1'),
                          (r" True([, \}\]])", r' true\1')]
         for r, s in regex_replace:
             dirty_json = re.sub(r, s, dirty_json)
         dirty_json = dirty_json.replace(": ''", ': ""')
-        clean_json = json.loads(dirty_json)
+
+        try:
+            clean_json = json.loads(dirty_json)
+            if not isinstance(clean_json, dict):
+                action_result.set_status(phantom.APP_ERROR, "Please provide cef_json parameter in JSON format")
+                return None
+        except Exception as e:
+            action_result.set_status(phantom.APP_ERROR, "Could not load JSON from cef_json parameter", e)
+            return None
 
         return clean_json
 
@@ -262,11 +270,18 @@ class PhantomConnector(BaseConnector):
 
         # Get the CEF JSON and update the artifact
         myData = resp_data['cef']
-        clean_json = self.load_dirty_json(str(cef_json))
+        clean_json = self.load_dirty_json(str(cef_json), action_result)
+
+        if clean_json is None:
+            return action_result.get_status()
+
         myData.update(clean_json)
         myData = dict((k, v) for k, v in myData.iteritems() if v)
         myJson = {"cef": myData}
-        myCleanJson = self.load_dirty_json(str(myJson))
+        myCleanJson = self.load_dirty_json(str(myJson), action_result)
+
+        if myCleanJson is None:
+            return action_result.get_status()
 
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=myCleanJson, method="post")
 
@@ -426,12 +441,12 @@ class PhantomConnector(BaseConnector):
             try:
                 loaded_cef = json.loads(cef_dict)
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF paramter", e)
+                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF parameter", e)
 
             try:
                 loaded_contains = json.loads(contains)
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains paramter", e)
+                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains parameter", e)
 
         if cef_name and cef_value:
             loaded_cef[cef_name] = cef_value

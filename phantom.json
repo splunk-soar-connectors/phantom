@@ -474,11 +474,15 @@
                     "default": false
                 }
             },
-            "render": {},
+            "render": {
+                "type": "table"
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Status"
                 },
                 {
                     "data_path": "action_result.parameter.create",
@@ -1156,6 +1160,9 @@
                     "required": true
                 }
             },
+            "render":{
+                "type": "table"
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
@@ -1163,7 +1170,9 @@
                     "example_values": [
                         "success",
                         "failed"
-                    ]
+                    ],
+                    "column_order": 0,
+                    "column_name": "Status"
                 },
                 {
                     "data_path": "action_result.parameter.container_id",
@@ -1195,7 +1204,7 @@
                     "contains": [
                         "phantom container id"
                     ],
-                    "column_order": 0,
+                    "column_order": 1,
                     "column_name": "New Container"
                 },
                 {
