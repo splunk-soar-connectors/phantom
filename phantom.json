@@ -2384,6 +2384,7 @@
         {
             "action": "modify indicator tag",
             "description": "modifies indicator tags",
+            "verbose": "If using ioc_list, do not use any of other parameters. IOC list should be a JSON formatted string like so: <br /><br />[{\"ioc_value\": \"ioc_value_goes_here\", \"tag_to_add\": \"csv_list_of_tags_to_add\", \"tags_to_remove\": \"csv_list_of_tags_to_remove\"}, {\"ioc_id\": \"ioc_id_goes_here\" ...]. <br /><br />. If not using IOC List, and ioc_value <strong>and</strong> ioc_id are provided, ioc_id will be used and ioc_value will be ignored.",
             "type": "generic",
             "identifier": "modify_indicator_tag",
             "read_only": false,
@@ -2401,7 +2402,7 @@
                     "required": false
                 },
                 "ioc_id": {
-                    "description": "ioc id",
+                    "description": "ioc id, will override ioc value if both are provided",
                     "data_type": "numeric",
                     "order": 2,
                     "required": false
@@ -2513,8 +2514,8 @@
                         "complete"
                     ]
                 },
-                "username": {
-                    "description": "Task assignee (user)",
+                "user": {
+                    "description": "Task assignee (username or user id)",
                     "data_type": "string",
                     "order": 4,
                     "required": false,
@@ -2583,7 +2584,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.username",
+                    "data_path": "action_result.parameter.user",
                     "data_type": "string"
                 },
                 {

@@ -457,7 +457,7 @@ class PhantomConnector(BaseConnector):
         status = param.get('status')
         note = param.get('note')
         note_title = param.get('note_title')
-        username = param.get('username')
+        username = param.get('user')
         role_id = param.get('role_id')
 
         if username and role_id:
