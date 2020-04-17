@@ -3,16 +3,16 @@
     "name": "Phantom",
     "description": "This App exposes various Phantom APIs as actions",
     "package_name": "phantom_phantom",
-    "publisher": "Phantom",
+    "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.pyc",
-    "app_version": "2.1.28",
+    "app_version": "2.1.29",
     "utctime_updated": "2019-11-19T20:26:14.000000Z",
     "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.2.7532",
-    "license": "Copyright (c) 2016-2019 Splunk Inc.",
+    "min_phantom_version": "4.6.19142",
+    "license": "Copyright (c) 2016-2020 Splunk Inc.",
     "logo": "logo_phantom.svg",
     "logo_dark": "logo_phantom_dark.svg",
     "configuration": {
@@ -332,7 +332,6 @@
         {
             "action": "add note",
             "description": "Add a note to an artifact",
-            "verbose": "",
             "type": "generic",
             "identifier": "add_note",
             "read_only": false,
@@ -369,8 +368,66 @@
                     "primary": false
                 }
             },
-            "render": {},
-            "output": [],
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Note created"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.title",
+                    "data_type": "string",
+                    "example_values": [
+                        "Note test",
+                        "Testing note"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.content",
+                    "data_type": "string",
+                    "example_values": [
+                        "Adding a note via app action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        35
+                    ],
+                    "contains": [
+                        "phantom container id"
+                    ]
+                }
+            ],
+            "render": {
+                "type": "table"
+            },
             "versions": "EQ(*)"
         },
         {
@@ -405,8 +462,62 @@
                     "allow_list": true
                 }
             },
-            "render": {},
-            "output": [],
+            "render": {
+                "type": "table"
+            },
+            "output": [
+                {
+                    "data_path": "action_result.status",
+                    "data_type": "string",
+                    "example_values": [
+                        "success"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Artifact Updated"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 1
+                },
+                {
+                    "data_path": "action_result.parameter.remove_tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "hello"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.artifact_id",
+                    "data_type": "string",
+                    "example_values": [
+                        "94"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.add_tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "splunk"
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                }
+            ],
             "versions": "EQ(*)"
         },
         {

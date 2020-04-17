@@ -1,5 +1,5 @@
 # File: phantom_connector.py
-# Copyright (c) 2016-2019 Splunk Inc.
+# Copyright (c) 2016-2020 Splunk Inc.
 #
 # SPLUNK CONFIDENTIAL - Use or disclosure of this material in whole or in part
 # without a valid written license from Splunk Inc. is PROHIBITED.
@@ -34,6 +34,8 @@ import bz2
 import datetime
 import time
 import urllib
+import random
+import string
 
 TIMEOUT = 120
 INVALID_RESPONSE = 'Server did not return a valid JSON response.'
@@ -181,7 +183,7 @@ class PhantomConnector(BaseConnector):
         auth_token = config.get('auth_token')
 
         if ((auth_token) and ('ph-auth-token' not in headers)):
-                headers['ph-auth-token'] = auth_token
+            headers['ph-auth-token'] = auth_token
 
         if ('Content-Type' not in headers):
             headers.update({'Content-Type': 'application/json'})
@@ -560,6 +562,9 @@ class PhantomConnector(BaseConnector):
 
         save_as = file_name or '_invalid_file_name_'
 
+        # PAPP-9543 append a random string to the filename to make concurrent action runs succeed
+        save_as = save_as + '_' + ''.join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16))
+
         # if the path contains a directory
         if (os.path.dirname(save_as)):
             save_as = '-'.join(save_as.split(os.sep))
@@ -915,7 +920,7 @@ class PhantomConnector(BaseConnector):
 
         if artifact_json_list:
             try:
-                    artifacts = json.loads(artifact_json_list)
+                artifacts = json.loads(artifact_json_list)
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR, "Error parsing artifacts list JSON: {}".format(str(e)))
         else:
