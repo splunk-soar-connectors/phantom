@@ -440,11 +440,16 @@ class PhantomConnector(BaseConnector):
 
             try:
                 loaded_cef = json.loads(cef_dict)
+                if not isinstance(loaded_cef, dict):
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide cef_dictionary parameter in JSON format")
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF parameter", e)
 
+        if contains:
             try:
                 loaded_contains = json.loads(contains)
+                if not isinstance(loaded_contains, dict):
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide contains parameter in JSON format")
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains parameter", e)
 
@@ -862,6 +867,12 @@ class PhantomConnector(BaseConnector):
         if artifact_json_list:
             try:
                 artifacts = json.loads(artifact_json_list)
+                if not isinstance(artifacts, list):
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide container_artifacts as a list of artifact objects in JSON format")
+                else:
+                    for artifact in artifacts:
+                        if not isinstance(artifacts, dict):
+                            return action_result.set_status(phantom.APP_ERROR, "Please provide container_artifacts as a list of artifact objects in JSON format")
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR, "Error parsing artifacts list JSON: {}".format(str(e)))
         else:
