@@ -6,8 +6,8 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.pyc",
-    "app_version": "2.1.29",
-    "utctime_updated": "2019-11-19T20:26:14.000000Z",
+    "app_version": "2.1.30",
+    "utctime_updated": "2020-04-21T02:13:09.000000Z",
     "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
@@ -72,7 +72,9 @@
                     "data_type": "string",
                     "order": 0,
                     "required": true,
-                    "contains": ["phantom artifact id"],
+                    "contains": [
+                        "phantom artifact id"
+                    ],
                     "primary": true
                 },
                 "name": {
@@ -150,7 +152,9 @@
                 {
                     "data_path": "action_result.parameter.artifact_id",
                     "data_type": "string",
-                    "contains": ["phantom artifact id"],
+                    "contains": [
+                        "phantom artifact id"
+                    ],
                     "example_values": [
                         "2388"
                     ],
