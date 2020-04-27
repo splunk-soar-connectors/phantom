@@ -69,7 +69,7 @@
             "parameters": {
                 "artifact_id": {
                     "description": "The artifact id",
-                    "data_type": "string",
+                    "data_type": "numeric",
                     "order": 0,
                     "required": true,
                     "primary": true

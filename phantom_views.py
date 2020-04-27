@@ -48,11 +48,18 @@ def find_artifacts(provides, all_results, context):
                 row.append({ 'value': item.get('matched') })
                 rows.append(row)
 
-    content = {
-      "data": rows,
-      "recordsTotal": total,
-      "recordsFiltered": total,
-    }
+    if len(rows) == 0:
+        content = {
+            "data": [[{"value": None}, {"value": None}, {"value": None}, {"value": None}, {"value": None}, {"value": None}]],
+            "recordsTotal": 1,
+            "recordsFiltered": 1
+        }
+    else:
+        content = {
+            "data": rows,
+            "recordsTotal": total,
+            "recordsFiltered": total,
+        }
     return HttpResponse(json.dumps(content), content_type='text/javascript')
 
 
@@ -91,11 +98,18 @@ def add_artifact(provides, all_results, context):
                 row.append({ 'value': c_link, 'link': summary.get('container id') })
                 rows.append(row)
 
-    content = {
-      "data": rows,
-      "recordsTotal": total,
-      "recordsFiltered": total,
-    }
+    if len(rows) == 0:
+        content = {
+            "data": [[{"value": None}, {"value": None}]],
+            "recordsTotal": 1,
+            "recordsFiltered": 1
+        }
+    else:
+        content = {
+            "data": rows,
+            "recordsTotal": total,
+            "recordsFiltered": total
+        }
     return HttpResponse(json.dumps(content), content_type='text/javascript')
 
 
@@ -141,9 +155,16 @@ def find_listitem(provides, all_results, context):
                     row.append({ 'value': 'Row {}, Column {}'.format(len_of_list[0], len_of_list[1])})
                 rows.append(row)
 
-    content = {
-      "data": rows,
-      "recordsTotal": total,
-      "recordsFiltered": total,
-    }
+    if len(rows) == 0:
+        content = {
+            "data": [[{"value": None}, {"value": None}, {"value": None}]],
+            "recordsTotal": 1,
+            "recordsFiltered": 1
+        }
+    else:
+        content = {
+            "data": rows,
+            "recordsTotal": total,
+            "recordsFiltered": total,
+        }
     return HttpResponse(json.dumps(content), content_type='text/javascript')

@@ -16,6 +16,7 @@ from phantom.cef import CEF_JSON
 from phantom.utils import CONTAINS_VALIDATORS
 import phantom.utils as ph_utils
 from phantom.vault import Vault
+from bs4 import UnicodeDammit
 
 import ast
 import json
@@ -87,7 +88,10 @@ class PhantomConnector(BaseConnector):
 
         # The device that this app talks to does not sends back a simple message,
         # so this function does not need to be that complicated
-        return resp_json.get('message', '-')
+        message = resp_json.get('message')
+        if not message:
+            message = "Unknown error occurred"
+        return message
 
     def _process_html_response(self, response, action_result):
 
@@ -199,6 +203,9 @@ class PhantomConnector(BaseConnector):
             auth = None
             if ('ph-auth-token' in headers):
                 del headers['ph-auth-token']
+            headers.update({'user-session-token': str(self.__dict__.get('_BaseConnector__input_json').get('user_session_token'))})
+            # To avoid '//' in the URL(due to self._base_uri + endpoint)
+            self._base_uri = self._base_uri[:-1]
 
         try:
             response = request_func(self._base_uri + endpoint,
@@ -214,7 +221,25 @@ class PhantomConnector(BaseConnector):
         except SSLError as e:
             return (action_result.set_status(phantom.APP_ERROR, "HTTPS SSL validation failed", e), None, None)
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, "Error connecting to server", e), None, None)
+            try:
+                if e.args:
+                    if len(e.args) > 1:
+                        error_code = e.args[0]
+                        error_msg = e.args[1]
+                    elif len(e.args) == 1:
+                        error_code = "Error code unavailable"
+                        error_msg = e.args[0]
+                else:
+                    error_code = "Error code unavailable"
+                    error_msg = "Error occurred while connecting to the LDAP server. Please check the asset configuration and|or action parameters."
+                error_msg = UnicodeDammit(error_msg).unicode_markup.encode('utf-8')
+            except TypeError:
+                error_code = "Error code unavailable"
+                error_msg = "Error occurred while connecting to the LDAP server. Please check the asset configuration and|or the action parameters."
+            except:
+                error_code = "Error code unavailable"
+                error_msg = "Error occurred while connecting to the LDAP server. Please check the asset configuration and|or action parameters."
+            return (action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Error code:{} Error Message:{}".format(error_code, error_msg)), None, None)
 
         return self._process_response(response, action_result)
 
@@ -260,7 +285,7 @@ class PhantomConnector(BaseConnector):
 
         cef_json = param.get('cef_json', '')
 
-        endpoint = "/rest/artifact/" + artifact_id
+        endpoint = "/rest/artifact/{}".format(artifact_id)
         # First get the artifacts json
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
 
@@ -270,7 +295,7 @@ class PhantomConnector(BaseConnector):
 
         # Get the CEF JSON and update the artifact
         myData = resp_data['cef']
-        clean_json = self.load_dirty_json(str(cef_json), action_result)
+        clean_json = self.load_dirty_json(cef_json, action_result)
 
         if clean_json is None:
             return action_result.get_status()
@@ -309,6 +334,11 @@ class PhantomConnector(BaseConnector):
             self.save_progress("Unable to get artifact, please check the artifact id")
             return action_result.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
 
+        resp_label = resp_data.get("label")
+
+        if not resp_label:
+            self.debug_print("The provided aritfact does not have any label")
+
         # Label has to be included or it gets clobbered in POST
         fields = ['tags', 'label']
         art_data = {f: response.json().get(f) for f in fields}
@@ -322,11 +352,22 @@ class PhantomConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             self.save_progress("Unable to modify artifact")
-            return action_result.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
+            msg = 'Failed to update artifact: {}'.format(action_result.get_message())
+            if not resp_label:
+                msg = "{}. {}".format("The reason of the failure can be the unavailability of the label in the provided artifact", msg)
+            return action_result.set_status(phantom.APP_ERROR, msg)
         return action_result.set_status(phantom.APP_SUCCESS, "Artifact Updated")
 
     def _add_note(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
+
+        phase_id = param.get('phase_id', None)
+
+        try:
+            if phase_id:
+                phase_id = int(phase_id)
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid phase ID")
 
         endpoint = '/rest/container_note'
 
@@ -334,7 +375,7 @@ class PhantomConnector(BaseConnector):
             'container_id': param.get('container_id', self.get_container_id()),
             'title': param.get('title', ''),
             'content': param.get('content', ''),
-            'phase_id': param.get('phase_id', None)
+            'phase': phase_id
         }
 
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=note_data, method="post")
@@ -349,6 +390,7 @@ class PhantomConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         limit_search = param.get("limit_search", False)
         container_ids = param.get("container_ids", "current")
+        values = UnicodeDammit(param.get('values', '')).unicode_markup.encode('utf-8')
         if limit_search:
             container_ids = list(set([a for a in
                 [int(z) if isinstance(z, int) or z.isdigit() else None for z in
@@ -358,8 +400,7 @@ class PhantomConnector(BaseConnector):
                  ]
                 if a
             ]))
-        action_result.update_param({"container_ids": str(sorted(container_ids)).strip("[]")})
-        values = param.get('values', '')
+            action_result.update_param({"container_ids": str(sorted(container_ids)).strip("[]")})
 
         if param.get('is_regex'):
             flt = 'iregex'
@@ -445,17 +486,18 @@ class PhantomConnector(BaseConnector):
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF parameter", e)
 
-        if contains:
-            try:
-                loaded_contains = json.loads(contains)
-                if not isinstance(loaded_contains, dict):
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide contains parameter in JSON format")
-            except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains parameter", e)
+            if contains:
+                try:
+                    loaded_contains = json.loads(contains)
+                    if not isinstance(loaded_contains, dict):
+                        return action_result.set_status(phantom.APP_ERROR, "Please provide contains parameter in JSON format")
+                except Exception as e:
+                    return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains parameter", e)
 
         if cef_name and cef_value:
             loaded_cef[cef_name] = cef_value
-            loaded_contains[cef_name] = [contains]
+            if contains:
+                loaded_contains[cef_name] = [contains]
 
         artifact = {}
         artifact['name'] = name
@@ -650,6 +692,13 @@ class PhantomConnector(BaseConnector):
                 'pretty': ''
             }
             ret_val, response, resp_data = self._make_rest_call('/rest/container_attachment', action_result, params=query_params)
+
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
+            if resp_data.get("count") == 0:
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while accessing the vault ID. Please verify the provided vault ID in the action parameter")
+
             vault_info = resp_data['data'][0]
             for k in vault_info.keys():
                 if k.startswith('_pretty_'):
@@ -679,7 +728,7 @@ class PhantomConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         values = param.get('values')
-        list_name = param.get('list')
+        list_name = UnicodeDammit(param.get('list')).unicode_markup.encode('utf-8')
         exact_match = param.get('exact_match')
         column_index = int(param.get('column_index', -1))
         if column_index == '':
@@ -704,7 +753,7 @@ class PhantomConnector(BaseConnector):
                         found += 1
                         action_result.add_data(row)
                         coordinates.append((rownum, cid))
-                    elif value and values in value:
+                    elif not exact_match and value and values in value:
                         found += 1
                         action_result.add_data(row)
                         coordinates.append((rownum, cid))
@@ -738,7 +787,7 @@ class PhantomConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        list_name = param.get('list')
+        list_name = UnicodeDammit(param.get('list')).unicode_markup.encode('utf-8')
 
         row = param.get('new_row')
 
@@ -759,7 +808,7 @@ class PhantomConnector(BaseConnector):
         ret_val, response, resp_data = self._make_rest_call(url, action_result, method='post', data=payload)
 
         if phantom.is_fail(ret_val):
-            if response.status_code == 404:
+            if response and response.status_code == 404:
                 if param.get('create'):
                     self.save_progress('List "{}" not found, creating'.format(list_name))
                     return self._create_list(list_name, row, action_result)
@@ -772,7 +821,7 @@ class PhantomConnector(BaseConnector):
 
     def _add_artifact_list(self, action_result, artifacts, ignore_auth=False):
         """ Add a list of artifacts """
-        ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifacts)
+        ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifacts, ignore_auth=ignore_auth)
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, "Error adding artifact: {}".format(action_result.get_message()))
         failed = 0
@@ -794,7 +843,7 @@ class PhantomConnector(BaseConnector):
         self._base_uri = source
         url = '/rest/container/{}'.format(container_id)
 
-        ret_val, response, resp_data = self._make_rest_call(url, action_result)
+        ret_val, response, resp_data = self._make_rest_call(url, action_result, ignore_auth=source_local)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -814,7 +863,7 @@ class PhantomConnector(BaseConnector):
         # container['ingest_app_id'] = container.pop('ingest_app', None)
 
         self._base_uri = destination
-        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container)
+        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container, ignore_auth=destination_local)
         if phantom.is_fail(ret_val):
             act_message = action_result.get_message()
             if ('ingesting asset_id' in act_message):
@@ -832,7 +881,7 @@ class PhantomConnector(BaseConnector):
         url = '/rest/container/{}/artifacts'.format(container_id)
         params = {'sort': 'id', 'order': 'asc', 'page_size': 0}
         self._base_uri = source
-        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params)
+        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params, ignore_auth=source_local)
 
         artifacts = resp_data['data']
         if artifacts:
@@ -851,7 +900,7 @@ class PhantomConnector(BaseConnector):
             artifacts[-1]['run_automation'] = True
 
             self._base_uri = destination
-            ret_val = self._add_artifact_list(action_result, artifacts)
+            ret_val = self._add_artifact_list(action_result, artifacts, ignore_auth=destination_local)
             if phantom.is_fail(ret_val):
                 return ret_val
 
@@ -861,6 +910,9 @@ class PhantomConnector(BaseConnector):
     def _create_container_new(self, action_result, container_json, artifact_json_list):
         try:
             container = json.loads(container_json)
+            if not isinstance(container, dict):
+                return action_result.set_status(phantom.APP_ERROR, "Please provide json formatted dictionary in container_json action parameter")
+
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Error parsing container JSON: {}".format(str(e)))
 
@@ -871,7 +923,7 @@ class PhantomConnector(BaseConnector):
                     return action_result.set_status(phantom.APP_ERROR, "Please provide container_artifacts as a list of artifact objects in JSON format")
                 else:
                     for artifact in artifacts:
-                        if not isinstance(artifacts, dict):
+                        if not isinstance(artifact, dict):
                             return action_result.set_status(phantom.APP_ERROR, "Please provide container_artifacts as a list of artifact objects in JSON format")
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR, "Error parsing artifacts list JSON: {}".format(str(e)))
@@ -935,7 +987,7 @@ class PhantomConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         url_params = {
-                '_filter_action': '"{0}"'.format(param['action_name']),
+                '_filter_action': '"{0}"'.format(UnicodeDammit(param['action_name']).unicode_markup.encode('utf-8')),
                 'include_expensive': '',
                 'sort': 'start_time',
                 'order': 'desc',
@@ -963,27 +1015,29 @@ class PhantomConnector(BaseConnector):
 
         if 'app' in param:
 
-            app_params = {'_filter_name__iexact': '"{0}"'.format(param['app'])}
+            app_name = UnicodeDammit(param['app']).unicode_markup.encode('utf-8')
+            app_params = {'_filter_name__iexact': '"{0}"'.format(app_name)}
             ret_val, response, resp_json = self._make_rest_call('/rest/app', action_result, params=app_params)
 
             if phantom.is_fail(ret_val):
                 return ret_val
 
             if resp_json['count'] == 0:
-                return action_result.set_status(phantom.APP_ERROR, "Could not find app with name '{0}'".format(param['app']))
+                return action_result.set_status(phantom.APP_ERROR, "Could not find app with name '{0}'".format(app_name))
 
             url_params['_filter_app'] = resp_json['data'][0]['id']
 
         if 'asset' in param:
 
-            asset_params = {'_filter_name__iexact': '"{0}"'.format(param['asset'])}
+            asset = UnicodeDammit(param['asset']).unicode_markup.encode('utf-8')
+            asset_params = {'_filter_name__iexact': '"{0}"'.format(asset)}
             ret_val, response, resp_json = self._make_rest_call('/rest/asset', action_result, params=asset_params)
 
             if phantom.is_fail(ret_val):
                 return ret_val
 
             if resp_json['count'] == 0:
-                return action_result.set_status(phantom.APP_ERROR, "Could not find asset with name '{0}'".format(param['asset']))
+                return action_result.set_status(phantom.APP_ERROR, "Could not find asset with name '{0}'".format(asset))
 
             url_params['_filter_asset'] = resp_json['data'][0]['id']
 
@@ -1036,7 +1090,7 @@ class PhantomConnector(BaseConnector):
         row_number = str(param['row_number'])
         row_values_as_list = param['row_values_as_list']
 
-        list_identifier = param.get('list_name')
+        list_identifier = UnicodeDammit(param.get('list_name')).unicode_markup.encode('utf-8')
         if not list_identifier:
             list_identifier = param.get('id')
         if not list_identifier:
