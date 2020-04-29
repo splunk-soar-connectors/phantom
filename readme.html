@@ -8,6 +8,12 @@ The auth_token config parameter is for use with Phantom instances. If both the t
 <br><br>
 Note that the IP (or name) being used must match the allowed IP in the remote Phantom instance's REST asset configuration.
 <br><br>
+For the <code>update list</code> action, if both, id and list_name parameters are given such that both of them point to different lists, then list_name parameter will be preferred and the action will update the list specified in the list_name parameter.
+<br><br>
+For the <code>find artifacts</code> action, container_id parameter will be considered only if limit_search parameter is true.
+<br><br>
+In the <code>add artifact</code> action, to provide values containing double-quotes("), add a backslash(\) before the double-quotes. For example, {"X-Universally-Unique-Identifier":"test","Content-Type":"multipart/alternative; boundary=<b>\"</b>Apple-Mail=_0DA95D7E-B791-4751-8043-175949088A2C<b>\"</b>>","Message-Id":"<abc@xyz.com>"}
+<br><br>
 For information on how to obtain an authorization token, see Provisioning an Authorization Token in the Phantom REST Overview documentation.
 <br><br>
 See <a href="https://my.phantom.us/kb/7/" target="_blank">KB article 7</a> and <a href="https://my.phantom.us/kb/16/" target="_blank">KB article 16</a> on how to create and verify a valid HTTPS certificate for your Phantom instance.

@@ -44,10 +44,12 @@ SUPPORTED_FILES = ['application/zip', 'application/x-gzip', 'application/x-tar',
 
 
 def determine_contains(value):
+    valid_contains = list()
     for c, f in CONTAINS_VALIDATORS.items():
         if f(value):
-            return c
-    return None
+            valid_contains.append(c)
+
+    return valid_contains
 
 
 class RetVal3(tuple):
@@ -271,6 +273,9 @@ class PhantomConnector(BaseConnector):
             if not isinstance(clean_json, dict):
                 action_result.set_status(phantom.APP_ERROR, "Please provide cef_json parameter in JSON format")
                 return None
+            if not clean_json:
+                action_result.set_status(phantom.APP_ERROR, "Please provide a non-empty JSON in cef_json parameter")
+                return None
         except Exception as e:
             action_result.set_status(phantom.APP_ERROR, "Could not load JSON from cef_json parameter", e)
             return None
@@ -318,7 +323,10 @@ class PhantomConnector(BaseConnector):
     def _tag_artifact(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        artifact_id = param.get('artifact_id', '')
+        try:
+            artifact_id = int(param.get('artifact_id'))
+        except:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid artifact ID")
         add_tags = param.get('add_tags', '')
         remove_tags = param.get('remove_tags', '')
 
@@ -326,7 +334,7 @@ class PhantomConnector(BaseConnector):
         add_tags = set(add_tags.split(','))
         remove_tags = set(remove_tags.split(','))
 
-        endpoint = "/rest/artifact/" + artifact_id
+        endpoint = "/rest/artifact/{}".format(artifact_id)
         # First get the artifacts json
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
 
@@ -516,7 +524,7 @@ class PhantomConnector(BaseConnector):
             if cef_name not in CEF_NAME_MAPPING:
                 determined_contains = determine_contains(loaded_cef[cef_name])
                 if determined_contains:
-                    artifact['cef_types'][cef_name] = [determined_contains]
+                    artifact['cef_types'][cef_name] = determined_contains
             else:
                 try:
                     artifact['cef_types'][cef_name] = CEF_JSON[cef_name]['contains']
@@ -709,7 +717,7 @@ class PhantomConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Failed to get vault item info", e)
 
-        file_type = magic.from_file(file_path, mime=True)
+        file_type = magic.from_file(file_path, mime=True)   
 
         if (file_type not in SUPPORTED_FILES):
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
@@ -730,9 +738,15 @@ class PhantomConnector(BaseConnector):
         values = param.get('values')
         list_name = UnicodeDammit(param.get('list')).unicode_markup.encode('utf-8')
         exact_match = param.get('exact_match')
-        column_index = int(param.get('column_index', -1))
-        if column_index == '':
-            column_index = -1
+        column_index = param.get('column_index')
+
+        if column_index is not None:
+            try:
+                column_index = int(column_index)
+                if column_index < 0:
+                    raise Exception
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a non-negative integer for column_index parameter")
 
         endpoint = '/rest/decided_list/{}'.format(list_name)
 
@@ -748,7 +762,7 @@ class PhantomConnector(BaseConnector):
         found = 0
         for rownum, row in enumerate(content):
             for cid, value in enumerate(row):
-                if column_index < 0 or cid == column_index:
+                if column_index is None or cid == column_index:
                     if exact_match and value == values:
                         found += 1
                         action_result.add_data(row)
@@ -964,7 +978,10 @@ class PhantomConnector(BaseConnector):
     def _export_container(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        container_id = param['container_id']
+        try:
+            container_id = int(param['container_id'])
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide an integer value for container_id parameter")
 
         destination = self._base_uri
         source = self.get_phantom_base_url()
@@ -974,7 +991,10 @@ class PhantomConnector(BaseConnector):
     def _import_container(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        container_id = param['container_id']
+        try:
+            container_id = int(param['container_id'])
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide an integer value for container_id parameter")
 
         destination = self.get_phantom_base_url()
         source = self._base_uri
@@ -1005,12 +1025,22 @@ class PhantomConnector(BaseConnector):
             url_params['_filter_result_data__regex'] = '"parameter.*\\"{0}\\": \\"{1}\\""'.format(search_key, search_value)
 
         if 'time_limit' in param:
-            hours = int(param['time_limit'])
+            try:
+                hours = int(param['time_limit'])
+                if hours <= 0:
+                    raise Exception
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a positive integer for time_limit parameter")
             time_str = (datetime.datetime.utcnow() - datetime.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%SZ")
             url_params['_filter_start_time__gt'] = '"{0}"'.format(time_str)
 
         if 'max_results' in param:
-            limit = int(param['max_results'])
+            try:
+                limit = int(param['max_results'])
+                if limit <= 0:
+                    raise Exception
+            except Exception:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a positive integer for max_results parameter")
             url_params['page_size'] = limit
 
         if 'app' in param:
@@ -1087,7 +1117,11 @@ class PhantomConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        row_number = str(param['row_number'])
+        try:
+            row_number = int(param['row_number'])
+        except Exception:
+            return action_result.set_status(phantom.APP_ERROR, "Please provide an integer value for row_number parameter")
+
         row_values_as_list = param['row_values_as_list']
 
         list_identifier = UnicodeDammit(param.get('list_name')).unicode_markup.encode('utf-8')
@@ -1100,7 +1134,7 @@ class PhantomConnector(BaseConnector):
 
         data = {
             "update_rows": {
-                row_number: row_values
+                str(row_number): row_values
             }
         }
 
@@ -1132,8 +1166,8 @@ class PhantomConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Error parsing the sleep seconds parameter. Reason: {0}".format(str(e)))
 
-        if (sleep_seconds < 0):
-            return action_result.set_status(phantom.APP_ERROR, "Invalid sleep_seconds value. Please specify a value greater or equal to 0")
+        if (sleep_seconds <= 0):
+            return action_result.set_status(phantom.APP_ERROR, "Invalid sleep_seconds value. Please specify a value greater than 0")
 
         remainder = sleep_seconds % 60
 
