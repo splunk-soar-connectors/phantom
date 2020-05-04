@@ -10,9 +10,13 @@ Note that the IP (or name) being used must match the allowed IP in the remote Ph
 <br><br>
 For the <code>update list</code> action, if both, id and list_name parameters are given such that both of them point to different lists, then list_name parameter will be preferred and the action will update the list specified in the list_name parameter.
 <br><br>
+While running the <code>create container</code> action, it is mandatory to provide a <b>label</b> key in the container_json parameter.	
+<br><br>
 For the <code>find artifacts</code> action, container_id parameter will be considered only if limit_search parameter is true.
 <br><br>
 In the <code>add artifact</code> action, to provide values containing double-quotes("), add a backslash(\) before the double-quotes. For example, {"X-Universally-Unique-Identifier":"test","Content-Type":"multipart/alternative; boundary=<b>\"</b>Apple-Mail=_0DA95D7E-B791-4751-8043-175949088A2C<b>\"</b>>","Message-Id":"<abc@xyz.com>"}
+<br><br>
+The actions, <code>export container</code> and <code>import container</code>, will fail with the error message like <b>severity instance with name u'critical' does not exist</b>, if the severity instances on the local phantom instance(the instance on which the action is being run) and the remote phantom instance(the instance which is configured in the asset) does not match.
 <br><br>
 For information on how to obtain an authorization token, see Provisioning an Authorization Token in the Phantom REST Overview documentation.
 <br><br>

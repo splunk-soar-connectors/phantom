@@ -1759,7 +1759,7 @@
                     "primary": false
                 },
                 "row_values_as_list": {
-                    "description": "New values for the row, separated by commas",
+                    "description": "JSON formatted list of new values for the row",
                     "data_type": "string",
                     "order": 0,
                     "required": true,

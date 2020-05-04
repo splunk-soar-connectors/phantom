@@ -290,6 +290,9 @@ class PhantomConnector(BaseConnector):
 
         cef_json = param.get('cef_json', '')
 
+        if cef_json:
+            cef_json = UnicodeDammit(cef_json).unicode_markup.encode("utf-8")
+
         endpoint = "/rest/artifact/{}".format(artifact_id)
         # First get the artifacts json
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
@@ -717,7 +720,7 @@ class PhantomConnector(BaseConnector):
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Failed to get vault item info", e)
 
-        file_type = magic.from_file(file_path, mime=True)   
+        file_type = magic.from_file(file_path, mime=True)
 
         if (file_type not in SUPPORTED_FILES):
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
@@ -1130,7 +1133,14 @@ class PhantomConnector(BaseConnector):
         if not list_identifier:
             return action_result.set_status(phantom.APP_ERROR, "Either the custom list's name or id must be provided")
 
-        row_values = [v.strip() for v in row_values_as_list.split(",")]
+        try:
+            row_values = json.loads(row_values_as_list)
+            if not isinstance(row_values, list):
+                return action_result.set_status(phantom.APP_ERROR, "Please provide row_values_as_list parameter as a non-empty JSON formatted list")
+            if not row_values:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide row_values_as_list parameter as a non-empty JSON formatted list")
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Could not load JSON formatted list from the row_values_as_list parameter", e)
 
         data = {
             "update_rows": {
