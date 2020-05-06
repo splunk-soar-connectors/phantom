@@ -7,6 +7,7 @@
 # --
 
 from django.http import HttpResponse
+from bs4 import UnicodeDammit
 import json
 
 
@@ -145,9 +146,15 @@ def find_listitem(provides, all_results, context):
                 if (cur_pos - 1) >= end:
                     break
                 row = []
+                item_str = ""
+                for i in item:
+                    if i:
+                        i = UnicodeDammit(i).unicode_markup.encode('utf-8')
+                    item_str = '{0}"{1}'.format(item_str, i)
+                item_str = '{0}"'.format(item_str)
 
                 row.append({ 'value': param.get('list') })
-                row.append({ 'value': json.dumps(item) })
+                row.append({ 'value': item_str })
                 len_of_list = len(locations) > idx and locations[idx] or 'Missing Data'
                 if type(len_of_list) == str:
                     row.append({ 'value': len_of_list})

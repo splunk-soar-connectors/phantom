@@ -92,7 +92,7 @@ class PhantomConnector(BaseConnector):
         # so this function does not need to be that complicated
         message = resp_json.get('message')
         if not message:
-            message = "Unknown error occurred"
+            message = "Error message is unavailable"
         return message
 
     def _process_html_response(self, response, action_result):
@@ -334,8 +334,8 @@ class PhantomConnector(BaseConnector):
         remove_tags = param.get('remove_tags', '')
 
         # These come in as str, so split, then convert to set
-        add_tags = set(add_tags.split(','))
-        remove_tags = set(remove_tags.split(','))
+        add_tags = set([x.strip() for x in add_tags.split(',')])
+        remove_tags = set([x.strip() for x in remove_tags.split(',')])
 
         endpoint = "/rest/artifact/{}".format(artifact_id)
         # First get the artifacts json
@@ -354,8 +354,22 @@ class PhantomConnector(BaseConnector):
         fields = ['tags', 'label']
         art_data = {f: response.json().get(f) for f in fields}
 
+        current_tags = set(art_data['tags'])
+        tags_already_added = set()
+        tags_already_removed = set()
+
+        # Find tags which are already present
+        for tag in add_tags:
+            if tag in current_tags:
+                tags_already_added.add(tag)
+
+        # Find tags that are to be removed but are not present
+        for tag in remove_tags:
+            if tag not in current_tags:
+                tags_already_removed.add(tag)
+
         # Set union first to add, then difference to remove, then cast back to list to update
-        _tags = (set(art_data['tags']) | add_tags) - remove_tags
+        _tags = (current_tags | add_tags) - remove_tags
         art_data['tags'] = list(_tags)
 
         # Post our changes
@@ -367,6 +381,10 @@ class PhantomConnector(BaseConnector):
             if not resp_label:
                 msg = "{}. {}".format("The reason of the failure can be the unavailability of the label in the provided artifact", msg)
             return action_result.set_status(phantom.APP_ERROR, msg)
+
+        action_result.update_summary({'Tags added': ', '.join((list(add_tags - tags_already_added))), 'Tags removed': ', '.join((list(remove_tags - tags_already_removed))),
+         'Tags already present': ', '.join((list(tags_already_added))), 'Unavailable tags to remove': ', '.join((list(tags_already_removed)))})
+
         return action_result.set_status(phantom.APP_SUCCESS, "Artifact Updated")
 
     def _add_note(self, param):
@@ -497,18 +515,24 @@ class PhantomConnector(BaseConnector):
             except Exception as e:
                 return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF parameter", e)
 
-            if contains:
-                try:
-                    loaded_contains = json.loads(contains)
-                    if not isinstance(loaded_contains, dict):
-                        return action_result.set_status(phantom.APP_ERROR, "Please provide contains parameter in JSON format")
-                except Exception as e:
-                    return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from contains parameter", e)
+        if contains:
+            try:
+                loaded_contains = json.loads(contains)
+                if isinstance(loaded_contains, list):
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide contains parameter in JSON or string format only")
+                if not isinstance(loaded_contains, dict):
+                    loaded_contains = {}
+                    raise Exception
+            except Exception:
+                if cef_name and cef_value:
+                    contains_list = [x.strip() for x in contains.split(",")]
+                    contains_list = list(filter(None, contains_list))
+                    loaded_contains[cef_name] = contains_list
+                else:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide contains parameter in JSON format")
 
         if cef_name and cef_value:
             loaded_cef[cef_name] = cef_value
-            if contains:
-                loaded_contains[cef_name] = [contains]
 
         artifact = {}
         artifact['name'] = name
@@ -825,7 +849,7 @@ class PhantomConnector(BaseConnector):
         ret_val, response, resp_data = self._make_rest_call(url, action_result, method='post', data=payload)
 
         if phantom.is_fail(ret_val):
-            if response and response.status_code == 404:
+            if response is not None and response.status_code == 404:
                 if param.get('create'):
                     self.save_progress('List "{}" not found, creating'.format(list_name))
                     return self._create_list(list_name, row, action_result)
@@ -965,7 +989,7 @@ class PhantomConnector(BaseConnector):
 
             ret_val = self._add_artifact_list(action_result, artifacts)
             if phantom.is_fail(ret_val):
-                return ret_val
+                return action_result.set_status(ret_val, "Container created:{0}. {1}".format(new_container_id, action_result.get_message()))
 
         action_result.update_summary({'container_id': new_container_id, 'artifact_count': len(artifacts)})
         return action_result.set_status(phantom.APP_SUCCESS)

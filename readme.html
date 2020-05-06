@@ -12,13 +12,23 @@ For the <code>update list</code> action, if both, id and list_name parameters ar
 <br><br>
 While running the <code>create container</code> action, it is mandatory to provide a <b>label</b> key in the container_json parameter.	
 <br><br>
-For the <code>find artifacts</code> action, container_id parameter will be considered only if limit_search parameter is true.
+For the <code>find artifacts</code> action, the container_ids parameter will be considered only if the limit_search parameter is true. If any non-integer value is provided in the container_ids parameter, then all the non-integer values will be removed and the parameter will be updated accordingly.
 <br><br>
 In the <code>add artifact</code> action, to provide values containing double-quotes("), add a backslash(\) before the double-quotes. For example, {"X-Universally-Unique-Identifier":"test","Content-Type":"multipart/alternative; boundary=<b>\"</b>Apple-Mail=_0DA95D7E-B791-4751-8043-175949088A2C<b>\"</b>>","Message-Id":"<abc@xyz.com>"}
 <br><br>
 The actions, <code>export container</code> and <code>import container</code>, will fail with the error message like <b>severity instance with name u'critical' does not exist</b>, if the severity instances on the local phantom instance(the instance on which the action is being run) and the remote phantom instance(the instance which is configured in the asset) does not match.
 <br><br>
+The <code>update artifact tags</code> action will fail to add the tags for the artifact that does not contain label.
+<br><br>
+The <code>deflate items</code> action will be supported only if the phantom_server parameter(in the asset configurations) is configured to the same phantom instance on which the action is being run(or 0.0.0.0).
+<br><br>
+While running the <code>add listitem</code> action, if the list is updated through UI, then the user needs to save those changes before updating the list with the <code>add listitem</code> action, otherwise the changes made through UI will be overridden.
+<br><br>
+The actions, <code>add artifact</code>, <code>find artifacts</code> and <code>add note</code>, if no container_id is provided then it will take the current container(on which the action is being executed) as the container_id and the status will be reflected accordingly.
+<br><br>
 For information on how to obtain an authorization token, see Provisioning an Authorization Token in the Phantom REST Overview documentation.
+<br><br>
+If the value provided in the <b>phantom_server</b> configuration parameter is 0.0.0.0 then the <code>test connectivity</code> passes successfully and the actions will run on the current phantom instance, i.e., the server through which the app is being used.
 <br><br>
 See <a href="https://my.phantom.us/kb/7/" target="_blank">KB article 7</a> and <a href="https://my.phantom.us/kb/16/" target="_blank">KB article 16</a> on how to create and verify a valid HTTPS certificate for your Phantom instance.
 <br><br>
