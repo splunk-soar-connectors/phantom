@@ -34,9 +34,13 @@ import gzip
 import bz2
 import datetime
 import time
-import urllib
 import random
 import string
+import sys
+try:
+    import urllib.parse
+except:
+    import urllib
 
 TIMEOUT = 120
 INVALID_RESPONSE = 'Server did not return a valid JSON response.'
@@ -45,7 +49,7 @@ SUPPORTED_FILES = ['application/zip', 'application/x-gzip', 'application/x-tar',
 
 def determine_contains(value):
     valid_contains = list()
-    for c, f in CONTAINS_VALIDATORS.items():
+    for c, f in list(CONTAINS_VALIDATORS.items()):
         if f(value):
             valid_contains.append(c)
 
@@ -171,6 +175,22 @@ class PhantomConnector(BaseConnector):
 
         return RetVal3(action_result.set_status(phantom.APP_ERROR, message), response, None)
 
+    def _handle_py_ver_compat_for_input_str(self, input_str):
+        """
+        This method returns the encoded|original string based on the Python version.
+        :param python_version: Python major version
+        :param input_str: Input string to be processed
+        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
+        """
+
+        try:
+            if input_str and self._python_version == 2:
+                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
+        except:
+            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
+
+        return input_str
+
     def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="get", ignore_auth=False):
 
         config = self.get_config()
@@ -234,7 +254,7 @@ class PhantomConnector(BaseConnector):
                 else:
                     error_code = "Error code unavailable"
                     error_msg = "Error occurred while connecting to the LDAP server. Please check the asset configuration and|or action parameters."
-                error_msg = UnicodeDammit(error_msg).unicode_markup.encode('utf-8')
+                error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
             except TypeError:
                 error_code = "Error code unavailable"
                 error_msg = "Error occurred while connecting to the LDAP server. Please check the asset configuration and|or the action parameters."
@@ -290,9 +310,6 @@ class PhantomConnector(BaseConnector):
 
         cef_json = param.get('cef_json', '')
 
-        if cef_json:
-            cef_json = UnicodeDammit(cef_json).unicode_markup.encode("utf-8")
-
         endpoint = "/rest/artifact/{}".format(artifact_id)
         # First get the artifacts json
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
@@ -308,10 +325,17 @@ class PhantomConnector(BaseConnector):
         if clean_json is None:
             return action_result.get_status()
 
+        try:
+            myData = dict((k, v) for k, v in myData.iteritems() if v)
+        except:
+            myData = dict((k, v) for k, v in myData.items() if v)
         myData.update(clean_json)
-        myData = dict((k, v) for k, v in myData.iteritems() if v)
+        try:
+            myData = dict((k, v) for k, v in myData.iteritems() if v)
+        except:
+            myData = dict((k, v) for k, v in myData.items() if v)
         myJson = {"cef": myData}
-        myCleanJson = self.load_dirty_json(str(myJson), action_result)
+        myCleanJson = self.load_dirty_json(json.dumps(myJson), action_result)
 
         if myCleanJson is None:
             return action_result.get_status()
@@ -419,7 +443,7 @@ class PhantomConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         limit_search = param.get("limit_search", False)
         container_ids = param.get("container_ids", "current")
-        values = UnicodeDammit(param.get('values', '')).unicode_markup.encode('utf-8')
+        values = self._handle_py_ver_compat_for_input_str(param.get('values', ''))
         if limit_search:
             container_ids = list(set([a for a in
                 [int(z) if isinstance(z, int) or z.isdigit() else None for z in
@@ -441,7 +465,10 @@ class PhantomConnector(BaseConnector):
         if exact_match:
             values = '"{}"'.format(values)
 
-        values = urllib.quote(values, safe=':/')
+        try:
+            values = urllib.quote(values, safe=':/')
+        except:
+            values = urllib.parse.quote(values, safe=':/')
 
         endpoint = '/rest/artifact?_filter_cef__{}={}&page_size=0&pretty'.format(flt, repr(values))
 
@@ -460,15 +487,24 @@ class PhantomConnector(BaseConnector):
         for rec in records:
             key, value = None, None
 
-            for k, v in rec['cef'].iteritems():
+            try:
+                cef_dict_items = rec['cef'].iteritems()
+            except:
+                cef_dict_items = rec['cef'].items()
+
+            for k, v in cef_dict_items:
 
                 curr_value = v
 
                 if ( isinstance(curr_value, dict)):
                     curr_value = json.dumps(curr_value)
 
-                if (not isinstance(curr_value, basestring)):
-                    curr_value = str(curr_value)
+                try:
+                    if (not isinstance(curr_value, basestring)):
+                        curr_value = str(curr_value)
+                except:
+                    if (not isinstance(curr_value, str)):
+                        curr_value = str(curr_value)
 
                 if values in curr_value.lower() or (exact_match and values.strip('"') == curr_value.lower()):
                     key = k
@@ -617,7 +653,7 @@ class PhantomConnector(BaseConnector):
             }
             ret_val, response, resp_data = self._make_rest_call('/rest/container_attachment', action_result, params=query_params)
             vault_info = resp_data['data'][0]
-            for k in vault_info.keys():
+            for k in list(vault_info.keys()):
                 if k.startswith('_pretty_'):
                     name = k[8:]
                     vault_info[name] = vault_info.pop(k)
@@ -735,7 +771,7 @@ class PhantomConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Error occurred while accessing the vault ID. Please verify the provided vault ID in the action parameter")
 
             vault_info = resp_data['data'][0]
-            for k in vault_info.keys():
+            for k in list(vault_info.keys()):
                 if k.startswith('_pretty_'):
                     name = k[8:]
                     vault_info[name] = vault_info.pop(k)
@@ -763,7 +799,7 @@ class PhantomConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         values = param.get('values')
-        list_name = UnicodeDammit(param.get('list')).unicode_markup.encode('utf-8')
+        list_name = self._handle_py_ver_compat_for_input_str(param['list'])
         exact_match = param.get('exact_match')
         column_index = param.get('column_index')
 
@@ -805,8 +841,12 @@ class PhantomConnector(BaseConnector):
 
     def _create_list(self, list_name, row, action_result):
 
-        if type(row) in (str, unicode):
-            row = [row]
+        try:
+            if type(row) in (str, unicode):
+                row = [row]
+        except:
+            if type(row) is str:
+                row = [row]
 
         payload = {
             'content': [row],
@@ -828,7 +868,7 @@ class PhantomConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        list_name = UnicodeDammit(param.get('list')).unicode_markup.encode('utf-8')
+        list_name = self._handle_py_ver_compat_for_input_str(param['list'])
 
         row = param.get('new_row')
 
@@ -943,7 +983,7 @@ class PhantomConnector(BaseConnector):
             self._base_uri = destination
             ret_val = self._add_artifact_list(action_result, artifacts, ignore_auth=destination_local)
             if phantom.is_fail(ret_val):
-                return ret_val
+                return action_result.set_status(ret_val, "Container created:{0}. {1}".format(new_container_id, action_result.get_message()))
 
         action_result.update_summary({'container_id': new_container_id, 'artifact_count': len(artifacts)})
         return action_result.set_status(phantom.APP_SUCCESS)
@@ -1034,7 +1074,7 @@ class PhantomConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         url_params = {
-                '_filter_action': '"{0}"'.format(UnicodeDammit(param['action_name']).unicode_markup.encode('utf-8')),
+                '_filter_action': '"{0}"'.format(self._handle_py_ver_compat_for_input_str(param['action_name'])),
                 'include_expensive': '',
                 'sort': 'start_time',
                 'order': 'desc',
@@ -1072,7 +1112,7 @@ class PhantomConnector(BaseConnector):
 
         if 'app' in param:
 
-            app_name = UnicodeDammit(param['app']).unicode_markup.encode('utf-8')
+            app_name = self._handle_py_ver_compat_for_input_str(param['app'])
             app_params = {'_filter_name__iexact': '"{0}"'.format(app_name)}
             ret_val, response, resp_json = self._make_rest_call('/rest/app', action_result, params=app_params)
 
@@ -1086,7 +1126,7 @@ class PhantomConnector(BaseConnector):
 
         if 'asset' in param:
 
-            asset = UnicodeDammit(param['asset']).unicode_markup.encode('utf-8')
+            asset = self._handle_py_ver_compat_for_input_str(param['asset'])
             asset_params = {'_filter_name__iexact': '"{0}"'.format(asset)}
             ret_val, response, resp_json = self._make_rest_call('/rest/asset', action_result, params=asset_params)
 
@@ -1113,8 +1153,13 @@ class PhantomConnector(BaseConnector):
                     cur_params = result['parameter']
 
                     found = True
-                    for k, v in parameters.iteritems():
 
+                    try:
+                        parameters_items = parameters.iteritems()
+                    except:
+                        parameters_items = parameters.items()
+
+                    for k, v in parameters_items:
                         if cur_params.get(k) != v:
                             found = False
                             break
@@ -1151,7 +1196,7 @@ class PhantomConnector(BaseConnector):
 
         row_values_as_list = param['row_values_as_list']
 
-        list_identifier = UnicodeDammit(param.get('list_name')).unicode_markup.encode('utf-8')
+        list_identifier = self._handle_py_ver_compat_for_input_str(param.get('list_name'))
         if not list_identifier:
             list_identifier = param.get('id')
         if not list_identifier:
@@ -1247,6 +1292,12 @@ class PhantomConnector(BaseConnector):
             return self.set_status(phantom.APP_ERROR,
                     'Accessing 127.0.0.1 is not allowed. Please specify the actual IP or hostname used by the Phantom instance in the Asset config')
 
+        # Fetching the Python major version
+        try:
+            self._python_version = int(sys.version_info[0])
+        except:
+            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
+
         self._base_uri = 'https://{}'.format(config['phantom_server'])
         self._verify_cert = config.get('verify_certificate', False)
 
@@ -1330,7 +1381,7 @@ if __name__ == '__main__':
 
     if (username and password):
         try:
-            print ("Accessing the Login page")
+            print("Accessing the Login page")
             r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
             csrftoken = r.cookies['csrftoken']
 
@@ -1343,11 +1394,11 @@ if __name__ == '__main__':
             headers['Cookie'] = 'csrftoken=' + csrftoken
             headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
 
-            print ("Logging into Platform to get the session id")
+            print("Logging into Platform to get the session id")
             r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print ("Unable to get session id from the platfrom. Error: " + str(e))
+            print("Unable to get session id from the platfrom. Error: " + str(e))
             exit(1)
 
     with open(args.input_test_json) as f:
@@ -1363,6 +1414,6 @@ if __name__ == '__main__':
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
-        print (json.dumps(json.loads(ret_val), indent=4))
+        print(json.dumps(json.loads(ret_val), indent=4))
 
     exit(0)

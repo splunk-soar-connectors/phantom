@@ -10,7 +10,9 @@ Note that the IP (or name) being used must match the allowed IP in the remote Ph
 <br><br>
 For the <code>update list</code> action, if both, id and list_name parameters are given such that both of them point to different lists, then list_name parameter will be preferred and the action will update the list specified in the list_name parameter.
 <br><br>
-While running the <code>create container</code> action, it is mandatory to provide a <b>label</b> key in the container_json parameter.	
+While running the <code>create container</code> action, it is mandatory to provide a <b>label</b> key in the container_json parameter. Also, to add the artifacts through this action, the artifacts should be provided as a list of artifact JSON object in the <b>container_artifacts</b> parameter.
+Each artifact JSON object should contain the following keys: <b>cef, cef_types, data, description, end_time, ingest_app_id, kill_chain, label, name, owner_id, severity, source_data_identifier, start_time, tags, type</b>. All other keys will be ignored. 
+See <a href="https://docs.splunk.com/Documentation/Phantom/4.8/PlatformAPI/RESTArtifacts" target="_blank">Splunk Phantom Documentation</a> for further details.
 <br><br>
 For the <code>find artifacts</code> action, the container_ids parameter will be considered only if the limit_search parameter is true. If any non-integer value is provided in the container_ids parameter, then all the non-integer values will be removed and the parameter will be updated accordingly.
 <br><br>

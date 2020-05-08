@@ -5,16 +5,17 @@
     "package_name": "phantom_phantom",
     "publisher": "Splunk",
     "type": "information",
-    "main_module": "phantom_connector.pyc",
+    "main_module": "phantom_connector.py",
     "app_version": "2.1.29",
+    "python_version": "3",
     "utctime_updated": "2019-11-19T20:26:14.000000Z",
     "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
     "min_phantom_version": "4.6.19142",
     "license": "Copyright (c) 2016-2020 Splunk Inc.",
-    "logo": "logo_phantom.svg",
-    "logo_dark": "logo_phantom_dark.svg",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
     "configuration": {
         "phantom_server": {
             "data_type": "string",
@@ -135,7 +136,7 @@
         },
         {
             "action": "add note",
-            "description": "Add a note to an artifact",
+            "description": "Add a note to a container",
             "type": "generic",
             "identifier": "add_note",
             "read_only": false,
@@ -357,7 +358,7 @@
                     "default": false
                 },
                 "container_ids": {
-                    "description": "List of space or comma separate container ids; the word \"current\" will be replaced by the current container id",
+                    "description": "List of space or comma separated container ids; the word \"current\" will be replaced by the current container id",
                     "data_type": "string",
                     "order": 4,
                     "required": false,
