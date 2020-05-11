@@ -234,7 +234,7 @@ class PhantomConnector(BaseConnector):
                     auth=auth,
                     json=data,
                     headers=headers if (headers) else None,
-                    verify=self._verify_cert,
+                    verify=False if ignore_auth else self._verify_cert,
                     params=params,
                     timeout=TIMEOUT)
 
