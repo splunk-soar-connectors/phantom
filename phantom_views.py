@@ -9,6 +9,7 @@
 from django.http import HttpResponse
 from bs4 import UnicodeDammit
 import json
+import sys
 
 
 def find_artifacts(provides, all_results, context):
@@ -116,6 +117,13 @@ def add_artifact(provides, all_results, context):
 
 def find_listitem(provides, all_results, context):
 
+    # Fetching the Python major version
+    python_version = 2
+    try:
+        python_version = int(sys.version_info[0])
+    except:
+        python_version = 2
+
     headers = ['List Name', 'Matched Row', 'Found at']
 
     context['ajax'] = True
@@ -149,9 +157,9 @@ def find_listitem(provides, all_results, context):
                 item_str = ""
                 for i in item:
                     if i:
-                        i = UnicodeDammit(i).unicode_markup.encode('utf-8')
-                    item_str = '{0}"{1}'.format(item_str, i)
-                item_str = '{0}"'.format(item_str)
+                        i = UnicodeDammit(i).unicode_markup.encode('utf-8') if python_version == 2 else i
+                    item_str = '{0}"{1}",'.format(item_str, i)
+                item_str = item_str[:-1]
 
                 row.append({ 'value': param.get('list') })
                 row.append({ 'value': item_str })
