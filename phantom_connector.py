@@ -459,9 +459,9 @@ class PhantomConnector(BaseConnector):
             values = '"{}"'.format(values)
 
         try:
-            url_enc_values = urllib.quote_plus(values)
+            url_enc_values = urllib.quote(values, safe='')
         except:
-            url_enc_values = urllib.parse.quote_plus(values)
+            url_enc_values = urllib.parse.quote(values, safe='')
 
         endpoint = '/rest/artifact?_filter_cef__{}={}&page_size=0&pretty'.format(flt, repr(url_enc_values))
 
@@ -753,7 +753,15 @@ class PhantomConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        vault_id = param['vault_id']
+        vault_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
+
+        if param.get('container_id') is not None:
+            try:
+                container_id = int(param.get('container_id'))
+                if container_id < 0:
+                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid container ID in the action parameter")
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid container ID in the action parameter")
 
         try:
             query_params = {
@@ -817,9 +825,9 @@ class PhantomConnector(BaseConnector):
 
         # Encode list_name to consider special url encoded characters like '\' in URL
         try:
-            list_name = urllib.quote_plus(list_name)
+            list_name = urllib.quote(list_name, safe='')
         except:
-            list_name = urllib.parse.quote_plus(list_name)
+            list_name = urllib.parse.quote(list_name, safe='')
 
         endpoint = '/rest/decided_list/{}'.format(list_name)
 
@@ -891,9 +899,9 @@ class PhantomConnector(BaseConnector):
 
         # Encode list_name to consider special url encoded characters like '\' in URL
         try:
-            url_enc_list_name = urllib.quote_plus(list_name)
+            url_enc_list_name = urllib.quote(list_name, safe='')
         except:
-            url_enc_list_name = urllib.parse.quote_plus(list_name)
+            url_enc_list_name = urllib.parse.quote(list_name, safe='')
 
         url = '/rest/decided_list/{}'.format(url_enc_list_name)
 
@@ -1101,13 +1109,18 @@ class PhantomConnector(BaseConnector):
         if 'parameters' in param:
 
             try:
-                parameters = json.loads(param['parameters'])
+                parameters = json.loads(self._handle_py_ver_compat_for_input_str(param['parameters']))
             except:
                 return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from 'parameters' parameter")
 
             search_key, search_value = parameters.popitem()
-            val_type = type(search_value)
-            url_params['_filter_result_data__regex'] = '"parameter.*\\"{0}\\": {1}"'.format(search_key, json.dumps(search_value) if val_type in [int, bool] else '\\"{}\\"'.format(search_value))
+
+            try:
+                is_not_string = isinstance(search_value, (float, int, bool))
+                formatted_search_value = json.dumps(search_value) if is_not_string else '\\"{}\\"'.format(search_value)
+                url_params['_filter_result_data__regex'] = '"parameter.*\\"{0}\\": {1}"'.format(search_key, formatted_search_value)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Error occurred while creating filter string to search action results data")
 
         if 'time_limit' in param:
             try:
@@ -1237,9 +1250,9 @@ class PhantomConnector(BaseConnector):
 
         # Encode list_identifier to consider special url encoded characters like '\' in URL
         try:
-            list_identifier = urllib.quote_plus(list_identifier)
+            list_identifier = urllib.quote(list_identifier, safe='')
         except:
-            list_identifier = urllib.parse.quote_plus(list_identifier)
+            list_identifier = urllib.parse.quote(list_identifier, safe='')
 
         # make rest call
         ret_val, response, resp_data = self._make_rest_call('/rest/decided_list/{}'.format(list_identifier), action_result, data=data, method="post")
@@ -1292,7 +1305,12 @@ class PhantomConnector(BaseConnector):
 
         config = self.get_config()
 
-        host = config['phantom_server']
+        host = self._handle_py_ver_compat_for_input_str(config['phantom_server'])
+
+        if host.startswith('http:') or host.startswith('https:'):
+            return self.set_status(phantom.APP_ERROR,
+                    'Please specify the actual IP or hostname used by the Phantom instance in the Asset config wihtout http: or https:')
+
         # Split hostname from port
         host = host.split(':')[0]
 
@@ -1322,7 +1340,7 @@ class PhantomConnector(BaseConnector):
         except:
             return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
 
-        self._base_uri = 'https://{}'.format(config['phantom_server'])
+        self._base_uri = 'https://{}'.format(self._handle_py_ver_compat_for_input_str(config['phantom_server']))
         self._verify_cert = config.get('verify_certificate', False)
 
         self._auth = None
