@@ -230,14 +230,14 @@ class PhantomConnector(BaseConnector):
                         error_msg = e.args[0]
                 else:
                     error_code = "Error code unavailable"
-                    error_msg = "Error occurred while connecting to the LDAP server. Please check the asset configuration and|or action parameters."
+                    error_msg = "Error occurred while connecting to the Phantom server. Please check the asset configuration and|or action parameters."
                 error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
             except TypeError:
                 error_code = "Error code unavailable"
-                error_msg = "Error occurred while connecting to the LDAP server. Please check the asset configuration and|or the action parameters."
+                error_msg = "Error occurred while connecting to the Phantom server. Please check the asset configuration and|or the action parameters."
             except:
                 error_code = "Error code unavailable"
-                error_msg = "Error occurred while connecting to the LDAP server. Please check the asset configuration and|or action parameters."
+                error_msg = "Error occurred while connecting to the Phantom server. Please check the asset configuration and|or action parameters."
             return (action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Error code:{} Error Message:{}".format(error_code, error_msg)), None, None)
 
         return self._process_response(response, action_result)
@@ -647,11 +647,16 @@ class PhantomConnector(BaseConnector):
         try:
             query_params = {
                 '_filter_vault_document__hash': '"{}"'.format(vault_info['vault_id'].lower()),
-                'page_size': 1,
+                'page_size': 0,
                 'pretty': ''
             }
             ret_val, response, resp_data = self._make_rest_call('/rest/container_attachment', action_result, params=query_params)
-            vault_info = resp_data['data'][0]
+
+            for resp_element in resp_data['data']:
+                if file_name == resp_element['name']:
+                    vault_info = resp_element
+                    break
+
             for k in list(vault_info.keys()):
                 if k.startswith('_pretty_'):
                     name = k[8:]
@@ -690,19 +695,22 @@ class PhantomConnector(BaseConnector):
             if (not zipfile.is_zipfile(file_path)):
                 return action_result.set_status(phantom.APP_ERROR, "Unable to deflate zip file")
 
-            with zipfile.ZipFile(file_path, 'r') as vault_file:
+            try:
+                with zipfile.ZipFile(file_path, 'r') as vault_file:
 
-                for compressed_file in vault_file.namelist():
+                    for compressed_file in vault_file.namelist():
 
-                    save_as = os.path.basename(compressed_file)
+                        save_as = os.path.basename(compressed_file)
 
-                    if not os.path.basename(save_as):
-                        continue
+                        if not os.path.basename(save_as):
+                            continue
 
-                    ret_val = self._add_file_to_vault(action_result, vault_file.read(compressed_file), save_as, recursive, container_id)
+                        ret_val = self._add_file_to_vault(action_result, vault_file.read(compressed_file), save_as, recursive, container_id)
 
-                    if phantom.is_fail(ret_val):
-                        return ret_val
+                        if phantom.is_fail(ret_val):
+                            return ret_val
+            except:
+                return action_result.set_status(phantom.APP_ERROR, "Unable to open the zip file: {}".format(file_path))
 
             return (phantom.APP_SUCCESS)
 
