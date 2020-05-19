@@ -680,7 +680,39 @@ class PhantomConnector(BaseConnector):
         if (file_type not in SUPPORTED_FILES):
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
 
-        if (file_type == 'application/zip'):
+        data = None
+        if (file_type == 'application/x-bzip2'):
+            # gz and bz2 don't provide a nice way to test, so trial and error
+            try:
+                with bz2.BZ2File(file_path, 'r') as f:
+                    data = f.read()
+            except IOError:
+                return action_result.set_status(phantom.APP_ERROR, "Unable to deflate bz2 file")
+
+            if data is None:
+                return phantom.APP_SUCCESS
+
+            ret_val = self._add_file_to_vault(action_result, data, os.path.splitext(file_name)[0], recursive, container_id)
+
+            if phantom.is_fail(ret_val):
+                return action_result.set_status(phantom.APP_ERROR, "Error decompressing {0} file. Details: {1}".format(file_type, action_result.get_message()))
+
+        elif (file_type == 'application/x-gzip'):
+            try:
+                with gzip.GzipFile(file_path, 'r') as f:
+                    data = f.read()
+            except IOError:
+                return action_result.set_status(phantom.APP_ERROR, "Unable to deflate gzip file")
+
+            if data is None:
+                return phantom.APP_SUCCESS
+
+            ret_val = self._add_file_to_vault(action_result, data, os.path.splitext(file_name)[0], recursive, container_id)
+
+            if phantom.is_fail(ret_val):
+                return action_result.set_status(phantom.APP_ERROR, "Error decompressing {0} file. Details: {1}".format(file_type, action_result.get_message()))
+
+        elif (file_type == 'application/zip'):
             if (not zipfile.is_zipfile(file_path)):
                 return action_result.set_status(phantom.APP_ERROR, "Unable to deflate zip file")
 
@@ -704,7 +736,7 @@ class PhantomConnector(BaseConnector):
             return (phantom.APP_SUCCESS)
 
         # a tgz is also a tar file, so first extract it and add it to the vault
-        if (tarfile.is_tarfile(file_path)):
+        elif (tarfile.is_tarfile(file_path)):
             with tarfile.open(file_path, 'r') as vault_file:
 
                 for member in vault_file.getmembers():
@@ -719,30 +751,6 @@ class PhantomConnector(BaseConnector):
                         return action_result.set_status(phantom.APP_ERROR, "Error decompressing tar file.")
 
             return (phantom.APP_SUCCESS)
-
-        data = None
-        if (file_type == 'application/x-bzip2'):
-            # gz and bz2 don't provide a nice way to test, so trial and error
-            try:
-                with bz2.BZ2File(file_path, 'r') as f:
-                    data = f.read()
-            except IOError:
-                return action_result.set_status(phantom.APP_ERROR, "Unable to deflate bz2 file")
-
-        if (file_type == 'application/x-gzip'):
-            try:
-                with gzip.GzipFile(file_path, 'r') as f:
-                    data = f.read()
-            except IOError:
-                return action_result.set_status(phantom.APP_ERROR, "Unable to deflate gzip file")
-
-        if data is None:
-            return phantom.APP_SUCCESS
-
-        ret_val = self._add_file_to_vault(action_result, data, os.path.splitext(file_name)[0], recursive, container_id)
-
-        if phantom.is_fail(ret_val):
-            return action_result.set_status(phantom.APP_ERROR, "Error decompressing {0} file. Details: {1}".format(file_type, action_result.get_message()))
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
