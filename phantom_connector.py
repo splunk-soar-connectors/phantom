@@ -284,16 +284,9 @@ class PhantomConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        artifact_id = param.get('artifact_id')
+        artifact_id = self._handle_py_ver_compat_for_input_str(param['artifact_id'])
 
         cef_json = param.get('cef_json', '')
-
-        try:
-            artifact_id = int(artifact_id)
-            if artifact_id < 0:
-                raise Exception
-        except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a non-negative integer for artifact_id parameter")
 
         endpoint = "/rest/artifact/{}".format(artifact_id)
         # First get the artifacts json
@@ -337,13 +330,9 @@ class PhantomConnector(BaseConnector):
     def _tag_artifact(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        try:
-            artifact_id = int(param.get('artifact_id'))
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid artifact ID")
-
-        add_tags = param.get('add_tags', '')
-        remove_tags = param.get('remove_tags', '')
+        artifact_id = self._handle_py_ver_compat_for_input_str(param['artifact_id'])
+        add_tags = self._handle_py_ver_compat_for_input_str(param.get('add_tags', ''))
+        remove_tags = self._handle_py_ver_compat_for_input_str(param.get('remove_tags', ''))
 
         # These come in as str, so split, then convert to set
         add_tags = set([x.strip() for x in add_tags.split(',')])
@@ -453,7 +442,7 @@ class PhantomConnector(BaseConnector):
         else:
             flt = 'icontains'
 
-        exact_match = param.get('exact_match')
+        exact_match = param.get('exact_match', True)
 
         if exact_match:
             values = '"{}"'.format(values)
@@ -532,7 +521,7 @@ class PhantomConnector(BaseConnector):
         cef_name = param.get('cef_name')
         cef_value = param.get('cef_value')
         cef_dict = param.get('cef_dictionary')
-        run_automation = param.get('run_automation', "true")
+        run_automation = param.get('run_automation', True)
 
         loaded_cef = {}
         loaded_contains = {}
@@ -820,7 +809,7 @@ class PhantomConnector(BaseConnector):
 
         values = self._handle_py_ver_compat_for_input_str(param.get('values'))
         list_name = self._handle_py_ver_compat_for_input_str(param['list'])
-        exact_match = param.get('exact_match')
+        exact_match = param.get('exact_match', True)
         column_index = param.get('column_index')
 
         if column_index is not None:
@@ -923,7 +912,7 @@ class PhantomConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             if response is not None and response.status_code == 404:
-                if param.get('create'):
+                if param.get('create', False):
                     self.save_progress('List "{}" not found, creating'.format(list_name))
                     return self._create_list(list_name, row, action_result)
             return action_result.set_status(phantom.APP_ERROR, 'Error appending to list: {0}'.format(action_result.get_message()))
