@@ -442,7 +442,7 @@ class PhantomConnector(BaseConnector):
         else:
             flt = 'icontains'
 
-        exact_match = param.get('exact_match', True)
+        exact_match = param.get('exact_match', False)
 
         if exact_match:
             values = '"{}"'.format(values)
@@ -713,7 +713,7 @@ class PhantomConnector(BaseConnector):
                     if not member.isfile():
                         continue
 
-                    ret_val = self._add_file_to_vault(action_result, vault_file.extractfile(member).read(), member.name, recursive, container_id)
+                    ret_val = self._add_file_to_vault(action_result, vault_file.extractfile(member).read(), os.path.basename(member.name), recursive, container_id)
 
                     if phantom.is_fail(ret_val):
                         return action_result.set_status(phantom.APP_ERROR, "Error decompressing tar file.")
@@ -734,7 +734,7 @@ class PhantomConnector(BaseConnector):
                 with gzip.GzipFile(file_path, 'r') as f:
                     data = f.read()
             except IOError:
-                return action_result.set_status(phantom.APP_ERROR, "Unable to deflate bz2 file")
+                return action_result.set_status(phantom.APP_ERROR, "Unable to deflate gzip file")
 
         if data is None:
             return phantom.APP_SUCCESS
@@ -809,7 +809,7 @@ class PhantomConnector(BaseConnector):
 
         values = self._handle_py_ver_compat_for_input_str(param.get('values'))
         list_name = self._handle_py_ver_compat_for_input_str(param['list'])
-        exact_match = param.get('exact_match', True)
+        exact_match = param.get('exact_match', False)
         column_index = param.get('column_index')
 
         if column_index is not None:
