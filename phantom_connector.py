@@ -619,9 +619,7 @@ class PhantomConnector(BaseConnector):
             vault_tmp_dir = '/opt/phantom/vault/tmp'
 
         save_path = os.path.join(vault_tmp_dir, save_as)
-        with open(save_path, 'w') as uncompressed_file:
-            if self._python_version == 3:
-                data_stream = UnicodeDammit(data_stream).unicode_markup
+        with open(save_path, 'wb') as uncompressed_file:
 
             uncompressed_file.write(data_stream)
 
@@ -642,7 +640,14 @@ class PhantomConnector(BaseConnector):
             ret_val, response, resp_data = self._make_rest_call('/rest/container_attachment', action_result, params=query_params)
 
             for resp_element in resp_data['data']:
-                if file_name == resp_element['name']:
+                resp_filename = resp_element['name']
+                if self._python_version == 2:
+                    try:
+                        resp_filename = UnicodeDammit(resp_filename).unicode_markup.encode('utf-8')
+                    except UnicodeEncodeError:
+                        resp_filename = unicodedata.normalize('NFKD', resp_filename).encode('utf-8', 'ignore')
+
+                if file_name == resp_filename:
                     vault_info = resp_element
                     break
 
@@ -730,8 +735,8 @@ class PhantomConnector(BaseConnector):
 
                         if phantom.is_fail(ret_val):
                             return ret_val
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Unable to open the zip file: {}".format(file_path))
+            except Exception as e:
+                return action_result.set_status(phantom.APP_ERROR, "Unable to open the zip file: {}. Error message:{}".format(file_path, e))
 
             return (phantom.APP_SUCCESS)
 

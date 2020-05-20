@@ -89,13 +89,11 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.artifact_id",
                     "data_type": "string",
                     "example_values": [
-                        "Artifact Updated"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
+                        "94"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.cef_json",
@@ -105,19 +103,21 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.artifact_id",
-                    "data_type": "string",
-                    "example_values": [
-                        "94"
-                    ]
-                },
-                {
                     "data_path": "action_result.data",
                     "data_type": "string"
                 },
                 {
                     "data_path": "action_result.summary",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Artifact Updated"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -180,13 +180,25 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        35
+                    ],
+                    "contains": [
+                        "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.content",
                     "data_type": "string",
                     "example_values": [
-                        "Note created"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
+                        "Adding a note via app action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.phase_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.title",
@@ -205,6 +217,15 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Note created"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
+                },
+                {
                     "data_path": "summary.total_objects",
                     "data_type": "numeric",
                     "example_values": [
@@ -216,23 +237,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.content",
-                    "data_type": "string",
-                    "example_values": [
-                        "Adding a note via app action"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.container_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        35
-                    ],
-                    "contains": [
-                        "phantom container id"
                     ]
                 }
             ],
@@ -280,19 +284,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.add_tags",
                     "data_type": "string",
                     "example_values": [
-                        "Tags added: tag1, Tags removed: tag2, Tags already present: tag3, Tags already absent: tag4"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
-                },
-                {
-                    "data_path": "action_result.parameter.remove_tags",
-                    "data_type": "string",
-                    "example_values": [
-                        "tag2, tag4"
+                        "tag1, tag3"
                     ]
                 },
                 {
@@ -303,10 +298,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.add_tags",
+                    "data_path": "action_result.parameter.remove_tags",
                     "data_type": "string",
                     "example_values": [
-                        "tag1, tag3"
+                        "tag2, tag4"
                     ]
                 },
                 {
@@ -321,10 +316,10 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.tags removed",
+                    "data_path": "action_result.summary.tags already absent",
                     "data_type": "string",
                     "example_values": [
-                        "tag2"
+                        "tag4"
                     ]
                 },
                 {
@@ -335,11 +330,20 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.tags already absent",
+                    "data_path": "action_result.summary.tags removed",
                     "data_type": "string",
                     "example_values": [
-                        "tag4"
+                        "tag2"
                     ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Tags added: tag1, Tags removed: tag2, Tags already present: tag3, Tags already absent: tag4"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -412,7 +416,15 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.parameter.container_ids",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.parameter.exact_match",
+                    "data_type": "boolean"
+                },
+                {
+                    "data_path": "action_result.parameter.limit_search",
                     "data_type": "boolean"
                 },
                 {
@@ -421,14 +433,6 @@
                     "contains": [
                         "*"
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.limit_search",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.parameter.container_ids",
-                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.found in",
@@ -480,7 +484,7 @@
         {
             "action": "add listitem",
             "description": "Add value to a custom list",
-            "verbose": "To add a row containing a single value to a list simply pass the value. However, to pass multiple values in a row, format it like a JSON array (e.g. [\"item1\", \"item2\", \"item3\"]).<br><br>After creating or updating a list through this action, if the same list is updated from the UI, then the user needs to save those changes before reupdating the list through this action, otherwise the changes made from the UI will be overridden.",
+            "verbose": "To add a row containing a single value to a list simply pass the value. However, to pass multiple values in a row, format it like a JSON array (e.g. [\"item1\", \"item2\", \"item3\"]).<br><br>After creating or updating a list through this action, if the same list is updated from the UI, then the user needs to save those changes before reupdating the list through this action, otherwise, the changes made from the UI will be overridden.",
             "type": "generic",
             "identifier": "add_listitem",
             "read_only": false,
@@ -570,7 +574,7 @@
         {
             "action": "find listitem",
             "description": "Find value in a custom list",
-            "verbose": "Row and column coordinates for each matching value can be found in the result summary under \"locations\". The match is case sensitive.<br><br>If the <b>exact_match</b> parameter is set to False, then the action will return all those strings for which the <b>values</b> parameter is its substring. Otherwise it will return those strings which matches exactly with the <b>values</b> parameter.",
+            "verbose": "Row and column coordinates for each matching value can be found in the result summary under \"locations\". The match is case sensitive.<br><br>If the <b>exact_match</b> parameter is set to False, then the action will return all those strings for which the <b>values</b> parameter is its substring. Otherwise it will return those strings which match exactly with the <b>values</b> parameter.",
             "type": "investigate",
             "identifier": "find_listitem",
             "read_only": true,
@@ -674,7 +678,7 @@
         },
         {
             "action": "add artifact",
-            "description": "Add a value as a new artifact",
+            "description": "Add a new artifact to a container",
             "verbose": "If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id(from which the action is being run) and the status will be reflected accordingly.<br><br>CEF fields can be added to the artifact in two ways, either by using the <b>cef_name</b> and <b>cef_value</b> parameter or by using the <b>cef_dictionary</b> parameter. If the <b>cef_name</b>, <b>cef_value</b>, and <b>cef_dictionary</b> parameters are all included, the action will add the <b>cef_name</b> field to the <b>cef_dictionary</b>.<br><br>Using only the <b>cef_name</b> and <b>cef_value</b> parameter will result in the artifact having one CEF field.<br><br>The <b>cef_dictionary</b> parameter takes a JSON dictionary with key-value pairs representing CEF key-value pairs. To provide values containing double-quotes(\"), add a backslash(\\) before the double-quotes.<br>For e.g., {\"X-Universally-Unique-Identifier\":\"test\",\"Content-Type\":\"multipart/alternative; boundary=<b>\\\"</b>Apple-Mail=_0DA95D7E-B791-4751-8043-175949088A2C<b>\\\"</b>>\",\"Message-Id\":\"<abc@xyz.com>\"}<br><br>The <b>contains</b> parameter can take a JSON dictionary, with the keys matching the keys of the <b>cef_dictionary</b> and the values being lists of possible contains for the CEF field. If a given value in the <b>cef_dictionary</b> is not present in the <b>contains</b> dictionary, the action will first check the list of default CEF fields. If not a default CEF field, the action will attempt to identify the appropriate contains value.<br>The <b>contains</b> parameter can also take a string(or a comma-separated list of strings) representing the contains for the <b>cef_value</b> parameter. This method should be used only if the <b>cef_name</b> and <b>cef_value</b> parameters are used.<br><br>If the <b>run_automation</b> parameter is set to True then the active playbooks will run automatically after the artifact is added. The active playbooks will run on the same container in which the artifact is added.<br><br>See the <a href=\"https://docs.splunk.com/Documentation/Phantom/4.8/PlatformAPI/RESTArtifacts\" target=\"_blank\">REST API Documentation</a> for more information on artifacts, CEF fields, and contains.",
             "type": "generic",
             "identifier": "add_artifact",
@@ -941,11 +945,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.source_data_identifier",
+                    "data_path": "action_result.parameter.run_automation",
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.parameter.run_automation",
+                    "data_path": "action_result.parameter.source_data_identifier",
                     "data_type": "string"
                 },
                 {
@@ -997,7 +1001,7 @@
         {
             "action": "deflate item",
             "description": "Deflates an item from the vault",
-            "verbose": "The action will be supported only if the <b>phantom_server</b> parameter(in the asset configurations) is configured to the local Phantom instance, i.e., the instance from which the action is being run.<br><br>The action detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to its vault, else to the current (the container whose context the action is executed) container. The action supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types. In case the compressed file contains another compressed file in it, set the <b>recursive</b> parameter to True, to deflate the inner compressed file.<br><br>The action fails on Python version 3, if <b>recursive</b> parameter is set to True because of the zipfile module.<br><br>For certain Unicode characters, the file name is not unzipped as it is, by the zipfile module.",
+            "verbose": "The action will be supported only if the <b>phantom_server</b> parameter(in the asset configurations) is configured to the local Phantom instance, i.e., the instance from which the action is being run.<br><br>The action detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to its vault, else to the current (the container whose context the action is executed) container. The action supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types. In case the compressed file contains another compressed file in it, set the <b>recursive</b> parameter to True, to deflate the inner compressed file.<br><br>For certain Unicode characters, the file name is not unzipped as it is, by the zipfile module.",
             "type": "generic",
             "identifier": "deflate_item",
             "read_only": false,
@@ -1367,7 +1371,7 @@
         {
             "action": "create container",
             "description": "Create a new container on a Phantom instance",
-            "verbose": "This action creates a new container on the Phantom asset that this action is executed on. The <b>container_json</b> parameter needs to be a JSON string. It is mandatory to provide a <b>label</b> key in the <b>container_json</b> parameter. The action will fail if the <b>container_json</b> has a label that does not exist on the destination Phantom asset.<br>E.g., {\"name\":\"Test Container\",\"label\":\"events\"}<br><br>The <b>container_artifacts</b> is an optional parameter that needs to be a list of artifact objects as a JSON string. Each artifact JSON object should contain the following keys: <b>cef, cef_types, data, description, end_time, ingest_app_id, kill_chain, label, name, owner_id, severity, source_data_identifier, start_time, tags, type</b>. All other keys will be ignored.<br>E.g., [{\"name\": \"artifact 1\", \"label\":\"label1\", \"cef\": {\"test\": \"123\"}},{\"name\": \"artifact 2\", \"label\":\"label2\", \"cef\": {\"test\": \"456\"}}]<br><br>See <a href=\"https://docs.splunk.com/Documentation/Phantom/4.8/PlatformAPI/RESTArtifacts\" target=\"_blank\"><b>Splunk Phantom Documentation</b></a> for further details.",
+            "verbose": "This action creates a new container on the Phantom server, which is configured in the <b>phantom_server</b> asset parameter. The <b>container_json</b> parameter needs to be a JSON string. It is mandatory to provide a <b>label</b> key in the <b>container_json</b> parameter. The action will fail if the <b>container_json</b> has a label that does not exist on the destination Phantom asset.<br>E.g., {\"name\":\"Test Container\",\"label\":\"events\"}<br><br>The <b>container_artifacts</b> is an optional parameter that needs to be a list of artifact objects as a JSON string. Each artifact JSON object should contain the following keys: <b>cef, cef_types, data, description, end_time, ingest_app_id, kill_chain, label, name, owner_id, severity, source_data_identifier, start_time, tags, type</b>. All other keys will be ignored.<br>E.g., [{\"name\": \"artifact 1\", \"label\":\"label1\", \"cef\": {\"test\": \"123\"}},{\"name\": \"artifact 2\", \"label\":\"label2\", \"cef\": {\"test\": \"456\"}}]<br><br>See <a href=\"https://docs.splunk.com/Documentation/Phantom/4.8/PlatformAPI/RESTArtifacts\" target=\"_blank\"><b>Splunk Phantom Documentation</b></a> for further details.",
             "type": "generic",
             "identifier": "create_container",
             "read_only": false,
