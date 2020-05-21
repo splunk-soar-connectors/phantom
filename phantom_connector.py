@@ -50,8 +50,11 @@ SUPPORTED_FILES = ['application/zip', 'application/x-gzip', 'application/x-tar',
 def determine_contains(value):
     valid_contains = list()
     for c, f in list(CONTAINS_VALIDATORS.items()):
-        if f(value):
-            valid_contains.append(c)
+        try:
+            if f(value):
+                valid_contains.append(c)
+        except:
+            continue
 
     return valid_contains
 
@@ -871,10 +874,10 @@ class PhantomConnector(BaseConnector):
     def _create_list(self, list_name, row, action_result):
 
         try:
-            if type(row) in (str, unicode):
+            if type(row) in (str, unicode, int, float, bool):
                 row = [row]
         except:
-            if type(row) is str:
+            if type(row) in (str, int, float, bool):
                 row = [row]
 
         payload = {

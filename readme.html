@@ -30,6 +30,7 @@ For security reasons, accessing 127.0.0.1 is not allowed.
 <h2> Known Issues </h2>
 <ul>
   <li> The <b>find listitem</b> action is unable to fetch the list, where the <b>list name</b> contains a forward slash('/') character.</li>
+  <li> The <b>add listitem</b> action is unable to update the list, where the <b>list name</b> contains a forward slash('/') character.</li>
   <li> The <b>find artifacts</b> action does not work as per the expectation, for the case where we have a backslash('\') character in the cef_value. This happens for both exact match and non-exact-match.</li>
   <li> The <b>find artifacts</b> action is unable to fetch the artifacts, where cef values contain Unicode character(s), on Phantom version 4.8.23319. The action works fine on Phantom version 4.5.15922.</li>
 </ul>
