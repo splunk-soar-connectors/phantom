@@ -1241,10 +1241,17 @@ class PhantomConnector(BaseConnector):
         row_values_as_list = param['row_values_as_list']
 
         list_identifier = self._handle_py_ver_compat_for_input_str(param.get('list_name'))
+
         if not list_identifier:
             list_identifier = param.get('id')
-        if not list_identifier:
-            return action_result.set_status(phantom.APP_ERROR, "Either the custom list's name or id must be provided")
+            if not list_identifier:
+                return action_result.set_status(phantom.APP_ERROR, "Either the custom list's name or id must be provided")
+        else:
+            # Encode list_identifier to consider special url encoded characters like '\' in URL
+            try:
+                list_identifier = urllib.quote(list_identifier, safe='')
+            except:
+                list_identifier = urllib.parse.quote(list_identifier, safe='')
 
         try:
             row_values = json.loads(row_values_as_list)
@@ -1260,12 +1267,6 @@ class PhantomConnector(BaseConnector):
                 str(row_number): row_values
             }
         }
-
-        # Encode list_identifier to consider special url encoded characters like '\' in URL
-        try:
-            list_identifier = urllib.quote(list_identifier, safe='')
-        except:
-            list_identifier = urllib.parse.quote(list_identifier, safe='')
 
         # make rest call
         ret_val, response, resp_data = self._make_rest_call('/rest/decided_list/{}'.format(list_identifier), action_result, data=data, method="post")
