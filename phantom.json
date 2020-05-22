@@ -422,66 +422,121 @@
                 },
                 {
                     "data_path": "action_result.parameter.container_ids",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "current"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.exact_match",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.limit_search",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.values",
                     "data_type": "string",
                     "contains": [
                         "*"
+                    ],
+                    "example_values": [
+                        "test_value"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.found in",
                     "data_type": "string",
                     "column_name": "Found in Field",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "test_key"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "numeric",
                     "column_name": "Artifact ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        12345
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.matched",
                     "data_type": "string",
                     "column_name": "Matched",
-                    "column_order": 3
+                    "column_order": 3,
+                    "example_values": [
+                        "test_value"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "column_name": "Artifact Name",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "Artifact_demo"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.artifacts found",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.server",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.1.1.10"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Artifacts found: 1, Server: https://10.1.1.10"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1234
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom_test"
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -533,17 +588,27 @@
                 },
                 {
                     "data_path": "action_result.parameter.create",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.list",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "demo_list"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.new_row",
                     "data_type": "string",
                     "contains": [
                         "*"
+                    ],
+                    "example_values": [
+                        "[\"value1\",\"value2\",\"value3\"]"
                     ]
                 },
                 {
@@ -552,26 +617,42 @@
                 },
                 {
                     "data_path": "action_result.data.*.success",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.server",
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://10.1.1.10"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Server: https://10.1.1.10"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -634,17 +715,27 @@
                 },
                 {
                     "data_path": "action_result.parameter.exact_match",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.list",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "list_demo"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.values",
                     "data_type": "string",
                     "contains": [
                         "*"
+                    ],
+                    "example_values": [
+                        "value1"
                     ]
                 },
                 {
@@ -653,7 +744,10 @@
                 },
                 {
                     "data_path": "action_result.summary.found matches",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.locations",
@@ -664,19 +758,46 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://10.1.1.10"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Server: https://10.1.1.10, Found matches: 1, Locations: [(1, 0)], List id: 18"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.locations.*",
                     "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.list_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        18
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -684,7 +805,7 @@
         {
             "action": "add artifact",
             "description": "Add a new artifact to a container",
-            "verbose": "If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id(from which the action is being run) and the status will be reflected accordingly.<br><br>CEF fields can be added to the artifact in two ways, either by using the <b>cef_name</b> and <b>cef_value</b> parameter or by using the <b>cef_dictionary</b> parameter. If the <b>cef_name</b>, <b>cef_value</b>, and <b>cef_dictionary</b> parameters are all included, the action will add the <b>cef_name</b> field to the <b>cef_dictionary</b>.<br><br>Using only the <b>cef_name</b> and <b>cef_value</b> parameter will result in the artifact having one CEF field.<br><br>The <b>cef_dictionary</b> parameter takes a JSON dictionary with key-value pairs representing CEF key-value pairs. To provide values containing double-quotes(\"), add a backslash(\\) before the double-quotes.<br>For e.g., {\"X-Universally-Unique-Identifier\":\"test\",\"Content-Type\":\"multipart/alternative; boundary=<b>\\\"</b>Apple-Mail=_0DA95D7E-B791-4751-8043-175949088A2C<b>\\\"</b>>\",\"Message-Id\":\"<abc@xyz.com>\"}<br><br>The <b>contains</b> parameter can take a JSON dictionary, with the keys matching the keys of the <b>cef_dictionary</b> and the values being lists of possible contains for the CEF field. If a given value in the <b>cef_dictionary</b> is not present in the <b>contains</b> dictionary, the action will first check the list of default CEF fields. If not a default CEF field, the action will attempt to identify the appropriate contains value.<br>The <b>contains</b> parameter can also take a string(or a comma-separated list of strings) representing the contains for the <b>cef_value</b> parameter. This method should be used only if the <b>cef_name</b> and <b>cef_value</b> parameters are used.<br><br>If the <b>run_automation</b> parameter is set to true then the active playbooks will run automatically after the artifact is added. The active playbooks will run on the same container in which the artifact is added.<br><br>See the <a href=\"https://docs.splunk.com/Documentation/Phantom/4.8/PlatformAPI/RESTArtifacts\" target=\"_blank\">REST API Documentation</a> for more information on artifacts, CEF fields, and contains.",
+            "verbose": "If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id(from which the action is being run) and the status will be reflected accordingly.<br><br>CEF fields can be added to the artifact in two ways, either by using the <b>cef_name</b> and <b>cef_value</b> parameter or by using the <b>cef_dictionary</b> parameter. If the <b>cef_name</b>, <b>cef_value</b>, and <b>cef_dictionary</b> parameters are all included, the action will add the <b>cef_name</b> field to the <b>cef_dictionary</b>.<br><br>Using only the <b>cef_name</b> and <b>cef_value</b> parameter will result in the artifact having one CEF field.<br><br>The <b>cef_dictionary</b> parameter takes a JSON dictionary with key-value pairs representing CEF key-value pairs. To provide values containing double-quotes(\"), add a backslash(\\) before the double-quotes.<br>For e.g., {\"X-Universally-Unique-Identifier\":\"test\",\"Content-Type\":\"multipart/alternative; boundary=<b>\\\"</b>Apple-Mail=_0DA95D7E-B791-4751-8043-175949088A2C<b>\\\"</b>>\",\"Message-Id\":\"<abc@xyz.com>\"}<br><br>The <b>contains</b> parameter can take a JSON dictionary, with the keys matching the keys of the <b>cef_dictionary</b> and the values being lists of possible contains for the CEF field. If a given value in the <b>cef_dictionary</b> is not present in the <b>contains</b> dictionary, the action will first check the list of default CEF fields. If not a default CEF field, then the action will attempt to identify the appropriate value for contains.<br>The <b>contains</b> parameter can also take a string(or a comma-separated list of strings) representing the contains for the <b>cef_value</b> parameter. This method should be used only if the <b>cef_name</b> and <b>cef_value</b> parameters are used.<br><br>If the <b>run_automation</b> parameter is set to true then the active playbooks will run automatically after the artifact is added. The active playbooks will run on the same container in which the artifact is added.<br><br>See the <a href=\"https://docs.splunk.com/Documentation/Phantom/4.8/PlatformAPI/RESTArtifacts\" target=\"_blank\">REST API Documentation</a> for more information on artifacts, CEF fields, and contains.",
             "type": "generic",
             "identifier": "add_artifact",
             "read_only": false,
@@ -917,7 +1038,10 @@
                 },
                 {
                     "data_path": "action_result.parameter.cef_dictionary",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"test_key\": \"test_value\"}"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.cef_name",
@@ -935,23 +1059,39 @@
                     "data_type": "numeric",
                     "contains": [
                         "phantom container id"
+                    ],
+                    "example_values": [
+                        1234
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.contains",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.label",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "event"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.name",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Artifact_demo"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.run_automation",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.source_data_identifier",
@@ -967,38 +1107,63 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        123
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.success",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.artifact id",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        12345
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.container id",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1234
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.server",
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://10.1.1.10"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Artifact id: 12345, Container id: 1234, Server: https://10.1.1.10"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -1062,7 +1227,11 @@
                 },
                 {
                     "data_path": "action_result.parameter.recursive",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.vault_id",
@@ -1070,45 +1239,72 @@
                     "contains": [
                         "sha1",
                         "vault id"
+                    ],
+                    "example_values": [
+                        "f582ed9120fa3be94852c73e1cd188f2948f677f"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.aka",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test.txt"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.container",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom_test"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.container_id",
                     "data_type": "numeric",
                     "contains": [
                         "phantom container id"
+                    ],
+                    "example_values": [
+                        1234
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.contains",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "vault id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.create_time",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "0 minutes ago"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.hash",
                     "data_type": "string",
                     "contains": [
                         "sha1"
+                    ],
+                    "example_values": [
+                        "0a0e6c7ab7f77d058efd444279b81c4c6a9cf4ce"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        12
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.contains",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "vault id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.md5",
@@ -1117,13 +1313,19 @@
                         "md5"
                     ],
                     "column_name": "MD5",
-                    "column_order": 3
+                    "column_order": 3,
+                    "example_values": [
+                        "0db33a0790b6d6d5c2e4425646eee7fc"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.sha1",
                     "data_type": "string",
                     "contains": [
                         "sha1"
+                    ],
+                    "example_values": [
+                        "fece6c7ab7f77d058efd444279b81c4c6a9cf4ce"
                     ]
                 },
                 {
@@ -1133,17 +1335,26 @@
                         "sha256"
                     ],
                     "column_name": "Sha256",
-                    "column_order": 4
+                    "column_order": 4,
+                    "example_values": [
+                        "4f2155212cb0f74207bd0e4fd5ecae548ee2bae1d2dcd36c1d0ba0b6254bd4a1"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.size",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        33
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "column_name": "Name",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "tgz-test"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.path",
@@ -1153,7 +1364,10 @@
                     "data_path": "action_result.data.*.size",
                     "data_type": "numeric",
                     "column_name": "Size",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        10240
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user",
@@ -1171,23 +1385,42 @@
                         "vault id"
                     ],
                     "column_name": "Vault ID",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "b90e6c7ab7f77d058efd444279b81c4c6a9cf4ce"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_vault_items",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        9
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Total vault items: 9"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -1481,7 +1714,7 @@
         {
             "action": "get action result",
             "description": "Find the results of a previously run action",
-            "verbose": "This action returns the most recent results of an action with the given <b>action_name</b> launched with the given <b>parameters</b> within the given <b>time_limit</b>.<br><br>The action will limit the number of results returned to the value in <b>max_results</b>. By default, the limit is 10. To get all the results set the<b>max_results</b> parameter to 0.<br><br>The <b>parameters</b> parameter takes a JSON string in the format:<br><br><pre>{<br>    &quot;parameter_name1&quot;: &quot;parameter_value1&quot;<br>    &quot;parameter_name2&quot;: &quot;parameter_value2&quot;<br>    ...<br>}</pre><br>The <b>app</b> parameter takes an app name, and if it is included, the action will only search for action results from that app. Similarly, the <b>asset</b> parameter takes an asset name, and if it is included, the action will only search for action results from that asset.",
+            "verbose": "This action returns the most recent results of the given <b>action_name</b> launched with the given <b>parameters</b> within the given <b>time_limit</b>.<br><br>The action will limit the number of results returned to the value in <b>max_results</b>. By default, the limit is 10. To get all the results set the<b>max_results</b> parameter to 0.<br><br>The <b>parameters</b> parameter takes a JSON string in the format:<br><br><pre>{<br>    &quot;parameter_name1&quot;: &quot;parameter_value1&quot;<br>    &quot;parameter_name2&quot;: &quot;parameter_value2&quot;<br>    ...<br>}</pre><br>The <b>app</b> parameter takes an app name, and if it is included, the action will only search for action results from that app. Similarly, the <b>asset</b> parameter takes an asset name, and if it is included, the action will only search for action results from that asset.",
             "type": "investigate",
             "identifier": "get_action",
             "read_only": true,
@@ -1781,7 +2014,7 @@
             "action": "update list",
             "identifier": "update_list",
             "description": "Update a list",
-            "verbose": "Either the <b>list_name</b> or </b>id</b> is required. If both, <b>list_name</b> and <b>id</b> parameters are provided and both of them point to different lists, then <b>list_name</b> parameter will be preferred and the action will update the list specified in the list_name parameter.",
+            "verbose": "Either the <b>list_name</b> or </b>id</b> is required. If both, <b>list_name</b> and <b>id</b> parameters are provided and both of them point to different lists, then the <b>list_name</b> parameter will be preferred and the action will update the list specified in the list_name parameter.",
             "type": "generic",
             "read_only": false,
             "parameters": {
