@@ -339,7 +339,7 @@
         {
             "action": "add note",
             "description": "Add a note to a container",
-            "verbose": "If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id(from which the action is being run) and the status will be reflected accordingly.",
+            "verbose": "If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id (from where the action is being run) and the status will be reflected accordingly.",
             "type": "generic",
             "identifier": "add_note",
             "read_only": false,
@@ -739,7 +739,7 @@
         {
             "action": "add listitem",
             "description": "Add value to a custom list",
-            "verbose": "To add a row containing a single value to a list simply pass the value. However, to pass multiple values in a row, format it like a JSON array (e.g. [\"item1\", \"item2\", \"item3\"]).<br><br>The action will update the <b>list</b>, if the <b>list</b> already exists (even if the <b>create</b> parameter is set to true).<br><br>After creating or updating a list through this action, if the same list is updated from the UI, then the user needs to save those changes before reupdating the list through this action, otherwise, the changes made from the UI will be overridden.",
+            "verbose": "To add a row containing a single value to a list simply pass the value. However, to pass multiple values in a row, format it like a JSON array (e.g. [\"item1\", \"item2\", \"item3\"]).<br><br>The action will update the <b>list</b>, if the <b>list</b> already exists (even if the <b>create</b> parameter is set to true).<br><br>After creating or updating a list through this action, if the same list is updated from the UI, then the user needs to save those changes before updating the list through this action again, otherwise, the changes made from the UI will be overridden.",
             "type": "generic",
             "identifier": "add_listitem",
             "read_only": false,
@@ -1366,7 +1366,7 @@
         {
             "action": "deflate item",
             "description": "Deflates an item from the vault",
-            "verbose": "The action will be supported only if the <b>phantom_server</b> parameter(in the asset configurations) is configured to the local Phantom instance, i.e., the instance from which the action is being run.<br><br>The action detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to its vault, else to the current (the container whose context the action is executed) container. The action supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types. In case the compressed file contains another compressed file in it, set the <b>recursive</b> parameter to true, to deflate the inner compressed file.<br><br>For certain Unicode characters, the file name is not unzipped as it is, by the zipfile module.",
+            "verbose": "The action will be supported only if the <b>phantom_server</b> parameter (in the asset configurations) is configured to the local Phantom instance, i.e., the instance from which the action is being run.<br><br>The action detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to its vault, else to the current (the container whose context the action is executed) container. The action supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types. In the case where the compressed file contains another compressed file in it, set the <b>recursive</b> parameter to true to deflate the inner compressed file.<br><br>For certain Unicode characters, the file name is not unzipped as it is, by the zipfile module.",
             "type": "generic",
             "identifier": "deflate_item",
             "read_only": false,
@@ -1623,7 +1623,7 @@
         {
             "action": "export container",
             "description": "Export local container to the configured Phantom asset",
-            "verbose": "This action exports a container (that matches the <b>container_id</b>) from the local Phantom instance(the instance from which the action is being run) to the configured Phantom asset (that the action is being executed on).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the local phantom instance and the configured Phantom asset does not match.",
+            "verbose": "This action exports a container (that matches the <b>container_id</b>) from the local Phantom instance (the instance from where the action is being run) to the configured Phantom asset (that the action is being executed on).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the local phantom instance and the configured Phantom asset does not match.",
             "type": "generic",
             "identifier": "export_container",
             "read_only": false,
@@ -1713,7 +1713,7 @@
         {
             "action": "import container",
             "description": "Import a container from an external Phantom instance",
-            "verbose": "This action imports a container (that matches the <b>container_id</b>) from the configured Phantom asset (that the action is being executed on) into the local Phantom instance(the instance from which the action is being run).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the configured Phantom asset and the local phantom instance does not match.",
+            "verbose": "This action imports a container (that matches the <b>container_id</b>) from the configured Phantom asset (that the action is being executed on) into the local Phantom instance (the instance from where the action is being run).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the configured Phantom asset and the local phantom instance does not match.",
             "type": "generic",
             "identifier": "import_container",
             "read_only": false,
@@ -1909,7 +1909,7 @@
         {
             "action": "get action result",
             "description": "Find the results of a previously run action",
-            "verbose": "This action returns the most recent results of the given <b>action_name</b> launched with the given <b>parameters</b> within the given <b>time_limit</b>.<br><br>The action will limit the number of results returned to the value in <b>max_results</b>. By default, the limit is 10. To get all the results set the<b>max_results</b> parameter to 0.<br><br>The <b>parameters</b> parameter takes a JSON string in the format:<br><br><pre>{<br>    &quot;parameter_name1&quot;: &quot;parameter_value1&quot;<br>    &quot;parameter_name2&quot;: &quot;parameter_value2&quot;<br>    ...<br>}</pre><br>The <b>app</b> parameter takes an app name, and if it is included, the action will only search for action results from that app. Similarly, the <b>asset</b> parameter takes an asset name, and if it is included, the action will only search for action results from that asset.",
+            "verbose": "This action returns the most recent results of the given <b>action_name</b> launched with the given <b>parameters</b> within the given <b>time_limit</b>.<br><br>The action will limit the number of results returned to the value in <b>max_results</b>. By default, the limit is 10. To get all the results, set the<b>max_results</b> parameter to 0.<br><br>The <b>parameters</b> parameter takes a JSON string in the format:<br><br><pre>{<br>    &quot;parameter_name1&quot;: &quot;parameter_value1&quot;<br>    &quot;parameter_name2&quot;: &quot;parameter_value2&quot;<br>    ...<br>}</pre><br>The <b>app</b> parameter takes an app name, and if it is included, the action will only search for action results from that app. Similarly, the <b>asset</b> parameter takes an asset name, and if it is included, the action will only search for action results from that asset.",
             "type": "investigate",
             "identifier": "get_action",
             "read_only": true,

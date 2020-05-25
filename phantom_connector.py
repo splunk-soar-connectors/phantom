@@ -561,15 +561,20 @@ class PhantomConnector(BaseConnector):
 
                 curr_value = v
 
-                if (isinstance(curr_value, dict)):
-                    curr_value = json.dumps(curr_value)
-
                 try:
-                    if (not isinstance(curr_value, basestring)):
+                    # if we convert this if/elif statement to if/else, then it will try to
+                    # perform str() operation on even the already string/basestring data.
+                    # This works for every situation except for the unicode characters for which it will fail.
+                    # Hence, we are avoiding the str() on already string/basestring formatted data.
+                    if (isinstance(curr_value, dict)):
+                        curr_value = json.dumps(curr_value)
+                    elif (not isinstance(curr_value, basestring)): # For python 2
                         curr_value = str(curr_value)
-                except:
-                    if (not isinstance(curr_value, str)):
+                except NameError:
+                    if (not isinstance(curr_value, str)): # For python 3
                         curr_value = str(curr_value)
+                except Exception as e:
+                    return action_result.set_status(phantom.APP_ERROR, 'Error occurred while processing the artifacts data', e)
 
                 curr_value = self._handle_py_ver_compat_for_input_str(curr_value)
 
