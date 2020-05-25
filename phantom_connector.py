@@ -263,8 +263,12 @@ class PhantomConnector(BaseConnector):
 
     def load_dirty_json(self, dirty_json, action_result):
         import re
-        regex_replace = [(r"([ \{,:\[])(u)?'([^']+)'", r'\1"\3"'), (r" False([, \}\]])", r' false\1'),
-                         (r" True([, \}\]])", r' true\1')]
+        regex_replace = [
+            (r"([ \{,:\[])(u?\\?)?'([^']*)'([^'])", r'\1"\3"\4'),   # Replace single quotes with double quotes
+            (r" False([, \}\]])", r' false\1'),                     # Replace python "False" with json "false"
+            (r" True([, \}\]])", r' true\1'),                       # Replace python "True" with json "true"
+            (r" None([, \}\]])", r' null\1')                        # Replace python "None" with json "null"
+        ]
         for r, s in regex_replace:
             dirty_json = re.sub(r, s, dirty_json)
         dirty_json = dirty_json.replace(": ''", ': ""')
@@ -289,14 +293,55 @@ class PhantomConnector(BaseConnector):
 
         artifact_id = self._handle_py_ver_compat_for_input_str(param['artifact_id'])
 
-        cef_json = param.get('cef_json', '')
+        name = param.get('name')
+        label = param.get('label')
+        severity = param.get('severity')
+        cef_json = param.get('cef_json')
+        cef_types_json = param.get('cef_types_json')
+        tags = param.get('tags')
+        art_json = param.get('artifact_json')
+
+        overwrite = param.get('overwrite', False)
+
+        # Check if at least one of the following parameters have been supplied:
+        if not any((name, label, severity, cef_json, cef_types_json, tags, art_json)):
+            req_params = 'name, label, severity, cef_json, cef_types_json, tags, artifact_json'
+            return action_result.set_status(phantom.APP_ERROR, 'At least one of the following parameters are required to update an artifact: {}'.format(req_params))
 
         endpoint = "/rest/artifact/{}".format(artifact_id)
+
+        output_artifact = {}
+
+        # name, label, and severity should always be overwritten, if provided
+        if name:
+            output_artifact['name'] = name
+
+        if label:
+            output_artifact['label'] = label
+
+        if severity:
+            output_artifact['severity'] = severity
+
+        existing_artifact = {}  # If overwriting, this will be used.
+
+        # //// Start workaround for PPS-18970 ////
+        ''' Use this once PPS-18970 is fixed
+        if overwrite is False:
+            # Get the existing artifact to append provided parameters to existing values
+            ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
+
+            if phantom.is_fail(ret_val):
+                self.save_progress('Unable to find artifact, please check the artifact id.')
+                return action_result.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
+
+            existing_artifact = resp_data
+        '''
+
         # First get the artifacts json
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
 
-        if (phantom.is_fail(ret_val)):
-            self.save_progress("Unable to get artifact, please check the artifact id")
+        if phantom.is_fail(ret_val):
+            self.save_progress('Unable to find artifact, please check the artifact id.')
             return action_result.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
 
         # Get the CEF JSON and update the artifact
@@ -322,13 +367,45 @@ class PhantomConnector(BaseConnector):
 
         if myCleanJson is None:
             return action_result.get_status()
+            
+        if overwrite is False:
+            existing_artifact = resp_data
+        if 'label' not in output_artifact:
+            output_artifact['label'] = resp_data.get('label')
+            if not output_artifact['label']:
+                output_artifact['label'] = 'event'
 
-        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=myCleanJson, method="post")
+        # //// End workaround for PPS-18970 ////
 
-        if (phantom.is_fail(ret_val)):
-            self.save_progress("Unable to modify artifact")
+        output_artifact['cef'] = myCleanJson
+
+        if cef_types_json:
+            # If overwrite is False, need to update existing cef_types verses replacing whole thing
+            contains = existing_artifact.get('cef_types', {})
+            contains.update(self.load_dirty_json(cef_types_json))
+            output_artifact['cef_types'] = contains
+
+        if tags:
+            # If overwrite is False, need to add to the existing tags. Otherwise replace list of tags.
+            cleaned_tags = [tag.strip().strip('\'"') for tag in tags.strip('[]').split(',')]
+            output_artifact['tags'] = list(set(existing_artifact.get('tags', []) + cleaned_tags))  # make sure any duplicates are removed
+
+        # This will always overwrite any existing fields provided.
+        if art_json:
+            output_artifact.update(self.load_dirty_json(art_json))
+
+        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=output_artifact, method="post")
+
+        action_result.add_data({
+            'requested_artifact': output_artifact,
+            'response': resp_data
+        })
+
+        if phantom.is_fail(ret_val):
+            self.save_progress('Unable to update artifact.')
             return action_result.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
-        return action_result.set_status(phantom.APP_SUCCESS, "Artifact Updated")
+
+        return action_result.set_status(phantom.APP_SUCCESS, 'Artifact updated successfully.')
 
     def _tag_artifact(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -430,15 +507,18 @@ class PhantomConnector(BaseConnector):
         container_ids = param.get("container_ids", "current")
         values = self._handle_py_ver_compat_for_input_str(param.get('values', ''))
         if limit_search:
-            container_ids = list(set([a for a in
-                [int(z) if isinstance(z, int) or z.isdigit() else None for z in
-                    [self.get_container_id() if y == "current" else y for y in
-                        [x.strip() for x in container_ids.replace(",", " ").split()]
-                     ]
-                 ]
-                if a
-            ]))
-            action_result.update_param({"container_ids": str(sorted(container_ids)).strip("[]")})
+            container_ids = list(
+                set([
+                    a for a in [
+                        int(z) if isinstance(z, int) or z.isdigit() else None for z in [
+                            self.get_container_id() if y == "current" else y for y in
+                            [x.strip() for x in container_ids.replace(",", " ").split()]
+                        ]
+                    ] if a
+                ])
+            )
+        action_result.update_param({"container_ids": str(sorted(container_ids)).strip("[]")})
+        values = param.get('values', '')
 
         if param.get('is_regex'):
             flt = 'iregex'

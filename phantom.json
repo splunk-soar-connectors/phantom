@@ -63,26 +63,85 @@
         },
         {
             "action": "update artifact",
-            "description": "Update an artifact",
+            "description": "Update or overwrite Phantom artifact with provided input",
+            "verbose": "<h4>Overwrite</h4>By default, this action will append or update these fields: \"cef_json\", \"cef_types_json\", and \"tags\", unless \"overwrite\" is enabled. In which case, those parameters will replace the entirety of current versions of what that artifact contains.<h4>Optional Fields</h4>While all are not required, for the action to run, at least one of the following optional parameters need to be provided:<table><thead><tr><th>PARAMETER</th><th>EXAMPLE</th></tr></thead><tbody><tr><td>name</td><td>Artifact Name</td></tr><tr><td>label</td><td>artifact_label</td></tr><tr><td>severity</td><td>high</td></tr><tr><td>cef_json</td><td>{\"key1\": \"value1\", \"goodDomain\": \"www.splunk.com\", \"remove_me\": \"\"}</td></tr><tr><td>cef_types_json</td><td>{\"goodDomain\": [\"domain\"]}</td></tr><tr><td>tags</td><td>tag1, tag3 <i>or</i> [\"tag2\", \"tag4\"]</td></tr><tr><td>artifact_json</td><td>{\"source_data_identifier\": \"myTicket1234\", \"label\": \"new_label\"}</td></tr></tbody></table><h4>Artifact JSON</h4>Artifact JSON should be used for more advanced aspects of Phantom artifacts. See Phantom REST API docs, specifically regarding artifacts.",
             "type": "generic",
             "identifier": "update_artifact",
             "read_only": false,
             "parameters": {
                 "artifact_id": {
-                    "description": "The artifact id",
+                    "description": "ID of artifact to update",
                     "data_type": "string",
                     "order": 0,
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "phantom artifact id"
+                    ],
+                    "primary": true
                 },
-                "cef_json": {
-                    "description": "JSON of the CEF Fields you want in the artifact",
+                "name": {
+                    "description": "Artifact name (Always overwrites, if provided)",
                     "data_type": "string",
                     "order": 1,
-                    "required": true
+                    "required": false,
+                    "primary": false
+                },
+                "label": {
+                    "description": "Artifact label (Always overwrites, if provided)",
+                    "data_type": "string",
+                    "order": 2,
+                    "required": false,
+                    "primary": false
+                },
+                "severity": {
+                    "description": "Artifact severity (Always overwrites, if provided)",
+                    "data_type": "string",
+                    "order": 3,
+                    "required": false,
+                    "primary": false
+                },
+                "cef_json": {
+                    "description": "JSON format of the CEF fields you want in the artifact",
+                    "data_type": "string",
+                    "order": 4,
+                    "required": false,
+                    "primary": false
+                },
+                "cef_types_json": {
+                    "description": "JSON format of the CEF types (e.g., {'myIP': ['ip', 'ipv6']})",
+                    "data_type": "string",
+                    "order": 5,
+                    "required": false,
+                    "primary": false
+                },
+                "tags": {
+                    "description": "Comma-separated list of tags to add or replace in the artifact",
+                    "data_type": "string",
+                    "order": 6,
+                    "required": false,
+                    "primary": false,
+                    "allow_list": true
+                },
+                "overwrite": {
+                    "description": "Overwrite artifacts with provided input (applies to: cef_json, contains_json, tags)",
+                    "data_type": "boolean",
+                    "order": 7,
+                    "primary": false,
+                    "default": false
+                },
+                "artifact_json": {
+                    "description": "JSON format of entire artifact (Always overwrites provided keys)",
+                    "data_type": "string",
+                    "order": 8,
+                    "required": false,
+                    "primary": false
                 }
             },
             "render": {
-                "type": "table"
+                "type": "table",
+                "width": 10,
+                "height": 5,
+                "title": "Update Artifact"
             },
             "output": [
                 {
@@ -96,20 +155,158 @@
                 {
                     "data_path": "action_result.parameter.artifact_id",
                     "data_type": "string",
+                    "contains": [
+                        "phantom artifact id"
+                    ],
                     "example_values": [
-                        "94"
+                        "2388"
+                    ],
+                    "column_name": "Artifact ID",
+                    "column_order": 0
+                },
+                {
+                    "data_path": "action_result.parameter.artifact_json",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"severity\": \"high\", \"label\": \"test label\", \"description\": \"Artifact added by Me\", \"source_data_identifier\": \"my_custom_sdi\"}"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.cef_json",
                     "data_type": "string",
                     "example_values": [
-                        "{\"ip\": \"1.1.2.5\"}"
+                        "{\"new_field\": \"new_value\", \"deleted_field\": \"\"}"
                     ]
                 },
                 {
-                    "data_path": "action_result.data",
-                    "data_type": "string"
+                    "data_path": "action_result.parameter.cef_types_json",
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"new_field\": [\"new contains\"]}"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "test label"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "New Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.overwrite",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "[\"tag2\"]"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.cef.deleted_field",
+                    "data_type": "string",
+                    "example_values": [
+                        ""
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.cef.new_field",
+                    "data_type": "string",
+                    "example_values": [
+                        "new_value"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.cef.test",
+                    "data_type": "string",
+                    "example_values": [
+                        "fff"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.cef_types.new_field",
+                    "data_type": "string",
+                    "example_values": [
+                        "new contains"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.description",
+                    "data_type": "string",
+                    "example_values": [
+                        "Artifact added by Me"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.label",
+                    "data_type": "string",
+                    "example_values": [
+                        "test label"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.name",
+                    "data_type": "string",
+                    "example_values": [
+                        "New Name"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.severity",
+                    "data_type": "string",
+                    "example_values": [
+                        "high"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.source_data_identifier",
+                    "data_type": "string",
+                    "example_values": [
+                        "my_custom_sdi"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.requested_artifact.tags",
+                    "data_type": "string",
+                    "example_values": [
+                        "tag2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2388
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.response.success",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ],
+                    "column_name": "Success",
+                    "column_order": 1
                 },
                 {
                     "data_path": "action_result.summary",
@@ -119,10 +316,8 @@
                     "data_path": "action_result.message",
                     "data_type": "string",
                     "example_values": [
-                        "Artifact Updated"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 0
+                        "Artifact updated successfully."
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
