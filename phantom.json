@@ -25,7 +25,7 @@
         "phantom_server": {
             "data_type": "string",
             "order": 0,
-            "description": "Phantom IP or Hostname(e.g. 10.1.1.10 or valid_phantom_hostname)",
+            "description": "Phantom IP or Hostname (e.g. 10.1.1.10 or valid_phantom_hostname)",
             "required": true
         },
         "auth_token": {
@@ -63,7 +63,7 @@
         },
         {
             "action": "update artifact",
-            "description": "Update or overwrite Phantom artifact with provided input",
+            "description": "Update or overwrite Phantom artifact with the provided input",
             "verbose": "<h4>Overwrite</h4>By default, this action will append or update these fields: \"cef_json\", \"cef_types_json\", and \"tags\", unless \"overwrite\" is enabled. In which case, those parameters will replace the entirety of current versions of what that artifact contains.<h4>Optional Fields</h4>While all are not required, for the action to run, at least one of the following optional parameters need to be provided:<table><thead><tr><th>PARAMETER</th><th>EXAMPLE</th></tr></thead><tbody><tr><td>name</td><td>Artifact Name</td></tr><tr><td>label</td><td>artifact_label</td></tr><tr><td>severity</td><td>high</td></tr><tr><td>cef_json</td><td>{\"key1\": \"value1\", \"goodDomain\": \"www.splunk.com\", \"remove_me\": \"\"}</td></tr><tr><td>cef_types_json</td><td>{\"goodDomain\": [\"domain\"]}</td></tr><tr><td>tags</td><td>tag1, tag3 <i>or</i> [\"tag2\", \"tag4\"]</td></tr><tr><td>artifact_json</td><td>{\"source_data_identifier\": \"myTicket1234\", \"label\": \"new_label\"}</td></tr></tbody></table><h4>Artifact JSON</h4>Artifact JSON should be used for more advanced aspects of Phantom artifacts. See Phantom REST API docs, specifically regarding artifacts.",
             "type": "generic",
             "identifier": "update_artifact",
@@ -82,59 +82,43 @@
                 "name": {
                     "description": "Artifact name (Always overwrites, if provided)",
                     "data_type": "string",
-                    "order": 1,
-                    "required": false,
-                    "primary": false
+                    "order": 1
                 },
                 "label": {
                     "description": "Artifact label (Always overwrites, if provided)",
                     "data_type": "string",
-                    "order": 2,
-                    "required": false,
-                    "primary": false
+                    "order": 2
                 },
                 "severity": {
                     "description": "Artifact severity (Always overwrites, if provided)",
                     "data_type": "string",
-                    "order": 3,
-                    "required": false,
-                    "primary": false
+                    "order": 3
                 },
                 "cef_json": {
                     "description": "JSON format of the CEF fields you want in the artifact",
                     "data_type": "string",
-                    "order": 4,
-                    "required": false,
-                    "primary": false
+                    "order": 4
                 },
                 "cef_types_json": {
                     "description": "JSON format of the CEF types (e.g., {'myIP': ['ip', 'ipv6']})",
                     "data_type": "string",
-                    "order": 5,
-                    "required": false,
-                    "primary": false
+                    "order": 5
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to add or replace in the artifact",
                     "data_type": "string",
                     "order": 6,
-                    "required": false,
-                    "primary": false,
                     "allow_list": true
                 },
                 "overwrite": {
                     "description": "Overwrite artifacts with provided input (applies to: cef_json, contains_json, tags)",
                     "data_type": "boolean",
-                    "order": 7,
-                    "primary": false,
-                    "default": false
+                    "order": 7
                 },
                 "artifact_json": {
                     "description": "JSON format of entire artifact (Always overwrites provided keys)",
                     "data_type": "string",
-                    "order": 8,
-                    "required": false,
-                    "primary": false
+                    "order": 8
                 }
             },
             "render": {

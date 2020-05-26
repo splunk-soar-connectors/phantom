@@ -261,7 +261,7 @@ class PhantomConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS, 'Request succeeded')
 
-    def load_dirty_json(self, dirty_json, action_result):
+    def load_dirty_json(self, dirty_json, action_result, parameter):
         import re
         regex_replace = [
             (r"([ \{,:\[])(u?\\?)?'([^']*)'([^'])", r'\1"\3"\4'),   # Replace single quotes with double quotes
@@ -276,13 +276,13 @@ class PhantomConnector(BaseConnector):
         try:
             clean_json = json.loads(dirty_json)
             if not clean_json:
-                action_result.set_status(phantom.APP_ERROR, "Please provide a non-empty JSON in cef_json parameter")
+                action_result.set_status(phantom.APP_ERROR, "Please provide a non-empty JSON in {parameter} parameter".format(parameter=parameter))
                 return None
             if not isinstance(clean_json, dict):
-                action_result.set_status(phantom.APP_ERROR, "Please provide cef_json parameter in JSON format")
+                action_result.set_status(phantom.APP_ERROR, "Please provide {parameter} parameter in JSON format".format(parameter=parameter))
                 return None
         except Exception as e:
-            action_result.set_status(phantom.APP_ERROR, "Could not load JSON from cef_json parameter", e)
+            action_result.set_status(phantom.APP_ERROR, "Could not load JSON from {parameter} parameter".format(parameter=parameter), e)
             return None
 
         return clean_json
@@ -293,12 +293,12 @@ class PhantomConnector(BaseConnector):
 
         artifact_id = self._handle_py_ver_compat_for_input_str(param['artifact_id'])
 
-        name = param.get('name')
-        label = param.get('label')
-        severity = param.get('severity')
+        name = self._handle_py_ver_compat_for_input_str(param.get('name'))
+        label = self._handle_py_ver_compat_for_input_str(param.get('label'))
+        severity = self._handle_py_ver_compat_for_input_str(param.get('severity'))
         cef_json = param.get('cef_json')
         cef_types_json = param.get('cef_types_json')
-        tags = param.get('tags')
+        tags = self._handle_py_ver_compat_for_input_str(param.get('tags'))
         art_json = param.get('artifact_json')
 
         overwrite = param.get('overwrite', False)
@@ -344,30 +344,6 @@ class PhantomConnector(BaseConnector):
             self.save_progress('Unable to find artifact, please check the artifact id.')
             return action_result.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
 
-        # Get the CEF JSON and update the artifact
-        myData = resp_data['cef']
-        clean_json = self.load_dirty_json(cef_json, action_result)
-
-        if clean_json is None:
-            return action_result.get_status()
-
-        try:
-            myData = dict((k, v) for k, v in myData.iteritems() if v)
-        except:
-            myData = dict((k, v) for k, v in myData.items() if v)
-        myData.update(clean_json)
-
-        try:
-            myData = dict((k, v) for k, v in myData.iteritems() if v)
-        except:
-            myData = dict((k, v) for k, v in myData.items() if v)
-
-        myJson = {"cef": myData}
-        myCleanJson = self.load_dirty_json(json.dumps(myJson), action_result)
-
-        if myCleanJson is None:
-            return action_result.get_status()
-            
         if overwrite is False:
             existing_artifact = resp_data
         if 'label' not in output_artifact:
@@ -375,14 +351,37 @@ class PhantomConnector(BaseConnector):
             if not output_artifact['label']:
                 output_artifact['label'] = 'event'
 
+        # Get the CEF JSON and update the artifact
+        myData = existing_artifact.get('cef', {})
+
+        if cef_json:
+            clean_json = self.load_dirty_json(cef_json, action_result, "cef_json")
+
+            if clean_json is None:
+                return action_result.get_status()
+
+            try:
+                myData = dict((k, v) for k, v in myData.iteritems() if v)
+            except:
+                myData = dict((k, v) for k, v in myData.items() if v)
+            myData.update(clean_json)
+
+        try:
+            myData = dict((k, v) for k, v in myData.iteritems() if v)
+        except:
+            myData = dict((k, v) for k, v in myData.items() if v)
+
         # //// End workaround for PPS-18970 ////
 
-        output_artifact['cef'] = myCleanJson
+        output_artifact['cef'] = myData
 
         if cef_types_json:
             # If overwrite is False, need to update existing cef_types verses replacing whole thing
             contains = existing_artifact.get('cef_types', {})
-            contains.update(self.load_dirty_json(cef_types_json))
+            cef_types_json = self.load_dirty_json(cef_types_json, action_result, "cef_types_json")
+            if cef_types_json is None:
+                return action_result.get_status()
+            contains.update(cef_types_json)
             output_artifact['cef_types'] = contains
 
         if tags:
@@ -392,7 +391,10 @@ class PhantomConnector(BaseConnector):
 
         # This will always overwrite any existing fields provided.
         if art_json:
-            output_artifact.update(self.load_dirty_json(art_json))
+            art_json = self.load_dirty_json(art_json, action_result, "art_json")
+            if art_json is None:
+                return action_result.get_status()
+            output_artifact.update(art_json)
 
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=output_artifact, method="post")
 
@@ -517,7 +519,7 @@ class PhantomConnector(BaseConnector):
                     ] if a
                 ])
             )
-        action_result.update_param({"container_ids": str(sorted(container_ids)).strip("[]")})
+            action_result.update_param({"container_ids": str(sorted(container_ids)).strip("[]")})
         values = param.get('values', '')
 
         if param.get('is_regex'):
