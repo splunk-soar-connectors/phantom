@@ -24,6 +24,17 @@ For security reasons, accessing 127.0.0.1 is not allowed.
     <ul>
       <li> Update List - The <b>row_values_as_list</b> parameter, has been changed from the comma-separated new values to a JSON formatted list of new values. This will allow the user to provide a value containing a comma(',') character. The example for the same has been updated in the example values.</li>
       <li> Add Artifacts - The <b>contains</b> parameter, can take a string(or a comma-separated list of string) or a JSON dictionary, with the keys matching the keys of the <b>cef_dictionary</b> and the values being lists of possible contains for the CEF field. In case, the <b>contains</b> parameter is a string(or a comma-separated list of string), the provided value will map to the <b>cef_name</b> parameter.</li>
+      <li> Update Artifact - The action parameters of this action have been modified. Please update your existing playbooks according to the new parameters. Below is the list of the added parameters:</li>
+        <ul>
+          <li>name: Artifact name (Always overwrites, if provided)</li>
+          <li>label: Artifact label (Always overwrites, if provided)</li>
+          <li>severity: Artifact severity (Always overwrites, if provided)</li>
+          <li>cef_types_json: JSON format of the CEF types (e.g., {'myIP': ['ip', 'ipv6']})</li>
+          <li>tags: Comma-separated list of tags to add or replace in the artifact</li>
+          <li>overwrite: Overwrite artifacts with provided input (applies to: cef_json, contains_json, tags)</li>
+          <li>artifact_json: JSON format of entire artifact (Always overwrites provided keys)</li>
+        </ul>
+        For further details, check the <b>update artifact</b> section.
     </ul>
 </ul>
 
