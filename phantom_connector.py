@@ -38,9 +38,9 @@ import random
 import string
 import sys
 try:
-    import urllib.parse
+    from urllib.parse import quote
 except:
-    import urllib
+    from urllib import quote
 
 TIMEOUT = 120
 INVALID_RESPONSE = 'Server did not return a valid JSON response.'
@@ -116,14 +116,14 @@ class PhantomConnector(BaseConnector):
 
         if (failed):
             return RetVal3(
-                    action_result.set_status(phantom.APP_ERROR, "Error from server. Status code: {0}, Details: {1} ".format(response.status_code,
+                    action_result.set_status(phantom.APP_ERROR, "Error from server. Status code: {0}, Details: {1}".format(response.status_code,
                         self._get_error_details(resp_json))), response)
 
         if (200 <= response.status_code < 399):
             return RetVal3(phantom.APP_SUCCESS, response, resp_json)
 
         return RetVal3(
-                action_result.set_status(phantom.APP_ERROR, "Error from server. Status code: {0}, Details: {1} ".format(response.status_code,
+                action_result.set_status(phantom.APP_ERROR, "Error from server. Status code: {0}, Details: {1}".format(response.status_code,
                     self._get_error_details(resp_json))), response, None)
 
     def _process_response(self, response, action_result):
@@ -224,7 +224,7 @@ class PhantomConnector(BaseConnector):
             return (action_result.set_status(phantom.APP_ERROR, "HTTPS SSL validation failed", e), None, None)
         except Exception as e:
             try:
-                if e.args:
+                if hasattr(e, 'args'):
                     if len(e.args) > 1:
                         error_code = e.args[0]
                         error_msg = e.args[1]
@@ -532,10 +532,7 @@ class PhantomConnector(BaseConnector):
         if exact_match:
             values = '"{}"'.format(values)
 
-        try:
-            url_enc_values = urllib.quote(values, safe='')
-        except:
-            url_enc_values = urllib.parse.quote(values, safe='')
+        url_enc_values = quote(values, safe='')
 
         endpoint = '/rest/artifact?_filter_cef__{}={}&page_size=0&pretty'.format(flt, repr(url_enc_values))
 
@@ -570,10 +567,10 @@ class PhantomConnector(BaseConnector):
                     # Hence, we are avoiding the str() on already string/basestring formatted data.
                     if (isinstance(curr_value, dict)):
                         curr_value = json.dumps(curr_value)
-                    elif (not isinstance(curr_value, basestring)): # For python 2
+                    elif (not isinstance(curr_value, basestring)):  # For python 2
                         curr_value = str(curr_value)
                 except NameError:
-                    if (not isinstance(curr_value, str)): # For python 3
+                    if (not isinstance(curr_value, str)):  # For python 3
                         curr_value = str(curr_value)
                 except Exception as e:
                     return action_result.set_status(phantom.APP_ERROR, 'Error occurred while processing the artifacts data', e)
@@ -924,10 +921,7 @@ class PhantomConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Please provide a non-negative integer for column_index parameter")
 
         # Encode list_name to consider special url encoded characters like '\' in URL
-        try:
-            list_name = urllib.quote(list_name, safe='')
-        except:
-            list_name = urllib.parse.quote(list_name, safe='')
+        list_name = quote(list_name, safe='')
 
         endpoint = '/rest/decided_list/{}'.format(list_name)
 
@@ -998,10 +992,8 @@ class PhantomConnector(BaseConnector):
             pass
 
         # Encode list_name to consider special url encoded characters like '\' in URL
-        try:
-            url_enc_list_name = urllib.quote(list_name, safe='')
-        except:
-            url_enc_list_name = urllib.parse.quote(list_name, safe='')
+
+        url_enc_list_name = quote(list_name, safe='')
 
         url = '/rest/decided_list/{}'.format(url_enc_list_name)
 
@@ -1335,10 +1327,7 @@ class PhantomConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Either the custom list's name or id must be provided")
         else:
             # Encode list_identifier to consider special url encoded characters like '\' in URL
-            try:
-                list_identifier = urllib.quote(list_identifier, safe='')
-            except:
-                list_identifier = urllib.parse.quote(list_identifier, safe='')
+            list_identifier = quote(list_identifier, safe='')
 
         try:
             row_values = json.loads(row_values_as_list)
