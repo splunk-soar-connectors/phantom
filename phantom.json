@@ -493,28 +493,28 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.tags added",
+                    "data_path": "action_result.summary.tags_added",
                     "data_type": "string",
                     "example_values": [
                         "tag1"
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.tags already absent",
+                    "data_path": "action_result.summary.tags_already_absent",
                     "data_type": "string",
                     "example_values": [
                         "tag4"
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.tags already present",
+                    "data_path": "action_result.summary.tags_already_present",
                     "data_type": "string",
                     "example_values": [
                         "tag3"
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.tags removed",
+                    "data_path": "action_result.summary.tags_removed",
                     "data_type": "string",
                     "example_values": [
                         "tag2"
@@ -669,7 +669,7 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.artifacts found",
+                    "data_path": "action_result.summary.artifacts_found",
                     "data_type": "numeric",
                     "example_values": [
                         1
@@ -922,7 +922,7 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.found matches",
+                    "data_path": "action_result.summary.found_matches",
                     "data_type": "numeric",
                     "example_values": [
                         1
@@ -1300,14 +1300,14 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.artifact id",
+                    "data_path": "action_result.summary.artifact_id",
                     "data_type": "numeric",
                     "example_values": [
                         12345
                     ]
                 },
                 {
-                    "data_path": "action_result.summary.container id",
+                    "data_path": "action_result.summary.container_id",
                     "data_type": "numeric",
                     "example_values": [
                         1234
@@ -2161,6 +2161,10 @@
                     "example_values": [
                         2761
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.num_results",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.message",

@@ -469,8 +469,8 @@ class PhantomConnector(BaseConnector):
                 msg = "{}. {}".format("The reason of the failure can be the unavailability of the label in the provided artifact", msg)
             return action_result.set_status(phantom.APP_ERROR, msg)
 
-        action_result.set_summary({'tags added': ', '.join((list(add_tags - tags_already_added))), 'tags removed': ', '.join((list(remove_tags - tags_already_removed))),
-         'tags already present': ', '.join((list(tags_already_added))), 'tags already absent': ', '.join((list(tags_already_removed)))})
+        action_result.set_summary({'tags_added': ', '.join((list(add_tags - tags_already_added))), 'tags_removed': ', '.join((list(remove_tags - tags_already_removed))),
+         'tags_already_present': ', '.join((list(tags_already_added))), 'tags_already_absent': ', '.join((list(tags_already_removed)))})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -592,7 +592,7 @@ class PhantomConnector(BaseConnector):
             }
             action_result.add_data(result)
 
-        action_result.update_summary({'artifacts found': len(records), 'server': self._base_uri})
+        action_result.update_summary({'artifacts_found': len(records), 'server': self._base_uri})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -679,7 +679,7 @@ class PhantomConnector(BaseConnector):
 
         action_result.add_data(resp_data)
 
-        action_result.update_summary({'artifact id': artifact_id, 'container id': container_id, 'server': self._base_uri})
+        action_result.update_summary({'artifact_id': artifact_id, 'container_id': container_id, 'server': self._base_uri})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -948,7 +948,7 @@ class PhantomConnector(BaseConnector):
                         action_result.add_data(row)
                         coordinates.append((rownum, cid))
 
-        action_result.update_summary({'server': self._base_uri, 'found matches': found, 'locations': coordinates, 'list_id': list_id})
+        action_result.update_summary({'server': self._base_uri, 'found_matches': found, 'locations': coordinates, 'list_id': list_id})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
