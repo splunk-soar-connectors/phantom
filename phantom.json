@@ -5,46 +5,48 @@
     "package_name": "phantom_phantom",
     "publisher": "Splunk",
     "type": "information",
-    "main_module": "phantom_connector.pyc",
-    "app_version": "2.1.30",
-    "utctime_updated": "2020-04-21T02:13:09.000000Z",
+    "main_module": "phantom_connector.py",
+    "app_version": "3.0.0",
+    "latest_tested_version": [
+        "Phantom v4.5.15922",
+        "Phantom v4.8.23319 with Python 2",
+        "Phantom v4.8.23319 with Python 3"
+    ],
+    "python_version": "3",
+    "utctime_updated": "2019-11-19T20:26:14.000000Z",
     "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
     "min_phantom_version": "4.6.19142",
     "license": "Copyright (c) 2016-2020 Splunk Inc.",
-    "logo": "logo_phantom.svg",
-    "logo_dark": "logo_phantom_dark.svg",
+    "logo": "logo_splunk.svg",
+    "logo_dark": "logo_splunk_dark.svg",
     "configuration": {
         "phantom_server": {
             "data_type": "string",
             "order": 0,
-            "description": "Phantom IP or Hostname",
+            "description": "Phantom IP or Hostname (e.g. 10.1.1.10 or valid_phantom_hostname)",
             "required": true
         },
         "auth_token": {
             "data_type": "password",
             "order": 1,
-            "description": "Phantom Auth token",
-            "required": false
+            "description": "Phantom Auth token"
         },
         "username": {
             "data_type": "string",
             "order": 2,
-            "description": "Username (for HTTP basic auth)",
-            "required": false
+            "description": "Username (for HTTP basic auth)"
         },
         "password": {
             "data_type": "password",
             "order": 3,
-            "description": "Password (for HTTP basic auth)",
-            "required": false
+            "description": "Password (for HTTP basic auth)"
         },
         "verify_certificate": {
             "data_type": "boolean",
             "order": 4,
-            "description": "Verify HTTPS certificate",
-            "required": false,
+            "description": "Verify HTTPS certificate (default: false)",
             "default": false
         }
     },
@@ -61,7 +63,7 @@
         },
         {
             "action": "update artifact",
-            "description": "Update or overwrite Phantom artifact with provided input",
+            "description": "Update or overwrite Phantom artifact with the provided input",
             "verbose": "<h4>Overwrite</h4>By default, this action will append or update these fields: \"cef_json\", \"cef_types_json\", and \"tags\", unless \"overwrite\" is enabled. In which case, those parameters will replace the entirety of current versions of what that artifact contains.<h4>Optional Fields</h4>While all are not required, for the action to run, at least one of the following optional parameters need to be provided:<table><thead><tr><th>PARAMETER</th><th>EXAMPLE</th></tr></thead><tbody><tr><td>name</td><td>Artifact Name</td></tr><tr><td>label</td><td>artifact_label</td></tr><tr><td>severity</td><td>high</td></tr><tr><td>cef_json</td><td>{\"key1\": \"value1\", \"goodDomain\": \"www.splunk.com\", \"remove_me\": \"\"}</td></tr><tr><td>cef_types_json</td><td>{\"goodDomain\": [\"domain\"]}</td></tr><tr><td>tags</td><td>tag1, tag3 <i>or</i> [\"tag2\", \"tag4\"]</td></tr><tr><td>artifact_json</td><td>{\"source_data_identifier\": \"myTicket1234\", \"label\": \"new_label\"}</td></tr></tbody></table><h4>Artifact JSON</h4>Artifact JSON should be used for more advanced aspects of Phantom artifacts. See Phantom REST API docs, specifically regarding artifacts.",
             "type": "generic",
             "identifier": "update_artifact",
@@ -80,59 +82,43 @@
                 "name": {
                     "description": "Artifact name (Always overwrites, if provided)",
                     "data_type": "string",
-                    "order": 1,
-                    "required": false,
-                    "primary": false
+                    "order": 1
                 },
                 "label": {
                     "description": "Artifact label (Always overwrites, if provided)",
                     "data_type": "string",
-                    "order": 2,
-                    "required": false,
-                    "primary": false
+                    "order": 2
                 },
                 "severity": {
                     "description": "Artifact severity (Always overwrites, if provided)",
                     "data_type": "string",
-                    "order": 3,
-                    "required": false,
-                    "primary": false
+                    "order": 3
                 },
                 "cef_json": {
                     "description": "JSON format of the CEF fields you want in the artifact",
                     "data_type": "string",
-                    "order": 4,
-                    "required": false,
-                    "primary": false
+                    "order": 4
                 },
                 "cef_types_json": {
                     "description": "JSON format of the CEF types (e.g., {'myIP': ['ip', 'ipv6']})",
                     "data_type": "string",
-                    "order": 5,
-                    "required": false,
-                    "primary": false
+                    "order": 5
                 },
                 "tags": {
                     "description": "Comma-separated list of tags to add or replace in the artifact",
                     "data_type": "string",
                     "order": 6,
-                    "required": false,
-                    "primary": false,
                     "allow_list": true
                 },
                 "overwrite": {
                     "description": "Overwrite artifacts with provided input (applies to: cef_json, contains_json, tags)",
                     "data_type": "boolean",
-                    "order": 7,
-                    "primary": false,
-                    "default": false
+                    "order": 7
                 },
                 "artifact_json": {
                     "description": "JSON format of entire artifact (Always overwrites provided keys)",
                     "data_type": "string",
-                    "order": 8,
-                    "required": false,
-                    "primary": false
+                    "order": 8
                 }
             },
             "render": {
@@ -146,7 +132,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -335,7 +322,8 @@
         },
         {
             "action": "add note",
-            "description": "Add a note to an artifact",
+            "description": "Add a note to a container",
+            "verbose": "If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id (from where the action is being run) and the status will be reflected accordingly.",
             "type": "generic",
             "identifier": "add_note",
             "read_only": false,
@@ -344,21 +332,17 @@
                     "description": "Title for the note",
                     "data_type": "string",
                     "order": 0,
-                    "required": true,
-                    "primary": false
+                    "required": true
                 },
                 "content": {
                     "description": "Note content",
                     "data_type": "string",
-                    "order": 1,
-                    "required": false,
-                    "primary": false
+                    "order": 1
                 },
                 "container_id": {
                     "description": "The container id (defaults to current container)",
                     "data_type": "numeric",
                     "order": 2,
-                    "required": false,
                     "contains": [
                         "phantom container id"
                     ],
@@ -367,9 +351,7 @@
                 "phase_id": {
                     "description": "Phase the note will be associated with",
                     "data_type": "string",
-                    "order": 3,
-                    "required": false,
-                    "primary": false
+                    "order": 3
                 }
             },
             "output": [
@@ -377,17 +359,30 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.container_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        35
+                    ],
+                    "contains": [
+                        "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.content",
                     "data_type": "string",
                     "example_values": [
-                        "Note created"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 1
+                        "Adding a note via app action"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.phase_id",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.title",
@@ -396,6 +391,23 @@
                         "Note test",
                         "Testing note"
                     ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Note created"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -410,23 +422,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.content",
-                    "data_type": "string",
-                    "example_values": [
-                        "Adding a note via app action"
-                    ]
-                },
-                {
-                    "data_path": "action_result.parameter.container_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        35
-                    ],
-                    "contains": [
-                        "phantom container id"
-                    ]
                 }
             ],
             "render": {
@@ -437,7 +432,6 @@
         {
             "action": "update artifact tags",
             "description": "Add/Remove tags from an artifact",
-            "verbose": "",
             "type": "generic",
             "identifier": "tag_artifact",
             "read_only": false,
@@ -446,23 +440,18 @@
                     "description": "The artifact id",
                     "data_type": "string",
                     "order": 0,
-                    "required": true,
-                    "primary": true
+                    "required": true
                 },
                 "add_tags": {
                     "description": "Comma-separated list of tags to add to the artifact",
                     "data_type": "string",
                     "order": 1,
-                    "required": false,
-                    "primary": false,
                     "allow_list": true
                 },
                 "remove_tags": {
                     "description": "Comma-separated list of tags to remove from the artifact",
                     "data_type": "string",
                     "order": 2,
-                    "required": false,
-                    "primary": false,
                     "allow_list": true
                 }
             },
@@ -474,23 +463,15 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
-                    "data_path": "action_result.message",
+                    "data_path": "action_result.parameter.add_tags",
                     "data_type": "string",
                     "example_values": [
-                        "Artifact Updated"
-                    ],
-                    "column_name": "Status",
-                    "column_order": 1
-                },
-                {
-                    "data_path": "action_result.parameter.remove_tags",
-                    "data_type": "string",
-                    "example_values": [
-                        "hello"
+                        "tag1, tag3"
                     ]
                 },
                 {
@@ -501,11 +482,52 @@
                     ]
                 },
                 {
-                    "data_path": "action_result.parameter.add_tags",
+                    "data_path": "action_result.parameter.remove_tags",
                     "data_type": "string",
                     "example_values": [
-                        "splunk"
+                        "tag2, tag4"
                     ]
+                },
+                {
+                    "data_path": "action_result.data",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.tags_added",
+                    "data_type": "string",
+                    "example_values": [
+                        "tag1"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.tags_already_absent",
+                    "data_type": "string",
+                    "example_values": [
+                        "tag4"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.tags_already_present",
+                    "data_type": "string",
+                    "example_values": [
+                        "tag3"
+                    ]
+                },
+                {
+                    "data_path": "action_result.summary.tags_removed",
+                    "data_type": "string",
+                    "example_values": [
+                        "tag2"
+                    ]
+                },
+                {
+                    "data_path": "action_result.message",
+                    "data_type": "string",
+                    "example_values": [
+                        "Tags added: tag1, Tags removed: tag2, Tags already present: tag3, Tags already absent: tag4"
+                    ],
+                    "column_name": "Status",
+                    "column_order": 0
                 },
                 {
                     "data_path": "summary.total_objects",
@@ -527,7 +549,7 @@
         {
             "action": "find artifacts",
             "description": "Find artifacts containing a CEF value",
-            "verbose": "",
+            "verbose": "If the <b>limit_search</b> parameter is set to true, then the action will search the required artifact in the provided <b>container_ids</b> only. Otherwise, the <b>container_ids</b> parameter will be ignored.<br><br>If any non-integer value is provided in the <b>container_ids</b> parameter, then all the non-integer values will be removed and the parameter will be updated accordingly. If the value of the <b>container_ids</b> parameter is <b>current</b>, then it will be replaced by the current container's id(from which the action is being run) and the status will be reflected accordingly.<br><br>If the <b>exact_match</b> parameter is set to false, then the action will return all those artifacts for which the <b>values</b> parameter is a substring of any one of its cef values. Otherwise it will return those artifacts for which any one of its cef value matches exactly with the <b>values</b> parameter.<br><br>For the <b>values</b> of type integer, float or string, it is suggested to set the <b>exact_match</b> parameter to false.",
             "type": "investigate",
             "identifier": "find_artifacts",
             "read_only": true,
@@ -543,24 +565,21 @@
                     "primary": true
                 },
                 "exact_match": {
-                    "description": "Exact match",
+                    "description": "Exact match (default: true)",
                     "data_type": "boolean",
                     "order": 1,
-                    "required": false,
                     "default": true
                 },
                 "limit_search": {
-                    "description": "Limit search to specified containers",
+                    "description": "Limit search to specified containers (default: false)",
                     "data_type": "boolean",
-                    "order": 3,
-                    "required": false,
+                    "order": 2,
                     "default": false
                 },
                 "container_ids": {
-                    "description": "List of space or comma separate container ids; the word \"current\" will be replaced by the current container id",
+                    "description": "List of space or comma separated container ids. the word \"current\" will be replaced by the current container id",
                     "data_type": "string",
-                    "order": 4,
-                    "required": false,
+                    "order": 3,
                     "default": "current"
                 }
             },
@@ -574,70 +593,129 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.container_ids",
+                    "data_type": "string",
+                    "example_values": [
+                        "current"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.exact_match",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.limit_search",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.values",
                     "data_type": "string",
                     "contains": [
                         "*"
+                    ],
+                    "example_values": [
+                        "test_value"
                     ]
-                },
-                {
-                    "data_path": "action_result.parameter.limit_search",
-                    "data_type": "boolean"
-                },
-                {
-                    "data_path": "action_result.parameter.container_ids",
-                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.data.*.found in",
                     "data_type": "string",
                     "column_name": "Found in Field",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        "test_key"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "numeric",
                     "column_name": "Artifact ID",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        12345
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.matched",
                     "data_type": "string",
                     "column_name": "Matched",
-                    "column_order": 3
+                    "column_order": 3,
+                    "example_values": [
+                        "test_value"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "column_name": "Artifact Name",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "Artifact_demo"
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary.artifacts found",
-                    "data_type": "numeric"
+                    "data_path": "action_result.summary.artifacts_found",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.server",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "https://10.1.1.10"
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Artifacts found: 1, Server: https://10.1.1.10"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1234
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom_test"
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -645,7 +723,7 @@
         {
             "action": "add listitem",
             "description": "Add value to a custom list",
-            "verbose": "To add a row containing a single value to a list simply pass the value. However, to pass multiple values in a row, format it like a JSON array (e.g. [\"item1\", \"item2\", \"item3\"])",
+            "verbose": "To add a row containing a single value to a list simply pass the value. However, to pass multiple values in a row, format it like a JSON array (e.g. [\"item1\", \"item2\", \"item3\"]).<br><br>The action will update the <b>list</b>, if the <b>list</b> already exists (even if the <b>create</b> parameter is set to true).<br><br>After creating or updating a list through this action, if the same list is updated from the UI, then the user needs to save those changes before updating the list through this action again, otherwise, the changes made from the UI will be overridden.",
             "type": "generic",
             "identifier": "add_listitem",
             "read_only": false,
@@ -667,32 +745,49 @@
                     ]
                 },
                 "create": {
-                    "description": "Create list if it does not exist",
+                    "description": "Create list if it does not exist (default: false)",
                     "data_type": "boolean",
                     "order": 2,
-                    "required": false,
                     "default": false
                 }
             },
-            "render": {},
+            "render": {
+                "type": "table"
+            },
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "column_order": 0,
+                    "column_name": "Status",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.create",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.list",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "demo_list"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.new_row",
                     "data_type": "string",
                     "contains": [
                         "*"
+                    ],
+                    "example_values": [
+                        "[\"value1\",\"value2\",\"value3\"]"
                     ]
                 },
                 {
@@ -701,26 +796,42 @@
                 },
                 {
                     "data_path": "action_result.data.*.success",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.server",
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://10.1.1.10"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Server: https://10.1.1.10"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -728,7 +839,7 @@
         {
             "action": "find listitem",
             "description": "Find value in a custom list",
-            "verbose": "Row and column coordinates for each matching value can be found in the result summary under \"locations\". The match is case sensitive.",
+            "verbose": "Row and column coordinates for each matching value can be found in the result summary under \"locations\". The match is case sensitive.<br><br>If the <b>exact_match</b> parameter is set to false, then the action will return all those strings for which the <b>values</b> parameter is its substring. Otherwise it will return those strings which match exactly with the <b>values</b> parameter.",
             "type": "investigate",
             "identifier": "find_listitem",
             "read_only": true,
@@ -742,8 +853,7 @@
                 "column_index": {
                     "description": "Search in column number (0 based)",
                     "data_type": "numeric",
-                    "order": 1,
-                    "required": false
+                    "order": 1
                 },
                 "values": {
                     "description": "Value to search for",
@@ -756,10 +866,10 @@
                     ]
                 },
                 "exact_match": {
-                    "description": "Exact match",
+                    "description": "Exact match (default: true)",
                     "data_type": "boolean",
                     "order": 3,
-                    "required": false
+                    "default": true
                 }
             },
             "render": {
@@ -772,7 +882,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.column_index",
@@ -780,17 +894,27 @@
                 },
                 {
                     "data_path": "action_result.parameter.exact_match",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.list",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "list_demo"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.values",
                     "data_type": "string",
                     "contains": [
                         "*"
+                    ],
+                    "example_values": [
+                        "value1"
                     ]
                 },
                 {
@@ -798,8 +922,11 @@
                     "data_type": "string"
                 },
                 {
-                    "data_path": "action_result.summary.found matches",
-                    "data_type": "numeric"
+                    "data_path": "action_result.summary.found_matches",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.locations",
@@ -810,27 +937,54 @@
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://10.1.1.10"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Server: https://10.1.1.10, Found matches: 1, Locations: [(1, 0)], List id: 18"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*",
+                    "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.summary.locations.*",
                     "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.list_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        18
+                    ]
                 }
             ],
             "versions": "EQ(*)"
         },
         {
             "action": "add artifact",
-            "description": "Add a value as a new artifact",
-            "verbose": "If the <b>container_id</b> parameter is left empty, the artifact will be added to the container the action is running on.<br><br>CEF fields can be added to the artifact in two ways, either by using the <b>cef_name</b> and <b>cef_value</b> parameter or by using the <b>cef_dictionary</b> parameter. If the <b>cef_name</b>, <b>cef_value</b>, and <b>cef_dictionary</b> parameters are all included, the action will add the <b>cef_name</b> field to the <b>cef_dictionary</b>.<br><br>Using only the <b>cef_name</b> and <b>cef_value</b> parameter will result in the artifact having one CEF field. When using these parameters the <b>contains</b> parameter will take a string representing the contains for the <b>cef_value</b> parameter.<br><br>The <b>cef_dictionary</b> parameter takes a JSON dictionary with key-value pairs representing CEF key-value pairs. When using this parameter, the <b>contains</b> parameter also takes a JSON dictionary, with the keys matching the keys of the <b>cef</b> dictionary and the values being lists of possible contains for the CEF field. If a given value in the <b>cef</b> dictionary is not also in the <b>contains</b> dictionary, the action will first check the list of default CEF fields. If not a default CEF field, the action will attempt to identify the appropriate contains value.<br><br>See the <b>REST API Documentation</b> for more information on artifacts, CEF fields, and contains.",
+            "description": "Add a new artifact to a container",
+            "verbose": "If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id (from which the action is being run) and the status will be reflected accordingly.<br><br>CEF fields can be added to the artifact in two ways, either by using the <b>cef_name</b> and <b>cef_value</b> parameter or by using the <b>cef_dictionary</b> parameter. If the <b>cef_name</b>, <b>cef_value</b>, and <b>cef_dictionary</b> parameters are all included, the action will add the <b>cef_name</b> field to the <b>cef_dictionary</b>.<br><br>Using only the <b>cef_name</b> and <b>cef_value</b> parameter will result in the artifact having one CEF field.<br><br>The <b>cef_dictionary</b> parameter takes a JSON dictionary with key-value pairs representing CEF key-value pairs. To provide values containing double-quotes(\"), add a backslash(\\) before the double-quotes.<br>For e.g., {\"X-Universally-Unique-Identifier\":\"test\",\"Content-Type\":\"multipart/alternative; boundary=<b>\\\"</b>Apple-Mail=_0DA95D7E-B791-4751-8043-175949088A2C<b>\\\"</b>>\",\"Message-Id\":\"<abc@xyz.com>\"}<br><br>The <b>contains</b> parameter can take a JSON dictionary, with the keys matching the keys of the <b>cef_dictionary</b> and the values being lists of possible contains for the CEF field. If a given value in the <b>cef_dictionary</b> is not present in the <b>contains</b> dictionary, the action will first check the list of default CEF fields. If not a default CEF field, then the action will attempt to identify the appropriate value for contains.<br>The <b>contains</b> parameter can also take a string(or a comma-separated list of strings) representing the contains for the <b>cef_value</b> parameter. This method should be used only if the <b>cef_name</b> and <b>cef_value</b> parameters are used.<br><br>If the <b>run_automation</b> parameter is set to true then the active playbooks will run automatically after the artifact is added. The active playbooks will run on the same container in which the artifact is added.<br><br>See the <a href=\"https://docs.splunk.com/Documentation/Phantom/4.8/PlatformAPI/RESTArtifacts\" target=\"_blank\">REST API Documentation</a> for more information on artifacts, CEF fields, and contains.",
             "type": "generic",
             "identifier": "add_artifact",
             "read_only": false,
@@ -839,7 +993,6 @@
                     "description": "Name of the new artifact",
                     "data_type": "string",
                     "order": 0,
-                    "required": false,
                     "default": "User created artifact"
                 },
                 "container_id": {
@@ -849,13 +1002,12 @@
                     "contains": [
                         "phantom container id"
                     ],
-                    "required": false
+                    "primary": true
                 },
                 "label": {
                     "description": "Artifact label (default: event)",
                     "data_type": "string",
                     "order": 2,
-                    "required": false,
                     "default": "event"
                 },
                 "source_data_identifier": {
@@ -868,7 +1020,6 @@
                     "description": "CEF Name",
                     "data_type": "string",
                     "order": 4,
-                    "required": false,
                     "value_list": [
                         "",
                         "act",
@@ -1026,7 +1177,6 @@
                     "description": "Value",
                     "data_type": "string",
                     "order": 5,
-                    "required": false,
                     "primary": true,
                     "contains": [
                         "*"
@@ -1035,20 +1185,17 @@
                 "cef_dictionary": {
                     "description": "CEF JSON",
                     "data_type": "string",
-                    "order": 6,
-                    "required": false
+                    "order": 6
                 },
                 "contains": {
                     "description": "Data type for each CEF field",
                     "data_type": "string",
-                    "order": 7,
-                    "required": false
+                    "order": 7
                 },
                 "run_automation": {
-                    "description": "Run automation on newly created artifact(s)",
+                    "description": "Run automation on newly created artifact(s) (default: true)",
                     "data_type": "boolean",
                     "order": 8,
-                    "required": false,
                     "default": true
                 }
             },
@@ -1062,11 +1209,18 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.cef_dictionary",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "{\"test_key\": \"test_value\"}"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.cef_name",
@@ -1084,26 +1238,42 @@
                     "data_type": "numeric",
                     "contains": [
                         "phantom container id"
+                    ],
+                    "example_values": [
+                        1234
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.contains",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "domain"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.label",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "event"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.name",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.parameter.source_data_identifier",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Artifact_demo"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.run_automation",
+                    "data_type": "string",
+                    "example_values": [
+                        true,
+                        false
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.source_data_identifier",
                     "data_type": "string"
                 },
                 {
@@ -1116,38 +1286,63 @@
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        123
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.success",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary.artifact id",
-                    "data_type": "numeric"
+                    "data_path": "action_result.summary.artifact_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        12345
+                    ]
                 },
                 {
-                    "data_path": "action_result.summary.container id",
-                    "data_type": "numeric"
+                    "data_path": "action_result.summary.container_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1234
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.server",
                     "data_type": "string",
                     "contains": [
                         "url"
+                    ],
+                    "example_values": [
+                        "https://10.1.1.10"
                     ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Artifact id: 12345, Container id: 1234, Server: https://10.1.1.10"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 }
             ],
             "versions": "EQ(*)"
@@ -1155,7 +1350,7 @@
         {
             "action": "deflate item",
             "description": "Deflates an item from the vault",
-            "verbose": "Detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to its vault, else to the current (the container whose context the action is executed) container. The app supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types.",
+            "verbose": "The action will be supported only if the <b>phantom_server</b> parameter (in the asset configurations) is configured to the local Phantom instance, i.e., the instance from which the action is being run.<br><br>The action detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to its vault, else to the current (the container whose context the action is executed) container. The action supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types. In the case where the compressed file contains another compressed file in it, set the <b>recursive</b> parameter to true to deflate the inner compressed file.<br><br>For certain Unicode characters, the file name is not unzipped as it is, by the zipfile module.",
             "type": "generic",
             "identifier": "deflate_item",
             "read_only": false,
@@ -1178,13 +1373,12 @@
                     "contains": [
                         "phantom container id"
                     ],
-                    "required": false
+                    "primary": true
                 },
                 "recursive": {
-                    "description": "Extract recursively",
+                    "description": "Extract recursively  (default: false)",
                     "data_type": "boolean",
                     "order": 2,
-                    "required": false,
                     "default": false
                 }
             },
@@ -1197,7 +1391,11 @@
             "output": [
                 {
                     "data_path": "action_result.status",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "success",
+                        "failed"
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.container_id",
@@ -1208,7 +1406,11 @@
                 },
                 {
                     "data_path": "action_result.parameter.recursive",
-                    "data_type": "boolean"
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
+                    ]
                 },
                 {
                     "data_path": "action_result.parameter.vault_id",
@@ -1216,45 +1418,72 @@
                     "contains": [
                         "sha1",
                         "vault id"
+                    ],
+                    "example_values": [
+                        "f582ed9120fa3be94852c73e1cd188f2948f677f"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.aka",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "test.txt"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.container",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom_test"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.container_id",
                     "data_type": "numeric",
                     "contains": [
                         "phantom container id"
+                    ],
+                    "example_values": [
+                        1234
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.contains",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "vault id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.create_time",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "0 minutes ago"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.hash",
                     "data_type": "string",
                     "contains": [
                         "sha1"
+                    ],
+                    "example_values": [
+                        "0a0e6c7ab7f77d058efd444279b81c4c6a9cf4ce"
                     ]
                 },
                 {
                     "data_path": "action_result.data.*.id",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        12
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.contains",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "vault id"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.md5",
@@ -1262,14 +1491,20 @@
                     "contains": [
                         "md5"
                     ],
-                    "column_name": "Md5",
-                    "column_order": 3
+                    "column_name": "MD5",
+                    "column_order": 3,
+                    "example_values": [
+                        "0db33a0790b6d6d5c2e4425646eee7fc"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.sha1",
                     "data_type": "string",
                     "contains": [
                         "sha1"
+                    ],
+                    "example_values": [
+                        "fece6c7ab7f77d058efd444279b81c4c6a9cf4ce"
                     ]
                 },
                 {
@@ -1279,17 +1514,26 @@
                         "sha256"
                     ],
                     "column_name": "Sha256",
-                    "column_order": 4
+                    "column_order": 4,
+                    "example_values": [
+                        "4f2155212cb0f74207bd0e4fd5ecae548ee2bae1d2dcd36c1d0ba0b6254bd4a1"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.metadata.size",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        33
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
                     "column_name": "Name",
-                    "column_order": 0
+                    "column_order": 0,
+                    "example_values": [
+                        "tgz-test"
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.path",
@@ -1299,7 +1543,10 @@
                     "data_path": "action_result.data.*.size",
                     "data_type": "numeric",
                     "column_name": "Size",
-                    "column_order": 2
+                    "column_order": 2,
+                    "example_values": [
+                        10240
+                    ]
                 },
                 {
                     "data_path": "action_result.data.*.user",
@@ -1317,23 +1564,42 @@
                         "vault id"
                     ],
                     "column_name": "Vault ID",
-                    "column_order": 1
+                    "column_order": 1,
+                    "example_values": [
+                        "b90e6c7ab7f77d058efd444279b81c4c6a9cf4ce"
+                    ]
                 },
                 {
                     "data_path": "action_result.summary.total_vault_items",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        9
+                    ]
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string"
+                    "data_type": "string",
+                    "example_values": [
+                        "Total vault items: 9"
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
                 },
                 {
                     "data_path": "summary.total_objects_successful",
-                    "data_type": "numeric"
+                    "data_type": "numeric",
+                    "example_values": [
+                        1
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.task",
+                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
@@ -1341,7 +1607,7 @@
         {
             "action": "export container",
             "description": "Export local container to the configured Phantom asset",
-            "verbose": "This action exports a container (that matches the <b>container_id</b>) from the local Phantom instance to the configured Phantom asset (that the action is executed on).",
+            "verbose": "This action exports a container (that matches the <b>container_id</b>) from the local Phantom instance (the instance from where the action is being run) to the configured Phantom asset (that the action is being executed on).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the local phantom instance and the configured Phantom asset does not match.",
             "type": "generic",
             "identifier": "export_container",
             "read_only": false,
@@ -1353,8 +1619,12 @@
                     ],
                     "order": 0,
                     "data_type": "numeric",
-                    "required": true
+                    "required": true,
+                    "primary": true
                 }
+            },
+            "render": {
+                "type": "table"
             },
             "output": [
                 {
@@ -1363,7 +1633,9 @@
                     "example_values": [
                         "success",
                         "failed"
-                    ]
+                    ],
+                    "column_order": 0,
+                    "column_name": "Status"
                 },
                 {
                     "data_path": "action_result.parameter.container_id",
@@ -1395,7 +1667,7 @@
                     "contains": [
                         "phantom container id"
                     ],
-                    "column_order": 0,
+                    "column_order": 1,
                     "column_name": "New Container"
                 },
                 {
@@ -1425,7 +1697,7 @@
         {
             "action": "import container",
             "description": "Import a container from an external Phantom instance",
-            "verbose": "This action imports a container (that matches the <b>container_id</b>) from the configured Phantom asset (that the action is executed on) into the local Phantom instance.",
+            "verbose": "This action imports a container (that matches the <b>container_id</b>) from the configured Phantom asset (that the action is being executed on) into the local Phantom instance (the instance from where the action is being run).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the configured Phantom asset and the local phantom instance does not match.",
             "type": "generic",
             "identifier": "import_container",
             "read_only": false,
@@ -1437,7 +1709,8 @@
                     ],
                     "order": 0,
                     "data_type": "numeric",
-                    "required": true
+                    "required": true,
+                    "primary": true
                 }
             },
             "output": [
@@ -1515,7 +1788,7 @@
         {
             "action": "create container",
             "description": "Create a new container on a Phantom instance",
-            "verbose": "This action creates a new container on the Phantom asset that this action is executed on. The <b>container_json</b> parameter needs to be a JSON string. The <b>container_artifacts</b> is an optional parameter that needs to be a list of artifact objects as a JSON string. The action will fail if the <b>container_json</b> has a label that doesn't exist on the destination Phantom asset.",
+            "verbose": "This action creates a new container on the Phantom server, which is configured in the <b>phantom_server</b> asset parameter. The <b>container_json</b> parameter needs to be a JSON string. It is mandatory to provide a <b>label</b> key in the <b>container_json</b> parameter. The action will fail if the <b>container_json</b> has a label that does not exist on the destination Phantom asset.<br>E.g., {\"name\":\"Test Container\",\"label\":\"events\"}<br><br>The <b>container_artifacts</b> is an optional parameter that needs to be a list of artifact objects as a JSON string. Each artifact JSON object should contain the following keys: <b>cef, cef_types, data, description, end_time, ingest_app_id, kill_chain, label, name, owner_id, severity, source_data_identifier, start_time, tags, type</b>. All other keys will be ignored.<br>E.g., [{\"name\": \"artifact 1\", \"label\":\"label1\", \"cef\": {\"test\": \"123\"}},{\"name\": \"artifact 2\", \"label\":\"label2\", \"cef\": {\"test\": \"456\"}}]<br><br>See <a href=\"https://docs.splunk.com/Documentation/Phantom/4.8/PlatformAPI/RESTArtifacts\" target=\"_blank\"><b>Splunk Phantom Documentation</b></a> for further details.",
             "type": "generic",
             "identifier": "create_container",
             "read_only": false,
@@ -1529,8 +1802,7 @@
                 "container_artifacts": {
                     "description": "List of artifact JSON objects",
                     "order": 1,
-                    "data_type": "string",
-                    "required": false
+                    "data_type": "string"
                 }
             },
             "output": [
@@ -1621,8 +1893,8 @@
         {
             "action": "get action result",
             "description": "Find the results of a previously run action",
-            "verbose": "This action returns the most recent results of an action with the given <b>action_name</b> launched with the given <b>parameters</b> within the given <b>time_limit</b>.<br><br>The action will limit the number of results returned to the value in <b>max_results</b>. By default, the limit is 10.<br><br>The <b>parameters</b> parameter takes a JSON string in the format:<br><br><pre>{<br>    &quot;parameter_name1&quot;: &quot;parameter_value1&quot;<br>    &quot;parameter_name2&quot;: &quot;parameter_value2&quot;<br>    ...<br>}</pre><br>The <b>app</b> parameter takes an app name, and if it is included, the action will only search for action results from that app. Similarly, the <b>asset</b> parameter takes an asset name, and if it is included, the action will only search for action results from that asset.",
-            "type": "generic",
+            "verbose": "This action returns the most recent results of the given <b>action_name</b> launched with the given <b>parameters</b> within the given <b>time_limit</b>.<br><br>The action will limit the number of results returned to the value in <b>max_results</b>. By default, the limit is 10. To get all the results, set the<b>max_results</b> parameter to 0.<br><br>The <b>parameters</b> parameter takes a JSON string in the format:<br><br><pre>{<br>    &quot;parameter_name1&quot;: &quot;parameter_value1&quot;<br>    &quot;parameter_name2&quot;: &quot;parameter_value2&quot;<br>    ...<br>}</pre><br>The <b>app</b> parameter takes an app name, and if it is included, the action will only search for action results from that app. Similarly, the <b>asset</b> parameter takes an asset name, and if it is included, the action will only search for action results from that asset.",
+            "type": "investigate",
             "identifier": "get_action",
             "read_only": true,
             "parameters": {
@@ -1630,38 +1902,33 @@
                     "description": "Action name",
                     "data_type": "string",
                     "order": 0,
-                    "required": true,
-                    "primary": true
+                    "required": true
                 },
                 "parameters": {
                     "description": "JSON string of action parameters",
                     "data_type": "string",
-                    "order": 1,
-                    "required": false
+                    "order": 1
                 },
                 "app": {
                     "description": "App name",
                     "data_type": "string",
-                    "order": 2,
-                    "required": false
+                    "order": 2
                 },
                 "asset": {
                     "description": "Asset name",
                     "data_type": "string",
-                    "order": 3,
-                    "required": false
+                    "order": 3
                 },
                 "time_limit": {
                     "description": "Number of hours to search back",
                     "data_type": "numeric",
-                    "order": 4,
-                    "required": false
+                    "order": 4
                 },
                 "max_results": {
                     "description": "Maximum number of action results to return",
                     "data_type": "numeric",
-                    "order": 5,
-                    "required": false
+                    "default": 10,
+                    "order": 5
                 }
             },
             "output": [
@@ -1669,7 +1936,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1683,21 +1951,21 @@
                     "data_path": "action_result.parameter.app",
                     "data_type": "string",
                     "example_values": [
-                        "Arbor APS"
+                        "Phantom"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.asset",
                     "data_type": "string",
                     "example_values": [
-                        "arboraps"
+                        "test_phantom"
                     ]
                 },
                 {
                     "data_path": "action_result.parameter.max_results",
                     "data_type": "numeric",
                     "example_values": [
-                        "5"
+                        5
                     ]
                 },
                 {
@@ -1711,7 +1979,7 @@
                     "data_path": "action_result.parameter.time_limit",
                     "data_type": "numeric",
                     "example_values": [
-                        "24"
+                        24
                     ]
                 },
                 {
@@ -1739,7 +2007,7 @@
                     "data_path": "action_result.data.*.app_name",
                     "data_type": "string",
                     "example_values": [
-                        "Arbor APS"
+                        "Phantom"
                     ]
                 },
                 {
@@ -1876,7 +2144,8 @@
                     "data_path": "action_result.data.*.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ]
                 },
                 {
@@ -1892,6 +2161,10 @@
                     "example_values": [
                         2761
                     ]
+                },
+                {
+                    "data_path": "action_result.summary.num_results",
+                    "data_type": "numeric"
                 },
                 {
                     "data_path": "action_result.message",
@@ -1924,37 +2197,31 @@
             "action": "update list",
             "identifier": "update_list",
             "description": "Update a list",
-            "verbose": "Either the list's name or id is required",
+            "verbose": "Either the <b>list_name</b> or </b>id</b> is required. If both, <b>list_name</b> and <b>id</b> parameters are provided and both of them point to different lists, then the <b>list_name</b> parameter will be preferred and the action will update the list specified in the list_name parameter.",
             "type": "generic",
             "read_only": false,
             "parameters": {
                 "list_name": {
                     "description": "List name",
                     "data_type": "string",
-                    "order": 0,
-                    "required": false,
-                    "primary": true
+                    "order": 0
                 },
                 "id": {
                     "description": "List id",
                     "data_type": "numeric",
-                    "order": 0,
-                    "required": false,
-                    "primary": true
+                    "order": 1
                 },
                 "row_number": {
                     "description": "Row number in list to be modified",
                     "data_type": "numeric",
-                    "order": 0,
-                    "required": true,
-                    "primary": false
+                    "order": 2,
+                    "required": true
                 },
                 "row_values_as_list": {
-                    "description": "New values for the row, separated by commas",
+                    "description": "JSON formatted list of new values for the row",
                     "data_type": "string",
-                    "order": 0,
-                    "required": true,
-                    "primary": false
+                    "order": 3,
+                    "required": true
                 }
             },
             "output": [
@@ -1962,7 +2229,8 @@
                     "data_path": "action_result.status",
                     "data_type": "string",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "column_name": "Status",
                     "column_order": 0
@@ -1989,7 +2257,7 @@
                     "data_path": "action_result.parameter.row_values_as_list",
                     "data_type": "string",
                     "example_values": [
-                        "this, is, a, test"
+                        "[\"this\", \"is\", \"a\", \"test\"]"
                     ]
                 },
                 {
@@ -2033,7 +2301,7 @@
         {
             "action": "no op",
             "description": "Wait for the specified number of seconds",
-            "type": "generic",
+            "type": "investigate",
             "identifier": "no_op",
             "read_only": true,
             "parameters": {
@@ -2041,15 +2309,15 @@
                     "description": "Sleep for this many seconds",
                     "data_type": "numeric",
                     "order": 0,
-                    "required": true,
-                    "primary": true
+                    "required": true
                 }
             },
             "output": [
                 {
                     "data_path": "action_result.status",
                     "example_values": [
-                        "success"
+                        "success",
+                        "failed"
                     ],
                     "data_type": "string"
                 },
@@ -2095,6 +2363,9 @@
             "versions": "EQ(*)",
             "render": {
                 "type": "table"
+            },
+            "lock": {
+                "enabled": false
             }
         }
     ]

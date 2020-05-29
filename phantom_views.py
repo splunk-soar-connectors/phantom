@@ -7,7 +7,9 @@
 # --
 
 from django.http import HttpResponse
+from bs4 import UnicodeDammit
 import json
+import sys
 
 
 def find_artifacts(provides, all_results, context):
@@ -48,11 +50,18 @@ def find_artifacts(provides, all_results, context):
                 row.append({ 'value': item.get('matched') })
                 rows.append(row)
 
-    content = {
-      "data": rows,
-      "recordsTotal": total,
-      "recordsFiltered": total,
-    }
+    if len(rows) == 0:
+        content = {
+            "data": [[{"value": None}, {"value": None}, {"value": None}, {"value": None}, {"value": None}, {"value": None}]],
+            "recordsTotal": 1,
+            "recordsFiltered": 1
+        }
+    else:
+        content = {
+            "data": rows,
+            "recordsTotal": total,
+            "recordsFiltered": total,
+        }
     return HttpResponse(json.dumps(content), content_type='text/javascript')
 
 
@@ -91,15 +100,29 @@ def add_artifact(provides, all_results, context):
                 row.append({ 'value': c_link, 'link': summary.get('container id') })
                 rows.append(row)
 
-    content = {
-      "data": rows,
-      "recordsTotal": total,
-      "recordsFiltered": total,
-    }
+    if len(rows) == 0:
+        content = {
+            "data": [[{"value": None}, {"value": None}]],
+            "recordsTotal": 1,
+            "recordsFiltered": 1
+        }
+    else:
+        content = {
+            "data": rows,
+            "recordsTotal": total,
+            "recordsFiltered": total
+        }
     return HttpResponse(json.dumps(content), content_type='text/javascript')
 
 
 def find_listitem(provides, all_results, context):
+
+    # Fetching the Python major version
+    python_version = 2
+    try:
+        python_version = int(sys.version_info[0])
+    except:
+        python_version = 2
 
     headers = ['List Name', 'Matched Row', 'Found at']
 
@@ -131,9 +154,15 @@ def find_listitem(provides, all_results, context):
                 if (cur_pos - 1) >= end:
                     break
                 row = []
+                item_str = ""
+                for i in item:
+                    if i:
+                        i = UnicodeDammit(i).unicode_markup.encode('utf-8') if python_version == 2 else i
+                    item_str = '{0}"{1}",'.format(item_str, i)
+                item_str = item_str[:-1]
 
                 row.append({ 'value': param.get('list') })
-                row.append({ 'value': json.dumps(item) })
+                row.append({ 'value': item_str })
                 len_of_list = len(locations) > idx and locations[idx] or 'Missing Data'
                 if type(len_of_list) == str:
                     row.append({ 'value': len_of_list})
@@ -141,9 +170,16 @@ def find_listitem(provides, all_results, context):
                     row.append({ 'value': 'Row {}, Column {}'.format(len_of_list[0], len_of_list[1])})
                 rows.append(row)
 
-    content = {
-      "data": rows,
-      "recordsTotal": total,
-      "recordsFiltered": total,
-    }
+    if len(rows) == 0:
+        content = {
+            "data": [[{"value": None}, {"value": None}, {"value": None}]],
+            "recordsTotal": 1,
+            "recordsFiltered": 1
+        }
+    else:
+        content = {
+            "data": rows,
+            "recordsTotal": total,
+            "recordsFiltered": total,
+        }
     return HttpResponse(json.dumps(content), content_type='text/javascript')
