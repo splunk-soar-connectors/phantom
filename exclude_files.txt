@@ -3,3 +3,4 @@ exclude_files.txt
 Makefile
 .git*
 .gitlab-ci.yml
+whitesource-results
