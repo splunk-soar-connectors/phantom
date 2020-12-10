@@ -21,6 +21,9 @@
     "license": "Copyright (c) 2016-2020 Splunk Inc.",
     "logo": "logo_splunk.svg",
     "logo_dark": "logo_splunk_dark.svg",
+    "test_metadata": {
+      "playbook_names": ["phantom_phantom"]
+    },
     "configuration": {
         "phantom_server": {
             "data_type": "string",
