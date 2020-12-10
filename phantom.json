@@ -6,14 +6,14 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.0.4",
+    "app_version": "3.0.5",
     "latest_tested_version": [
         "Phantom v4.5.15922",
         "Phantom v4.8.23319 with Python 2",
         "Phantom v4.8.23319 with Python 3"
     ],
     "python_version": "3",
-    "utctime_updated": "2020-11-12T22:54:10.000000Z",
+    "utctime_updated": "2020-12-10T23:35:38.000000Z",
     "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
@@ -22,7 +22,9 @@
     "logo": "logo_splunk.svg",
     "logo_dark": "logo_splunk_dark.svg",
     "test_metadata": {
-      "playbook_names": ["phantom_phantom"]
+        "playbook_names": [
+            "phantom_phantom"
+        ]
     },
     "configuration": {
         "phantom_server": {
