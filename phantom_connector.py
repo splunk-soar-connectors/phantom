@@ -15,6 +15,7 @@ from phantom.cef import CEF_NAME_MAPPING
 from phantom.cef import CEF_JSON
 from phantom.utils import CONTAINS_VALIDATORS
 import phantom.utils as ph_utils
+import phantom.rules as ph_rules
 from phantom.vault import Vault
 from bs4 import UnicodeDammit
 
@@ -711,16 +712,16 @@ class PhantomConnector(BaseConnector):
             uncompressed_file.write(data_stream)
 
         try:
-            vault_info = Vault.add_attachment(save_path, container_id, file_name)
+            success, message, vault_id = ph_rules.vault_add(container=container_id, file_location=save_path, file_name=file_name)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault", e)
 
-        if not vault_info.get('succeeded', False):
-            return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault, {0}".format(vault_info.get('message', 'NA')))
+        if not success:
+            return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault, {0}".format(message))
 
         try:
             query_params = {
-                '_filter_vault_document__hash': '"{}"'.format(vault_info['vault_id'].lower()),
+                '_filter_vault_document__hash': '"{}"'.format(vault_id.lower()),
                 'page_size': 0,
                 'pretty': ''
             }
