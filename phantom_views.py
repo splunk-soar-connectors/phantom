@@ -39,7 +39,7 @@ def find_artifacts(provides, all_results, context):
                 table_data.append(row)
             results.append(table)
 
-    return 'phantom_custom_view_template.html'
+    return 'phantom_multiple_actions.html'
 
 
 def add_artifact(provides, all_results, context):
@@ -66,7 +66,7 @@ def add_artifact(provides, all_results, context):
                 table_data.append(row)
             results.append(table)
 
-    return 'phantom_custom_view_template.html'
+    return 'phantom_multiple_actions.html'
 
 
 def find_listitem(provides, all_results, context):
@@ -112,4 +112,4 @@ def find_listitem(provides, all_results, context):
                 table_data.append(row)
             results.append(table)
 
-    return 'phantom_custom_view_template.html'
+    return 'phantom_multiple_actions.html'
