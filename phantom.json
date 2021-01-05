@@ -211,10 +211,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.requested_artifact.cef.deleted_field",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.requested_artifact.cef.new_field",
@@ -444,7 +441,11 @@
                     "description": "The artifact id",
                     "data_type": "string",
                     "order": 0,
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "phantom artifact id"
+                    ],
+                    "primary": true
                 },
                 "add_tags": {
                     "description": "Comma-separated list of tags to add to the artifact",
@@ -483,6 +484,9 @@
                     "data_type": "string",
                     "example_values": [
                         "94"
+                    ],
+                    "contains": [
+                        "phantom artifact id"
                     ]
                 },
                 {
@@ -2269,10 +2273,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
