@@ -8,12 +8,11 @@
     "main_module": "phantom_connector.py",
     "app_version": "3.0.6",
     "latest_tested_version": [
-        "Phantom v4.9.39220 with Python 3",
-        "Phantm v4.10.0.40961 with Python 3"
+        ""
     ],
     "python_version": "3",
     "utctime_updated": "2020-12-23T22:42:17.000000Z",
-    "product_vendor": "Phantom",
+    "product_vendor": "Splunk",
     "product_name": "Phantom",
     "product_version_regex": ".*",
     "min_phantom_version": "4.9.39220",
