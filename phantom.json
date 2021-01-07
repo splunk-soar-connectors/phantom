@@ -6,21 +6,24 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.0.2",
+    "app_version": "3.0.7",
     "latest_tested_version": [
-        "Phantom v4.5.15922",
-        "Phantom v4.8.23319 with Python 2",
-        "Phantom v4.8.23319 with Python 3"
+        ""
     ],
     "python_version": "3",
-    "utctime_updated": "2020-05-29T23:44:06.000000Z",
-    "product_vendor": "Phantom",
+    "utctime_updated": "2021-01-05T17:16:21.000000Z",
+    "product_vendor": "Splunk",
     "product_name": "Phantom",
     "product_version_regex": ".*",
-    "min_phantom_version": "4.6.19142",
-    "license": "Copyright (c) 2016-2020 Splunk Inc.",
+    "min_phantom_version": "4.9.39220",
+    "license": "Copyright (c) 2016-2021 Splunk Inc.",
     "logo": "logo_splunk.svg",
     "logo_dark": "logo_splunk_dark.svg",
+    "test_metadata": {
+        "playbook_names": [
+            "phantom_phantom"
+        ]
+    },
     "configuration": {
         "phantom_server": {
             "data_type": "string",
@@ -207,10 +210,7 @@
                 },
                 {
                     "data_path": "action_result.data.*.requested_artifact.cef.deleted_field",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.data.*.requested_artifact.cef.new_field",
@@ -440,7 +440,11 @@
                     "description": "The artifact id",
                     "data_type": "string",
                     "order": 0,
-                    "required": true
+                    "required": true,
+                    "contains": [
+                        "phantom artifact id"
+                    ],
+                    "primary": true
                 },
                 "add_tags": {
                     "description": "Comma-separated list of tags to add to the artifact",
@@ -479,6 +483,9 @@
                     "data_type": "string",
                     "example_values": [
                         "94"
+                    ],
+                    "contains": [
+                        "phantom artifact id"
                     ]
                 },
                 {
@@ -635,8 +642,6 @@
                 {
                     "data_path": "action_result.data.*.found in",
                     "data_type": "string",
-                    "column_name": "Found in Field",
-                    "column_order": 2,
                     "example_values": [
                         "test_key"
                     ]
@@ -644,8 +649,6 @@
                 {
                     "data_path": "action_result.data.*.id",
                     "data_type": "numeric",
-                    "column_name": "Artifact ID",
-                    "column_order": 0,
                     "example_values": [
                         12345
                     ]
@@ -653,8 +656,6 @@
                 {
                     "data_path": "action_result.data.*.matched",
                     "data_type": "string",
-                    "column_name": "Matched",
-                    "column_order": 3,
                     "example_values": [
                         "test_value"
                     ]
@@ -662,8 +663,6 @@
                 {
                     "data_path": "action_result.data.*.name",
                     "data_type": "string",
-                    "column_name": "Artifact Name",
-                    "column_order": 1,
                     "example_values": [
                         "Artifact_demo"
                     ]
@@ -2273,10 +2272,7 @@
                 },
                 {
                     "data_path": "action_result.message",
-                    "data_type": "string",
-                    "example_values": [
-                        ""
-                    ]
+                    "data_type": "string"
                 },
                 {
                     "data_path": "summary.total_objects",
