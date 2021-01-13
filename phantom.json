@@ -6,7 +6,7 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.0.7",
+    "app_version": "3.0.8",
     "latest_tested_version": [
         ""
     ],
