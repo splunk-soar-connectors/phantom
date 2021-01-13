@@ -12,7 +12,7 @@
     ],
     "python_version": "3",
     "utctime_updated": "2021-01-05T17:16:21.000000Z",
-    "product_vendor": "Splunk",
+    "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
     "min_phantom_version": "4.9.39220",
