@@ -356,7 +356,10 @@ class PhantomConnector(BaseConnector):
         myData = existing_artifact.get('cef', {})
 
         if cef_json:
-            clean_json = self.load_dirty_json(cef_json, action_result, "cef_json")
+            try:
+                clean_json = json.loads(cef_json)
+            except:
+                clean_json = self.load_dirty_json(cef_json, action_result, "cef_json")
 
             if clean_json is None:
                 return action_result.get_status()

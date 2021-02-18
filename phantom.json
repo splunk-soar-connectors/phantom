@@ -6,12 +6,12 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.0.10",
+    "app_version": "3.1.1",
     "latest_tested_version": [
         ""
     ],
     "python_version": "3",
-    "utctime_updated": "2021-01-14T18:35:59.000000Z",
+    "utctime_updated": "2021-02-18T05:28:09.000000Z",
     "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
