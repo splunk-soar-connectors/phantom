@@ -208,7 +208,6 @@ class PhantomConnector(BaseConnector):
             auth = None
             if ('ph-auth-token' in headers):
                 del headers['ph-auth-token']
-            headers.update({'user-session-token': str(self.__dict__.get('_BaseConnector__input_json').get('user_session_token'))})
 
         try:
             response = request_func(self._base_uri + endpoint,
@@ -1036,7 +1035,7 @@ class PhantomConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Failed to add one or more artifacts")
         return phantom.APP_SUCCESS
 
-    def _create_container_copy(self, action_result, container_id, destination, source, source_local=False, destination_local=False):
+    def _create_container_copy(self, action_result, container_id, destination, source, source_local=False, destination_local=False, keep_owner=False):
         """ destination: where new container is being made """
         """ source: where the original container is """
         """ Create a copy of this existing container, including all of its artifacts """
@@ -1059,18 +1058,31 @@ class PhantomConnector(BaseConnector):
         container.pop('ingest_app')
         container.pop('tenant')
         container.pop('id')
-        container['owner_id'] = container.pop('owner')
+
+        if keep_owner:
+            container['owner_id'] = container.pop('owner')
+        else:
+            container.pop('owner')
+
         if (destination_local):
             container['asset_id'] = int(self.get_asset_id())
         # container['ingest_app_id'] = container.pop('ingest_app', None)
 
         self._base_uri = destination
         ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container, ignore_auth=destination_local)
+
         if phantom.is_fail(ret_val):
+
             act_message = action_result.get_message()
-            if ('ingesting asset_id' in act_message):
+
+            if 'ingesting asset_id' in act_message:
                 act_message += 'If Multi-tenancy is enabled, please make sure the asset is assigned a tenant'
                 action_result.set_status(ret_val, act_message)
+
+            elif '"owner_id" Not found' in act_message:
+                act_message += '. Try setting the keep_owner parameter to false.'
+                action_result.set_status(ret_val, act_message)
+
             return ret_val
 
         try:
@@ -1164,6 +1176,7 @@ class PhantomConnector(BaseConnector):
         return self._create_container_new(action_result, container_json, container_artifacts)
 
     def _export_container(self, param):
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         try:
@@ -1174,9 +1187,10 @@ class PhantomConnector(BaseConnector):
         destination = self._base_uri
         source = self.get_phantom_base_url()
 
-        return self._create_container_copy(action_result, container_id, destination, source, source_local=True)
+        return self._create_container_copy(action_result, container_id, destination, source, source_local=True, keep_owner=param.get('keep_owner', False))
 
     def _import_container(self, param):
+
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         try:
@@ -1187,7 +1201,7 @@ class PhantomConnector(BaseConnector):
         destination = self.get_phantom_base_url()
         source = self._base_uri
 
-        return self._create_container_copy(action_result, container_id, destination, source, destination_local=True)
+        return self._create_container_copy(action_result, container_id, destination, source, destination_local=True, keep_owner=param.get('keep_owner', False))
 
     def _get_action(self, param):
 
@@ -1376,8 +1390,8 @@ class PhantomConnector(BaseConnector):
         except:
             return action_result.set_status(phantom.APP_ERROR, "Error parsing the sleep seconds parameter. Please specify sleep_seconds as an integer greater than 0")
 
-        if (sleep_seconds <= 0):
-            return action_result.set_status(phantom.APP_ERROR, "Invalid sleep_seconds value. Please specify a value greater than 0")
+        if (sleep_seconds < 0):
+            return action_result.set_status(phantom.APP_ERROR, "Invalid sleep_seconds value. Please specify a value greater than or equal to 0")
 
         remainder = sleep_seconds % 60
 

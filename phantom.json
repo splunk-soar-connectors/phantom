@@ -6,7 +6,7 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.1.1",
+    "app_version": "3.1.4",
     "latest_tested_version": [
         ""
     ],
@@ -1620,6 +1620,12 @@
                     "data_type": "numeric",
                     "required": true,
                     "primary": true
+                },
+                "keep_owner": {
+                    "description": "Keep Owner",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 1
                 }
             },
             "render": {
@@ -1644,6 +1650,14 @@
                     ],
                     "contains": [
                         "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.keep_owner",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
                     ]
                 },
                 {
@@ -1706,10 +1720,16 @@
                     "contains": [
                         "phantom container id"
                     ],
-                    "order": 0,
                     "data_type": "numeric",
                     "required": true,
-                    "primary": true
+                    "primary": true,
+                    "order": 0
+                },
+                "keep_owner": {
+                    "description": "Keep Owner",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 1
                 }
             },
             "output": [
@@ -1729,6 +1749,14 @@
                     ],
                     "contains": [
                         "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.keep_owner",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
                     ]
                 },
                 {
