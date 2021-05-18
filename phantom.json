@@ -1606,7 +1606,7 @@
         {
             "action": "export container",
             "description": "Export local container to the configured Phantom asset",
-            "verbose": "This action exports a container (that matches the <b>container_id</b>) from the local Phantom instance (the instance from where the action is being run) to the configured Phantom asset (that the action is being executed on).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the local phantom instance and the configured Phantom asset does not match.",
+            "verbose": "This action exports a container (that matches the <b>container_id</b>) from the local Phantom instance (the instance from where the action is being run) to the configured Phantom asset (that the action is being executed on).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the local phantom instance and the configured Phantom asset does not match.<br><br>Set the <b>keep_owner</b> parameter to true if you want the owner of the container on the configured Phantom instance to match the owner on the local instance. Note that this will be based on Owner ID, not Owner Name.",
             "type": "generic",
             "identifier": "export_container",
             "read_only": false,
@@ -1710,7 +1710,7 @@
         {
             "action": "import container",
             "description": "Import a container from an external Phantom instance",
-            "verbose": "This action imports a container (that matches the <b>container_id</b>) from the configured Phantom asset (that the action is being executed on) into the local Phantom instance (the instance from where the action is being run).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the configured Phantom asset and the local phantom instance does not match.",
+            "verbose": "This action imports a container (that matches the <b>container_id</b>) from the configured Phantom asset (that the action is being executed on) into the local Phantom instance (the instance from where the action is being run).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the configured Phantom asset and the local phantom instance does not match.<br><br>Set the <b>keep_owner</b> parameter to true if you want the owner of the container on the local Phantom instance to match the owner on the configured instance. Note that this will be based on Owner ID, not Owner Name.",
             "type": "generic",
             "identifier": "import_container",
             "read_only": false,
