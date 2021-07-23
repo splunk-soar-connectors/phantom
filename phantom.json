@@ -6,7 +6,7 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.1.5",
+    "app_version": "3.2.0",
     "latest_tested_version": [
         ""
     ],
@@ -323,7 +323,7 @@
         {
             "action": "add note",
             "description": "Add a note to a container",
-            "verbose": "If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id (from where the action is being run) and the status will be reflected accordingly.",
+            "verbose": "If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id (from where the action is being run) and the status will be reflected accordingly. If the container is a case, a <b>phase_id</b> parameter can be provided to associate the note to a particular phase.",
             "type": "generic",
             "identifier": "add_note",
             "read_only": false,
@@ -561,10 +561,15 @@
             "identifier": "find_artifacts",
             "read_only": true,
             "parameters": {
+                "cef_key": {
+                    "description": "Key of the cef dict you are querying: act, app, applicationProtocol, baseEventCount, bytesIn, etc. It will search the entire cef dictionary if blank",
+                    "data_type": "string",
+                    "order": 0
+                },
                 "values": {
                     "description": "Find this value in artifacts",
                     "data_type": "string",
-                    "order": 0,
+                    "order": 1,
                     "required": true,
                     "contains": [
                         "*"
@@ -574,19 +579,19 @@
                 "exact_match": {
                     "description": "Exact match (default: true)",
                     "data_type": "boolean",
-                    "order": 1,
+                    "order": 2,
                     "default": true
                 },
                 "limit_search": {
                     "description": "Limit search to specified containers (default: false)",
                     "data_type": "boolean",
-                    "order": 2,
+                    "order": 3,
                     "default": false
                 },
                 "container_ids": {
                     "description": "List of space or comma separated container ids. the word \"current\" will be replaced by the current container id",
                     "data_type": "string",
-                    "order": 3,
+                    "order": 4,
                     "default": "current"
                 }
             },
@@ -604,6 +609,15 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.cef_key",
+                    "data_type": "string",
+                    "example_values": [
+                        "act",
+                        "app",
+                        "applicationProtocol"
                     ]
                 },
                 {
@@ -1512,7 +1526,7 @@
                     "contains": [
                         "sha256"
                     ],
-                    "column_name": "Sha256",
+                    "column_name": "SHA256",
                     "column_order": 4,
                     "example_values": [
                         "4f2155212cb0f74207bd0e4fd5ecae548ee2bae1d2dcd36c1d0ba0b6254bd4a1"

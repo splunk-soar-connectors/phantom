@@ -6,9 +6,7 @@
 #
 # --
 
-from django.http import HttpResponse
 from bs4 import UnicodeDammit
-import json
 import sys
 
 

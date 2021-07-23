@@ -17,12 +17,13 @@ from phantom.utils import CONTAINS_VALIDATORS
 import phantom.utils as ph_utils
 import phantom.rules as ph_rules
 from phantom.vault import Vault
-from bs4 import UnicodeDammit
+
+# Constants imports
+from phantom_consts import *
 
 import ast
 import json
 import requests
-import unicodedata
 from requests.exceptions import Timeout, SSLError
 
 import socket
@@ -37,15 +38,10 @@ import datetime
 import time
 import random
 import string
-import sys
 try:
     from urllib.parse import quote
 except:
     from urllib import quote
-
-TIMEOUT = 120
-INVALID_RESPONSE = 'Server did not return a valid JSON response.'
-SUPPORTED_FILES = ['application/zip', 'application/x-gzip', 'application/x-tar', 'application/x-bzip2']
 
 
 def determine_contains(value):
@@ -67,6 +63,42 @@ class RetVal3(tuple):
 
 class PhantomConnector(BaseConnector):
 
+    def _validate_integer(self, action_result, parameter, key, allow_zero=False):
+        if parameter is not None:
+            try:
+                if not float(parameter).is_integer():
+                    return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_INVALID_INT.format(msg="", param=key)), None
+
+                parameter = int(parameter)
+            except:
+                return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_INVALID_INT.format(msg="", param=key)), None
+
+            if parameter < 0:
+                return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_INVALID_INT.format(msg="non-negative", param=key)), None
+            if not allow_zero and parameter == 0:
+                return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_INVALID_INT.format(msg="non-zero positive", param=key)), None
+
+        return phantom.APP_SUCCESS, parameter
+
+    def _get_error_message_from_exception(self, e):
+        """ This method is used to get appropriate error message from the exception.
+        :param e: Exception object
+        :return: error message
+        """
+        error_code = PHANTOM_ERR_CODE_UNAVAILABLE
+        error_msg = PHANTOM_ERR_MSG_UNAVAILABLE
+        try:
+            if hasattr(e, 'args'):
+                if len(e.args) > 1:
+                    error_code = e.args[0]
+                    error_msg = e.args[1]
+                elif len(e.args) == 1:
+                    error_msg = e.args[0]
+        except:
+            pass
+
+        return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
+
     def _get_error_details(self, resp_json):
 
         # The device that this app talks to does not sends back a simple message,
@@ -74,7 +106,7 @@ class PhantomConnector(BaseConnector):
         message = resp_json.get('message')
         if not message:
             message = "Error message is unavailable"
-        return self._handle_py_ver_compat_for_input_str(message)
+        return message
 
     def _process_html_response(self, response, action_result):
 
@@ -94,7 +126,7 @@ class PhantomConnector(BaseConnector):
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
-                self._handle_py_ver_compat_for_input_str(error_text))
+                error_text)
 
         # In 2.0 the platform does not like braces in messages, unless it's format parameters
         message = message.replace('{', ' ').replace('}', ' ')
@@ -107,7 +139,7 @@ class PhantomConnector(BaseConnector):
         try:
             resp_json = response.json()
         except Exception as e:
-            return RetVal3(action_result.set_status(phantom.APP_ERROR, "Unable to parse response as JSON", e), response)
+            return RetVal3(action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_PARSE_JSON_RESPONSE.format(self._get_error_message_from_exception(e))), response)
 
         if isinstance(resp_json, list):
             # Let's not parse it here
@@ -117,14 +149,14 @@ class PhantomConnector(BaseConnector):
 
         if (failed):
             return RetVal3(
-                    action_result.set_status(phantom.APP_ERROR, "Error from server. Status code: {0}, Details: {1}".format(response.status_code,
+                    action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_SERVER.format(response.status_code,
                         self._get_error_details(resp_json))), response)
 
         if (200 <= response.status_code < 399):
             return RetVal3(phantom.APP_SUCCESS, response, resp_json)
 
         return RetVal3(
-                action_result.set_status(phantom.APP_ERROR, "Error from server. Status code: {0}, Details: {1}".format(response.status_code,
+                action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_SERVER.format(response.status_code,
                     self._get_error_details(resp_json))), response, None)
 
     def _process_response(self, response, action_result):
@@ -151,25 +183,9 @@ class PhantomConnector(BaseConnector):
 
         # everything else is actually an error at this point
         message = "Can't process response from server. Status Code: {0} Data from server: {1}".format(
-                response.status_code, self._handle_py_ver_compat_for_input_str(response.text.replace('{', ' ').replace('}', ' ')))
+                response.status_code, response.text.replace('{', ' ').replace('}', ' '))
 
         return RetVal3(action_result.set_status(phantom.APP_ERROR, message), response, None)
-
-    def _handle_py_ver_compat_for_input_str(self, input_str):
-        """
-        This method returns the encoded|original string based on the Python version.
-        :param python_version: Python major version
-        :param input_str: Input string to be processed
-        :return: input_str (Processed input string based on following logic 'input_str - Python 3; encoded input_str - Python 2')
-        """
-
-        try:
-            if input_str and self._python_version == 2:
-                input_str = UnicodeDammit(input_str).unicode_markup.encode('utf-8')
-        except:
-            self.debug_print("Error occurred while handling python 2to3 compatibility for the input string")
-
-        return input_str
 
     def _make_rest_call(self, endpoint, action_result, headers=None, params=None, data=None, method="get", ignore_auth=False):
 
@@ -183,7 +199,7 @@ class PhantomConnector(BaseConnector):
             try:
                 headers = json.loads(headers)
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Unable to load headers as JSON", e)
+                return action_result.set_status(phantom.APP_ERROR, "Unable to load headers as JSON: {}".format(self._get_error_message_from_exception(e)))
 
         # auth_token is a bit tricky, it can be in the params or config
         auth_token = config.get('auth_token')
@@ -219,29 +235,11 @@ class PhantomConnector(BaseConnector):
                     timeout=TIMEOUT)
 
         except Timeout as e:
-            return RetVal3(action_result.set_status(phantom.APP_ERROR, "Request timed out", e), None, None)
+            return RetVal3(action_result.set_status(phantom.APP_ERROR, "Request timed out: {}".format(self._get_error_message_from_exception(e))), None, None)
         except SSLError as e:
-            return (action_result.set_status(phantom.APP_ERROR, "HTTPS SSL validation failed", e), None, None)
+            return (action_result.set_status(phantom.APP_ERROR, "HTTPS SSL validation failed: {}".format(self._get_error_message_from_exception(e))), None, None)
         except Exception as e:
-            try:
-                if hasattr(e, 'args'):
-                    if len(e.args) > 1:
-                        error_code = e.args[0]
-                        error_msg = e.args[1]
-                    elif len(e.args) == 1:
-                        error_code = "Error code unavailable"
-                        error_msg = e.args[0]
-                else:
-                    error_code = "Error code unavailable"
-                    error_msg = "Error occurred while connecting to the Phantom server. Please check the asset configuration and|or action parameters."
-                error_msg = self._handle_py_ver_compat_for_input_str(error_msg)
-            except TypeError:
-                error_code = "Error code unavailable"
-                error_msg = "Error occurred while connecting to the Phantom server. Please check the asset configuration and|or the action parameters."
-            except:
-                error_code = "Error code unavailable"
-                error_msg = "Error occurred while connecting to the Phantom server. Please check the asset configuration and|or action parameters."
-            return (action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Error code:{} Error Message:{}".format(error_code, error_msg)), None, None)
+            return (action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Error Details: {}".format(self._get_error_message_from_exception(e))), None, None)
 
         return self._process_response(response, action_result)
 
@@ -282,7 +280,7 @@ class PhantomConnector(BaseConnector):
                 action_result.set_status(phantom.APP_ERROR, "Please provide {parameter} parameter in JSON format".format(parameter=parameter))
                 return None
         except Exception as e:
-            action_result.set_status(phantom.APP_ERROR, "Could not load JSON from {parameter} parameter".format(parameter=parameter), e)
+            action_result.set_status(phantom.APP_ERROR, "Could not load JSON from {parameter} parameter".format(parameter=parameter), self._get_error_message_from_exception(e))
             return None
 
         return clean_json
@@ -291,14 +289,14 @@ class PhantomConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        artifact_id = self._handle_py_ver_compat_for_input_str(param['artifact_id'])
+        artifact_id = param['artifact_id']
 
-        name = self._handle_py_ver_compat_for_input_str(param.get('name'))
-        label = self._handle_py_ver_compat_for_input_str(param.get('label'))
-        severity = self._handle_py_ver_compat_for_input_str(param.get('severity'))
+        name = param.get('name')
+        label = param.get('label')
+        severity = param.get('severity')
         cef_json = param.get('cef_json')
         cef_types_json = param.get('cef_types_json')
-        tags = self._handle_py_ver_compat_for_input_str(param.get('tags'))
+        tags = param.get('tags')
         art_json = param.get('artifact_json')
 
         overwrite = param.get('overwrite', False)
@@ -331,8 +329,8 @@ class PhantomConnector(BaseConnector):
             ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
 
             if phantom.is_fail(ret_val):
-                self.save_progress('Unable to find artifact, please check the artifact id.')
-                return action_result.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
+                self.save_progress(PHANTOM_ERR_FIND_ARTIFACT)
+                return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_GET_ARTIFACT.format(action_result.get_message()))
 
             existing_artifact = resp_data
         '''
@@ -341,8 +339,8 @@ class PhantomConnector(BaseConnector):
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
-            self.save_progress('Unable to find artifact, please check the artifact id.')
-            return action_result.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
+            self.save_progress(PHANTOM_ERR_FIND_ARTIFACT)
+            return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_GET_ARTIFACT.format(action_result.get_message()))
 
         if overwrite is False:
             existing_artifact = resp_data
@@ -408,16 +406,16 @@ class PhantomConnector(BaseConnector):
 
         if phantom.is_fail(ret_val):
             self.save_progress('Unable to update artifact.')
-            return action_result.set_status(phantom.APP_ERROR, 'Failed to update artifact: {}'.format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_UPDATE_ARTIFACT.format(action_result.get_message()))
 
         return action_result.set_status(phantom.APP_SUCCESS, 'Artifact updated successfully.')
 
     def _tag_artifact(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        artifact_id = self._handle_py_ver_compat_for_input_str(param['artifact_id'])
-        add_tags = self._handle_py_ver_compat_for_input_str(param.get('add_tags', ''))
-        remove_tags = self._handle_py_ver_compat_for_input_str(param.get('remove_tags', ''))
+        artifact_id = param['artifact_id']
+        add_tags = param.get('add_tags', '')
+        remove_tags = param.get('remove_tags', '')
 
         # These come in as str, so split, then convert to set
         add_tags = set([x.strip() for x in add_tags.split(',')])
@@ -429,7 +427,7 @@ class PhantomConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             self.save_progress("Unable to get artifact, please check the artifact id")
-            return action_result.set_status(phantom.APP_ERROR, 'Failed to get artifact: {}'.format(action_result.get_message()))
+            return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_GET_ARTIFACT.format(action_result.get_message()))
 
         resp_label = resp_data.get("label")
 
@@ -467,7 +465,7 @@ class PhantomConnector(BaseConnector):
 
         if (phantom.is_fail(ret_val)):
             self.save_progress("Unable to modify artifact")
-            msg = 'Failed to update artifact: {}'.format(action_result.get_message())
+            msg = PHANTOM_ERR_UPDATE_ARTIFACT.format(action_result.get_message())
             if not resp_label:
                 msg = "{}. {}".format("The reason of the failure can be the unavailability of the label in the provided artifact", msg)
             return action_result.set_status(phantom.APP_ERROR, msg)
@@ -483,18 +481,22 @@ class PhantomConnector(BaseConnector):
 
         phase_id = param.get('phase_id', None)
 
-        try:
-            if phase_id:
-                phase_id = int(phase_id)
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide a valid phase ID")
+        ret_val, phase_id = self._validate_integer(action_result, phase_id, 'phase_id')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
-        endpoint = '/rest/container_note'
+        container_id = param.get('container_id', self.get_container_id())
+        ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
+        endpoint = '/rest/note'
 
         note_data = {
-            'container_id': param.get('container_id', self.get_container_id()),
+            'container_id': container_id,
             'title': param.get('title', ''),
             'content': param.get('content', ''),
+            'note_type': "general",
             'phase': phase_id
         }
 
@@ -510,7 +512,7 @@ class PhantomConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
         limit_search = param.get("limit_search", False)
         container_ids = param.get("container_ids", "current")
-        values = self._handle_py_ver_compat_for_input_str(param.get('values', ''))
+        values = param.get('values', '')
         if limit_search:
             container_ids = list(
                 set([
@@ -523,31 +525,36 @@ class PhantomConnector(BaseConnector):
                 ])
             )
             action_result.update_param({"container_ids": str(sorted(container_ids)).strip("[]")})
-        values = param.get('values', '')
 
-        if param.get('is_regex'):
-            flt = 'iregex'
-        else:
-            flt = 'icontains'
+        if limit_search and not container_ids:
+            action_result.update_summary({'artifacts_found': 0, 'server': self._base_uri})
+            return action_result.set_status(phantom.APP_SUCCESS)
+
+        cef_key = param.get("cef_key")
 
         exact_match = param.get('exact_match', False)
 
-        if exact_match:
+        if exact_match and not cef_key:
             values = '"{}"'.format(values)
 
         url_enc_values = quote(values, safe='')
 
-        endpoint = '/rest/artifact?_filter_cef__{}={}&page_size=0&pretty'.format(flt, repr(url_enc_values))
+        if cef_key and exact_match:
+            endpoint = '/rest/artifact?_filter_cef__{}={}&page_size=0&pretty'.format(quote(cef_key, safe=''), repr(url_enc_values))
+        elif cef_key:
+            endpoint = '/rest/artifact?_filter_cef__{}__{}={}&page_size=0&pretty'.format(quote(cef_key, safe=''), "icontains", repr(url_enc_values))
+        else:
+            endpoint = '/rest/artifact?_filter_cef__{}={}&page_size=0&pretty'.format("icontains", repr(url_enc_values))
+
+        if limit_search:
+            endpoint += '&_filter_container__in={}'.format(container_ids)
 
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, 'Error retrieving records: {0}'.format(action_result.get_message()))
 
-        if limit_search:
-            records = [x for x in resp_data['data'] if int(x['container']) in container_ids]
-        else:
-            records = resp_data['data']
+        records = resp_data['data']
 
         values = values.lower()
 
@@ -570,15 +577,10 @@ class PhantomConnector(BaseConnector):
                     # Hence, we are avoiding the str() on already string/basestring formatted data.
                     if (isinstance(curr_value, dict)):
                         curr_value = json.dumps(curr_value)
-                    elif (not isinstance(curr_value, basestring)):  # For python 2
-                        curr_value = str(curr_value)
-                except NameError:
                     if (not isinstance(curr_value, str)):  # For python 3
                         curr_value = str(curr_value)
                 except Exception as e:
-                    return action_result.set_status(phantom.APP_ERROR, 'Error occurred while processing the artifacts data', e)
-
-                curr_value = self._handle_py_ver_compat_for_input_str(curr_value)
+                    return action_result.set_status(phantom.APP_ERROR, 'Error occurred while processing the artifacts data: {}'.format(self._get_error_message_from_exception(e)))
 
                 if values in curr_value.lower() or (exact_match and values.strip('"') == curr_value.lower()):
                     key = k
@@ -613,6 +615,10 @@ class PhantomConnector(BaseConnector):
         cef_dict = param.get('cef_dictionary')
         run_automation = param.get('run_automation', True)
 
+        ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
+
         loaded_cef = {}
         loaded_contains = {}
 
@@ -623,7 +629,7 @@ class PhantomConnector(BaseConnector):
                 if not isinstance(loaded_cef, dict):
                     return action_result.set_status(phantom.APP_ERROR, "Please provide cef_dictionary parameter in JSON format")
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF parameter", e)
+                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF parameter: {}".format(self._get_error_message_from_exception(e)))
 
         if contains:
             try:
@@ -688,16 +694,11 @@ class PhantomConnector(BaseConnector):
 
     def _add_file_to_vault(self, action_result, data_stream, file_name, recursive, container_id):
 
-        if self._python_version == 2:
-            try:
-                file_name = UnicodeDammit(file_name).unicode_markup.encode('utf-8')
-            except UnicodeEncodeError:
-                file_name = unicodedata.normalize('NFKD', file_name).encode('utf-8', 'ignore')
-
         save_as = file_name or '_invalid_file_name_'
 
         # PAPP-9543 append a random string to the filename to make concurrent action runs succeed
-        save_as = save_as + '_' + ''.join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16))
+        random_suffix = '_' + ''.join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16))
+        save_as = save_as + random_suffix
 
         # if the path contains a directory
         if (os.path.dirname(save_as)):
@@ -708,18 +709,36 @@ class PhantomConnector(BaseConnector):
         else:
             vault_tmp_dir = '/opt/phantom/vault/tmp'
 
-        save_path = os.path.join(vault_tmp_dir, save_as)
-        with open(save_path, 'wb') as uncompressed_file:
-
-            uncompressed_file.write(data_stream)
+        try:
+            save_path = os.path.join(vault_tmp_dir, save_as)
+            with open(save_path, 'wb') as uncompressed_file:
+                uncompressed_file.write(data_stream)
+        except IOError as e:
+            error_msg = self._get_error_message_from_exception(e)
+            try:
+                if "File name too long" in error_msg:
+                    new_file_name = "ph_long_file_name_{}{}".format(self._level, random_suffix)
+                    save_path = os.path.join(vault_tmp_dir, new_file_name)
+                    self.debug_print("Original filename: {}".format(file_name))
+                    self.debug_print("Modified filename: {}".format(new_file_name))
+                    with open(save_path, 'wb') as uncompressed_file:
+                        uncompressed_file.write(data_stream)
+                else:
+                    return (action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to Vault. Error Details:{}".format(
+                        self._get_error_message_from_exception(e))))
+            except Exception as e:
+                return (action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to Vault. Error Details:{}".format(
+                    self._get_error_message_from_exception(e))))
+        except Exception as e:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to Vault. Error Details:{}".format(self._get_error_message_from_exception(e)))
 
         try:
             success, message, vault_id = ph_rules.vault_add(container=container_id, file_location=save_path, file_name=file_name)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault", e)
+            return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault: {}".format(self._get_error_message_from_exception(e)))
 
         if not success:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault, {0}".format(message))
+            return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault: {0}".format(message))
 
         try:
             query_params = {
@@ -731,11 +750,6 @@ class PhantomConnector(BaseConnector):
 
             for resp_element in resp_data['data']:
                 resp_filename = resp_element['name']
-                if self._python_version == 2:
-                    try:
-                        resp_filename = UnicodeDammit(resp_filename).unicode_markup.encode('utf-8')
-                    except UnicodeEncodeError:
-                        resp_filename = unicodedata.normalize('NFKD', resp_filename).encode('utf-8', 'ignore')
 
                 if file_name == resp_filename:
                     vault_info = resp_element
@@ -746,7 +760,7 @@ class PhantomConnector(BaseConnector):
                     name = k[8:]
                     vault_info[name] = vault_info.pop(k)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to retrieve info about file added to vault", e)
+            return action_result.set_status(phantom.APP_ERROR, "Failed to retrieve info about file added to vault {}".format(self._get_error_message_from_exception(e)))
 
         action_result.add_data(vault_info)
 
@@ -762,11 +776,13 @@ class PhantomConnector(BaseConnector):
                 return (phantom.APP_SUCCESS)
 
             self._extract_file(action_result, file_path, file_name, recursive, container_id)
+            self._level -= 1
 
         return (phantom.APP_SUCCESS)
 
     def _extract_file(self, action_result, file_path, file_name, recursive, container_id=None):
 
+        self._level += 1
         if (container_id is None):
             container_id = self.get_container_id()
 
@@ -790,7 +806,7 @@ class PhantomConnector(BaseConnector):
             ret_val = self._add_file_to_vault(action_result, data, os.path.splitext(file_name)[0], recursive, container_id)
 
             if phantom.is_fail(ret_val):
-                return action_result.set_status(phantom.APP_ERROR, "Error decompressing {0} file. Details: {1}".format(file_type, action_result.get_message()))
+                return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_DECOMPRESSING_FILE.format(file_type, action_result.get_message()))
 
         elif (file_type == 'application/x-gzip'):
             try:
@@ -805,7 +821,7 @@ class PhantomConnector(BaseConnector):
             ret_val = self._add_file_to_vault(action_result, data, os.path.splitext(file_name)[0], recursive, container_id)
 
             if phantom.is_fail(ret_val):
-                return action_result.set_status(phantom.APP_ERROR, "Error decompressing {0} file. Details: {1}".format(file_type, action_result.get_message()))
+                return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_DECOMPRESSING_FILE.format(file_type, action_result.get_message()))
 
         elif (file_type == 'application/zip'):
             if (not zipfile.is_zipfile(file_path)):
@@ -826,7 +842,7 @@ class PhantomConnector(BaseConnector):
                         if phantom.is_fail(ret_val):
                             return ret_val
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Unable to open the zip file: {}. Error message:{}".format(file_path, e))
+                return action_result.set_status(phantom.APP_ERROR, "Unable to open the zip file: {}. Error message:{}".format(file_path, self._get_error_message_from_exception(e)))
 
             return (phantom.APP_SUCCESS)
 
@@ -853,15 +869,12 @@ class PhantomConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        vault_id = self._handle_py_ver_compat_for_input_str(param['vault_id'])
+        vault_id = param['vault_id']
 
-        if param.get('container_id') is not None:
-            try:
-                container_id = int(param.get('container_id'))
-                if container_id < 0:
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide a valid container ID in the action parameter")
-            except:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a valid container ID in the action parameter")
+        container_id = param.get('container_id')
+        ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         try:
             query_params = {
@@ -885,24 +898,25 @@ class PhantomConnector(BaseConnector):
             file_path = vault_info['path']
             file_name = vault_info['name']
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to get vault item info", e)
+            return action_result.set_status(phantom.APP_ERROR, "Failed to get vault item info: {}".format(self._get_error_message_from_exception(e)))
 
         try:
             file_type = magic.from_file(file_path, mime=True)
         except IOError:
-            return action_result.set_status(phantom.APP_ERROR, "File path not found. Please check that the asset is pointing to the current(self) Phantom instance.")
+            return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_FILE_PATH_NOT_FOUND)
         except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "File path not found. Please check that the asset is pointing to the current(self) Phantom instance.")
+            return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_FILE_PATH_NOT_FOUND)
 
         if (file_type not in SUPPORTED_FILES):
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
 
-        ret_val = self._extract_file(action_result, file_path, file_name, param.get('recursive', False), param.get('container_id'))
+        ret_val = self._extract_file(action_result, file_path, file_name, param.get('recursive', False), container_id)
 
         if (phantom.is_fail(ret_val)):
             return action_result.get_status()
 
-        action_result.set_summary({'total_vault_items': action_result.get_data_size()})
+        summary = action_result.update_summary({})
+        summary['total_vault_items'] = action_result.get_data_size()
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -910,18 +924,14 @@ class PhantomConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        values = self._handle_py_ver_compat_for_input_str(param.get('values'))
-        list_name = self._handle_py_ver_compat_for_input_str(param['list'])
+        values = param.get('values')
+        list_name = param['list']
         exact_match = param.get('exact_match', False)
         column_index = param.get('column_index')
 
-        if column_index is not None:
-            try:
-                column_index = int(column_index)
-                if column_index < 0:
-                    raise Exception
-            except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a non-negative integer for column_index parameter")
+        ret_val, column_index = self._validate_integer(action_result, column_index, 'column_index', True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         # Encode list_name to consider special url encoded characters like '\' in URL
         list_name = quote(list_name, safe='')
@@ -940,7 +950,6 @@ class PhantomConnector(BaseConnector):
         found = 0
         for rownum, row in enumerate(content):
             for cid, value in enumerate(row):
-                value = self._handle_py_ver_compat_for_input_str(value)
                 if column_index is None or cid == column_index:
                     if exact_match and value == values:
                         found += 1
@@ -984,7 +993,7 @@ class PhantomConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        list_name = self._handle_py_ver_compat_for_input_str(param['list'])
+        list_name = param['list']
 
         row = param.get('new_row')
 
@@ -1089,7 +1098,7 @@ class PhantomConnector(BaseConnector):
             new_container_id = resp_data['id']
         except KeyError:
             # The newly created container wont get cleaned up
-            return action_result.set_status(phantom.APP_ERROR, "Unable to retrieve ID of newly created container")
+            return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_UNABLE_RETRIEVE_ID)
 
         # Retrieve artifacts from old container
         url = '/rest/container/{}/artifacts'.format(container_id)
@@ -1128,19 +1137,19 @@ class PhantomConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Please provide json formatted dictionary in container_json action parameter")
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error parsing container JSON: {}".format(str(e)))
+            return action_result.set_status(phantom.APP_ERROR, "Error parsing container JSON: {}".format(self._get_error_message_from_exception(e)))
 
         if artifact_json_list:
             try:
                 artifacts = json.loads(artifact_json_list)
                 if not isinstance(artifacts, list):
-                    return action_result.set_status(phantom.APP_ERROR, "Please provide container_artifacts as a list of artifact objects in JSON format")
+                    return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_CONTAINER_ARTIFACT)
                 else:
                     for artifact in artifacts:
                         if not isinstance(artifact, dict):
-                            return action_result.set_status(phantom.APP_ERROR, "Please provide container_artifacts as a list of artifact objects in JSON format")
+                            return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_CONTAINER_ARTIFACT)
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Error parsing artifacts list JSON: {}".format(str(e)))
+                return action_result.set_status(phantom.APP_ERROR, "Error parsing artifacts list JSON: {}".format(self._get_error_message_from_exception(e)))
         else:
             artifacts = []
 
@@ -1152,7 +1161,7 @@ class PhantomConnector(BaseConnector):
             new_container_id = resp_data['id']
         except KeyError:
             # The newly created container wont get cleaned up
-            return action_result.set_status(phantom.APP_ERROR, "Unable to retrieve ID of newly created container")
+            return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_UNABLE_RETRIEVE_ID)
 
         if artifacts:
             for artifact in artifacts:
@@ -1179,10 +1188,10 @@ class PhantomConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        try:
-            container_id = int(param['container_id'])
-        except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide an integer value for container_id parameter")
+        container_id = param.get('container_id')
+        ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         destination = self._base_uri
         source = self.get_phantom_base_url()
@@ -1193,10 +1202,10 @@ class PhantomConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        try:
-            container_id = int(param['container_id'])
-        except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide an integer value for container_id parameter")
+        container_id = param.get('container_id')
+        ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         destination = self.get_phantom_base_url()
         source = self._base_uri
@@ -1209,7 +1218,7 @@ class PhantomConnector(BaseConnector):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         url_params = {
-                '_filter_action': '"{0}"'.format(self._handle_py_ver_compat_for_input_str(param['action_name'])),
+                '_filter_action': '"{0}"'.format(param['action_name']),
                 'include_expensive': '',
                 'sort': 'start_time',
                 'order': 'desc',
@@ -1219,7 +1228,7 @@ class PhantomConnector(BaseConnector):
         if 'parameters' in param:
 
             try:
-                parameters = json.loads(self._handle_py_ver_compat_for_input_str(param['parameters']))
+                parameters = json.loads(param['parameters'])
             except:
                 return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from 'parameters' parameter")
 
@@ -1233,27 +1242,25 @@ class PhantomConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Error occurred while creating filter string to search action results data")
 
         if 'time_limit' in param:
-            try:
-                hours = int(param['time_limit'])
-                if hours <= 0:
-                    raise Exception
-            except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a positive integer for time_limit parameter")
+            hours = param.get('time_limit')
+            ret_val, hours = self._validate_integer(action_result, hours, 'time_limit')
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
             time_str = (datetime.datetime.utcnow() - datetime.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%SZ")
             url_params['_filter_start_time__gt'] = '"{0}"'.format(time_str)
 
         if 'max_results' in param:
-            try:
-                limit = int(param['max_results'])
-                if limit <= 0:
-                    raise Exception
-            except Exception:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide a positive integer for max_results parameter")
+            limit = param.get('max_results')
+            ret_val, limit = self._validate_integer(action_result, limit, 'max_results')
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
+
             url_params['page_size'] = limit
 
         if 'app' in param:
 
-            app_name = self._handle_py_ver_compat_for_input_str(param['app'])
+            app_name = param['app']
             app_params = {'_filter_name__iexact': '"{0}"'.format(app_name)}
             ret_val, response, resp_json = self._make_rest_call('/rest/app', action_result, params=app_params)
 
@@ -1267,7 +1274,7 @@ class PhantomConnector(BaseConnector):
 
         if 'asset' in param:
 
-            asset = self._handle_py_ver_compat_for_input_str(param['asset'])
+            asset = param['asset']
             asset_params = {'_filter_name__iexact': '"{0}"'.format(asset)}
             ret_val, response, resp_json = self._make_rest_call('/rest/asset', action_result, params=asset_params)
 
@@ -1310,13 +1317,13 @@ class PhantomConnector(BaseConnector):
                         action_result.add_data(action_run)
 
             if count == 0:
-                return action_result.set_status(phantom.APP_SUCCESS, "No action results found matching given criteria")
+                return action_result.set_status(phantom.APP_SUCCESS, PHANTOM_ERR_ACTION_RESULT_NOT_FOUND)
             else:
                 action_result.set_summary({'num_results': count})
                 return action_result.set_status(phantom.APP_SUCCESS)
 
         elif resp_json['count'] == 0:
-            return action_result.set_status(phantom.APP_SUCCESS, "No action results found matching given criteria")
+            return action_result.set_status(phantom.APP_SUCCESS, PHANTOM_ERR_ACTION_RESULT_NOT_FOUND)
 
         for action_run in resp_json['data']:
             action_result.add_data(action_run)
@@ -1330,31 +1337,36 @@ class PhantomConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        try:
-            row_number = int(param['row_number'])
-        except Exception:
-            return action_result.set_status(phantom.APP_ERROR, "Please provide an integer value for row_number parameter")
+        row_number = param.get('row_number')
+        ret_val, row_number = self._validate_integer(action_result, row_number, 'row_number', True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         row_values_as_list = param['row_values_as_list']
 
-        list_identifier = self._handle_py_ver_compat_for_input_str(param.get('list_name'))
+        list_name = param.get('list_name')
+        list_id = param.get('id')
 
-        if not list_identifier:
-            list_identifier = param.get('id')
-            if not list_identifier:
-                return action_result.set_status(phantom.APP_ERROR, "Either the custom list's name or id must be provided")
-        else:
+        if not list_name and not list_id:
+            return action_result.set_status(phantom.APP_ERROR, "Either the custom list's name or id must be provided")
+
+        if list_name:
             # Encode list_identifier to consider special url encoded characters like '\' in URL
-            list_identifier = quote(list_identifier, safe='')
+            list_identifier = quote(list_name, safe='')
+        else:
+            ret_val, list_identifier = self._validate_integer(action_result, list_id, 'id')
+            if phantom.is_fail(ret_val):
+                return action_result.get_status()
 
         try:
             row_values = json.loads(row_values_as_list)
             if not isinstance(row_values, list):
-                return action_result.set_status(phantom.APP_ERROR, "Please provide row_values_as_list parameter as a non-empty JSON formatted list")
+                return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_NON_EMPTY_PARAM_VALUE)
             if not row_values:
-                return action_result.set_status(phantom.APP_ERROR, "Please provide row_values_as_list parameter as a non-empty JSON formatted list")
+                return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_NON_EMPTY_PARAM_VALUE)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Could not load JSON formatted list from the row_values_as_list parameter", e)
+            return action_result.set_status(phantom.APP_ERROR, "Could not load JSON formatted list from the row_values_as_list parameter: {}".format(
+                self._get_error_message_from_exception(e)))
 
         data = {
             "update_rows": {
@@ -1383,15 +1395,10 @@ class PhantomConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        sleep_seconds = param['sleep_seconds']
-
-        try:
-            sleep_seconds = int(sleep_seconds)
-        except:
-            return action_result.set_status(phantom.APP_ERROR, "Error parsing the sleep seconds parameter. Please specify sleep_seconds as an integer greater than 0")
-
-        if (sleep_seconds < 0):
-            return action_result.set_status(phantom.APP_ERROR, "Invalid sleep_seconds value. Please specify a value greater than or equal to 0")
+        sleep_seconds = param.get('sleep_seconds')
+        ret_val, sleep_seconds = self._validate_integer(action_result, sleep_seconds, 'sleep_seconds', True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         remainder = sleep_seconds % 60
 
@@ -1413,7 +1420,7 @@ class PhantomConnector(BaseConnector):
 
         config = self.get_config()
 
-        host = self._handle_py_ver_compat_for_input_str(config['phantom_server'])
+        host = config['phantom_server']
 
         if host.startswith('http:') or host.startswith('https:'):
             return self.set_status(phantom.APP_ERROR,
@@ -1427,7 +1434,7 @@ class PhantomConnector(BaseConnector):
                 packed = socket.inet_aton(host)
                 unpacked = socket.inet_ntoa(packed)
             except Exception as e:
-                return self.set_status(phantom.APP_ERROR, "Unable to do ip to name conversion on {0}".format(host), e)
+                return self.set_status(phantom.APP_ERROR, "Unable to do ip to name conversion on {0}".format(host), self._get_error_message_from_exception(e))
         else:
             try:
                 unpacked = socket.gethostbyname(host)
@@ -1435,26 +1442,20 @@ class PhantomConnector(BaseConnector):
                 return self.set_status(phantom.APP_ERROR, "Unable to do name to ip conversion on {0}".format(host))
 
         if unpacked.startswith('127.'):
-            return self.set_status(phantom.APP_ERROR,
-                    'Accessing 127.0.0.1 is not allowed. Please specify the actual IP or hostname used by the Phantom instance in the Asset config')
+            return self.set_status(phantom.APP_ERROR, PHANTOM_ERR_SPECIFY_IP_HOSTNAME)
 
         if '127.0.0.1' in host or 'localhost' in host:
-            return self.set_status(phantom.APP_ERROR,
-                    'Accessing 127.0.0.1 is not allowed. Please specify the actual IP or hostname used by the Phantom instance in the Asset config')
+            return self.set_status(phantom.APP_ERROR, PHANTOM_ERR_SPECIFY_IP_HOSTNAME)
 
-        # Fetching the Python major version
-        try:
-            self._python_version = int(sys.version_info[0])
-        except:
-            return self.set_status(phantom.APP_ERROR, "Error occurred while getting the Phantom server's Python major version.")
-
-        self._base_uri = 'https://{}'.format(self._handle_py_ver_compat_for_input_str(config['phantom_server']))
+        self._base_uri = 'https://{}'.format(config['phantom_server'])
         self._verify_cert = config.get('verify_certificate', False)
 
         self._auth = None
 
         if config.get('username') and config.get('password'):
             self._auth = (config['username'], config['password'])
+
+        self._level = 0
 
         return (phantom.APP_SUCCESS)
 
