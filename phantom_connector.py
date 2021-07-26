@@ -808,7 +808,7 @@ class PhantomConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_DECOMPRESSING_FILE.format(file_type, action_result.get_message()))
 
-        elif (file_type == 'application/x-gzip'):
+        elif (file_type == 'application/x-gzip' or file_type == 'application/gzip'):
             try:
                 with gzip.GzipFile(file_path, 'r') as f:
                     data = f.read()
