@@ -8,7 +8,7 @@
     "main_module": "phantom_connector.py",
     "app_version": "3.2.7",
     "latest_tested_version": [
-        "Splunk\u00ae Phantom, 4.10.4"
+        "Splunk Phantom PlatformAPI v4.10.4"
     ],
     "python_version": "3",
     "utctime_updated": "2021-07-27T14:40:06.000000Z",
