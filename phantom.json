@@ -6,12 +6,12 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.1.2",
+    "app_version": "3.2.3",
     "latest_tested_version": [
         ""
     ],
     "python_version": "3",
-    "utctime_updated": "2021-02-18T08:26:50.000000Z",
+    "utctime_updated": "2021-07-26T14:30:46.000000Z",
     "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
@@ -323,7 +323,7 @@
         {
             "action": "add note",
             "description": "Add a note to a container",
-            "verbose": "If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id (from where the action is being run) and the status will be reflected accordingly.",
+            "verbose": "If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id (from where the action is being run) and the status will be reflected accordingly. If the container is a case, a <b>phase_id</b> parameter can be provided to associate the note to a particular phase.",
             "type": "generic",
             "identifier": "add_note",
             "read_only": false,
@@ -561,10 +561,15 @@
             "identifier": "find_artifacts",
             "read_only": true,
             "parameters": {
+                "cef_key": {
+                    "description": "Key of the cef dict you are querying: act, app, applicationProtocol, baseEventCount, bytesIn, etc. It will search the entire cef dictionary if blank",
+                    "data_type": "string",
+                    "order": 0
+                },
                 "values": {
                     "description": "Find this value in artifacts",
                     "data_type": "string",
-                    "order": 0,
+                    "order": 1,
                     "required": true,
                     "contains": [
                         "*"
@@ -574,19 +579,19 @@
                 "exact_match": {
                     "description": "Exact match (default: true)",
                     "data_type": "boolean",
-                    "order": 1,
+                    "order": 2,
                     "default": true
                 },
                 "limit_search": {
                     "description": "Limit search to specified containers (default: false)",
                     "data_type": "boolean",
-                    "order": 2,
+                    "order": 3,
                     "default": false
                 },
                 "container_ids": {
                     "description": "List of space or comma separated container ids. the word \"current\" will be replaced by the current container id",
                     "data_type": "string",
-                    "order": 3,
+                    "order": 4,
                     "default": "current"
                 }
             },
@@ -604,6 +609,15 @@
                     "example_values": [
                         "success",
                         "failed"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.cef_key",
+                    "data_type": "string",
+                    "example_values": [
+                        "act",
+                        "app",
+                        "applicationProtocol"
                     ]
                 },
                 {
@@ -1512,7 +1526,7 @@
                     "contains": [
                         "sha256"
                     ],
-                    "column_name": "Sha256",
+                    "column_name": "SHA256",
                     "column_order": 4,
                     "example_values": [
                         "4f2155212cb0f74207bd0e4fd5ecae548ee2bae1d2dcd36c1d0ba0b6254bd4a1"
@@ -1606,7 +1620,7 @@
         {
             "action": "export container",
             "description": "Export local container to the configured Phantom asset",
-            "verbose": "This action exports a container (that matches the <b>container_id</b>) from the local Phantom instance (the instance from where the action is being run) to the configured Phantom asset (that the action is being executed on).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the local phantom instance and the configured Phantom asset does not match.",
+            "verbose": "This action exports a container (that matches the <b>container_id</b>) from the local Phantom instance (the instance from where the action is being run) to the configured Phantom asset (that the action is being executed on).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the local phantom instance and the configured Phantom asset does not match.<br><br>Set the <b>keep_owner</b> parameter to true if you want the owner of the container on the configured Phantom instance to match the owner on the local instance. Note that this will be based on Owner ID, not Owner Name.",
             "type": "generic",
             "identifier": "export_container",
             "read_only": false,
@@ -1620,6 +1634,12 @@
                     "data_type": "numeric",
                     "required": true,
                     "primary": true
+                },
+                "keep_owner": {
+                    "description": "Keep Owner",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 1
                 }
             },
             "render": {
@@ -1644,6 +1664,14 @@
                     ],
                     "contains": [
                         "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.keep_owner",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
                     ]
                 },
                 {
@@ -1696,7 +1724,7 @@
         {
             "action": "import container",
             "description": "Import a container from an external Phantom instance",
-            "verbose": "This action imports a container (that matches the <b>container_id</b>) from the configured Phantom asset (that the action is being executed on) into the local Phantom instance (the instance from where the action is being run).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the configured Phantom asset and the local phantom instance does not match.",
+            "verbose": "This action imports a container (that matches the <b>container_id</b>) from the configured Phantom asset (that the action is being executed on) into the local Phantom instance (the instance from where the action is being run).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the configured Phantom asset and the local phantom instance does not match.<br><br>Set the <b>keep_owner</b> parameter to true if you want the owner of the container on the local Phantom instance to match the owner on the configured instance. Note that this will be based on Owner ID, not Owner Name.",
             "type": "generic",
             "identifier": "import_container",
             "read_only": false,
@@ -1706,10 +1734,16 @@
                     "contains": [
                         "phantom container id"
                     ],
-                    "order": 0,
                     "data_type": "numeric",
                     "required": true,
-                    "primary": true
+                    "primary": true,
+                    "order": 0
+                },
+                "keep_owner": {
+                    "description": "Keep Owner",
+                    "data_type": "boolean",
+                    "default": false,
+                    "order": 1
                 }
             },
             "output": [
@@ -1729,6 +1763,14 @@
                     ],
                     "contains": [
                         "phantom container id"
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.keep_owner",
+                    "data_type": "boolean",
+                    "example_values": [
+                        true,
+                        false
                     ]
                 },
                 {
