@@ -40,7 +40,7 @@ import random
 import string
 try:
     from urllib.parse import quote
-except:
+except Exception:
     from urllib import quote
 
 
@@ -50,7 +50,7 @@ def determine_contains(value):
         try:
             if f(value):
                 valid_contains.append(c)
-        except:
+        except Exception:
             continue
 
     return valid_contains
@@ -70,7 +70,7 @@ class PhantomConnector(BaseConnector):
                     return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_INVALID_INT.format(msg="", param=key)), None
 
                 parameter = int(parameter)
-            except:
+            except Exception:
                 return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_INVALID_INT.format(msg="", param=key)), None
 
             if parameter < 0:
@@ -94,7 +94,7 @@ class PhantomConnector(BaseConnector):
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
-        except:
+        except Exception:
             pass
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
@@ -122,7 +122,7 @@ class PhantomConnector(BaseConnector):
             split_lines = error_text.split('\n')
             split_lines = [x.strip() for x in split_lines if x.strip()]
             error_text = '\n'.join(split_lines)
-        except:
+        except Exception:
             error_text = "Cannot parse error details"
 
         message = "Status Code: {0}. Data from server:\n{1}\n".format(status_code,
@@ -355,7 +355,7 @@ class PhantomConnector(BaseConnector):
         if cef_json:
             try:
                 clean_json = json.loads(cef_json)
-            except:
+            except Exception:
                 clean_json = self.load_dirty_json(cef_json, action_result, "cef_json")
 
             if clean_json is None:
@@ -363,13 +363,13 @@ class PhantomConnector(BaseConnector):
 
             try:
                 myData = dict((k, v) for k, v in myData.iteritems() if v)
-            except:
+            except Exception:
                 myData = dict((k, v) for k, v in myData.items() if v)
             myData.update(clean_json)
 
         try:
             myData = dict((k, v) for k, v in myData.iteritems() if v)
-        except:
+        except Exception:
             myData = dict((k, v) for k, v in myData.items() if v)
 
         # //// End workaround for PPS-18970 ////
@@ -563,7 +563,7 @@ class PhantomConnector(BaseConnector):
 
             try:
                 cef_dict_items = rec['cef'].iteritems()
-            except:
+            except Exception:
                 cef_dict_items = rec['cef'].items()
 
             for k, v in cef_dict_items:
@@ -671,7 +671,7 @@ class PhantomConnector(BaseConnector):
             else:
                 try:
                     artifact['cef_types'][cef_name] = CEF_JSON[cef_name]['contains']
-                except:
+                except Exception:
                     pass
 
         success, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifact)
@@ -969,7 +969,7 @@ class PhantomConnector(BaseConnector):
         try:
             if type(row) in (str, unicode, int, float, bool):
                 row = [row]
-        except:
+        except Exception:
             if type(row) in (str, int, float, bool):
                 row = [row]
 
@@ -999,7 +999,7 @@ class PhantomConnector(BaseConnector):
 
         try:
             row = ast.literal_eval(row)
-        except:
+        except Exception:
             # it's just a string
             pass
 
@@ -1229,7 +1229,7 @@ class PhantomConnector(BaseConnector):
 
             try:
                 parameters = json.loads(param.get('parameters'))
-            except:
+            except Exception:
                 return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from 'parameters' parameter")
 
             search_key, search_value = parameters.popitem()
@@ -1238,7 +1238,7 @@ class PhantomConnector(BaseConnector):
                 is_not_string = isinstance(search_value, (float, int, bool))
                 formatted_search_value = json.dumps(search_value) if is_not_string else '\\"{}\\"'.format(search_value)
                 url_params['_filter_result_data__regex'] = '"parameter.*\\"{0}\\": {1}"'.format(search_key, formatted_search_value)
-            except:
+            except Exception:
                 return action_result.set_status(phantom.APP_ERROR, "Error occurred while creating filter string to search action results data")
 
         if 'time_limit' in param:
@@ -1304,7 +1304,7 @@ class PhantomConnector(BaseConnector):
 
                     try:
                         parameters_items = parameters.iteritems()
-                    except:
+                    except Exception:
                         parameters_items = parameters.items()
 
                     for k, v in parameters_items:
@@ -1438,7 +1438,7 @@ class PhantomConnector(BaseConnector):
         else:
             try:
                 unpacked = socket.gethostbyname(host)
-            except:
+            except Exception:
                 return self.set_status(phantom.APP_ERROR, "Unable to do name to ip conversion on {0}".format(host))
 
         if unpacked.startswith('127.'):
