@@ -1228,7 +1228,7 @@ class PhantomConnector(BaseConnector):
         if 'parameters' in param:
 
             try:
-                parameters = json.loads(param['parameters'])
+                parameters = json.loads(param.get('parameters'))
             except:
                 return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from 'parameters' parameter")
 
@@ -1260,7 +1260,7 @@ class PhantomConnector(BaseConnector):
 
         if 'app' in param:
 
-            app_name = param['app']
+            app_name = param.get('app')
             app_params = {'_filter_name__iexact': '"{0}"'.format(app_name)}
             ret_val, response, resp_json = self._make_rest_call('/rest/app', action_result, params=app_params)
 
@@ -1274,7 +1274,7 @@ class PhantomConnector(BaseConnector):
 
         if 'asset' in param:
 
-            asset = param['asset']
+            asset = param.get('asset')
             asset_params = {'_filter_name__iexact': '"{0}"'.format(asset)}
             ret_val, response, resp_json = self._make_rest_call('/rest/asset', action_result, params=asset_params)
 
@@ -1453,7 +1453,7 @@ class PhantomConnector(BaseConnector):
         self._auth = None
 
         if config.get('username') and config.get('password'):
-            self._auth = (config['username'], config['password'])
+            self._auth = (config.get('username'), config.get('password'))
 
         self._level = 0
 
