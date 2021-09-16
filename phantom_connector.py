@@ -1237,7 +1237,7 @@ class PhantomConnector(BaseConnector):
             try:
                 is_not_string = isinstance(search_value, (float, int, bool))
                 formatted_search_value = json.dumps(search_value) if is_not_string else '\\"{}\\"'.format(search_value)
-                url_params['_filter_result_data__regex'] = '"parameter.*\\"{0}\\": {1}"'.format(search_key, formatted_search_value)
+                url_params['_filter_result_data__regex'] = '\'parameter.*\\"{0}\\": {1}\''.format(search_key, formatted_search_value)
             except Exception:
                 return action_result.set_status(phantom.APP_ERROR, "Error occurred while creating filter string to search action results data")
 
