@@ -6,7 +6,7 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.2.12",
+    "app_version": "3.2.14",
     "latest_tested_version": [
         "Splunk Phantom PlatformAPI v4.10.4"
     ],
