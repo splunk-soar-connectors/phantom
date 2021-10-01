@@ -4,3 +4,4 @@ Makefile
 .git*
 .gitlab-ci.yml
 whitesource-results
+*.postman_collection.json

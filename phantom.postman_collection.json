@@ -1,0 +1,691 @@
+{
+	"info": {
+		"_postman_id": "fedca567-852b-4aef-a030-f4a421ea0b8d",
+		"name": "Phantom",
+		"description": "# Postman Collection of Endpoints for Phantom App on Splunk SOAR.\n\n- ### Prerequisite\n\nThe below mentioned are the required fields to use this collection. So, Set this all fields before run the request.\n\n| Variable Name |  |\n| ------ | ------ |\n| username  | Phantom instance username (in environment variables & Basic Auth) |\n| password  | Phantom instance password (in environment variables & Basic Auth) |\n| base_url | Phantom instance IP/ Hostname (in collection variables) |\n\n- ### Variables needed to run the actions \n\n| Action Name | Variable(s) Name |\n| ------ | ------ |\n| Import & Export Container  | importexportcontainer_containerid, export_baseurl |\n| Import & Export Artifacts  | importexportartifact_artifactid, export_baseurl |\n| Find Listitem  | findlistitem_listname |\n| Add Listitem | addListitem_listname, addListitem_content |\n| Find Artifacts | pagesize, filter |\n| Update Artifact tags | updatetag_artifactid |\n| Update Artifact| updateartifact_id |\n| Update List | updatelist_listname|\n\n> **_NOTE:_**  The body parameters for the requests have not been mentioned in the above table. Please set them as per your requirements. Refer the documentation of individual requests.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Import & Export Container",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const importexportcontainer_containerid = pm.variables.get(\"importexportcontainer_containerid\")",
+							"if(importexportcontainer_containerid){",
+							"            const export_baseurl = pm.variables.get(\"export_baseurl\")",
+							"            const request = {",
+							"                url: `https://${export_baseurl}/rest/container/${importexportcontainer_containerid}`,",
+							"                method: \"get\",",
+							"                header: {",
+							"                    'Authorization': `Basic ${pm.environment.get('authCreds')}`,",
+							"                    'Content-Type': 'application/json',",
+							"                },",
+							"            }",
+							"        pm.sendRequest(request, (err, response) => {",
+							"            if (err) throw new Error(err)",
+							"            else pm.variables.set(\"container_data\", response.json());",
+							"        });",
+							"}else{",
+							"    throw new Error(\"Please set importexportcontainer_containerid variable from collections variables\")",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{container_data}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/rest/container",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"rest",
+						"container"
+					]
+				},
+				"description": "This action uses the below mentioned API calls.\n\n1) Import Artifacts: for Import the Artifacts\n\n2) Export Artifact: for Export the Artifacts"
+			},
+			"response": []
+		},
+		{
+			"name": "Import & Export Artifacts",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const importexportartifact_artifactid = pm.variables.get(\"importexportartifact_artifactid\")",
+							"if(importexportartifact_artifactid){",
+							"    const export_baseurl = pm.variables.get(\"export_baseurl\")",
+							"            const request = {",
+							"                url: `https://${export_baseurl}/rest/container/${importexportartifact_artifactid}/artifacts`,",
+							"                method: \"get\",",
+							"                header: {",
+							"                    'Authorization': `Basic ${pm.environment.get('authCreds')}`,",
+							"                    'Content-Type': 'application/json',",
+							"                },",
+							"            }",
+							"        pm.sendRequest(request, (err, response) => {",
+							"            if (err) throw new Error(err)",
+							"            else pm.variables.set(\"artifacts_data\", response.json().data);",
+							"            console.log(pm.variables.get(\"artifacts_data\"))",
+							"        });",
+							"}else{",
+							"    throw new Error(\"Please set importexportartifact_artifactid variable from the collection variables\")",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{{artifacts_data}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/rest/artifact",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"rest",
+						"artifact"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deflate item",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"_filter_vault_document__hash\": \"{{vault_id}}\", \"page_size\": {{page_size}}, \"pretty\": \"\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/rest/container_attachment",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"rest",
+						"container_attachment"
+					]
+				},
+				"description": "This action gets the attachment using above api call. It then extracts all the files from the given compressed file. The extracted file directly added to the vault using add_file_to_vault method."
+			},
+			"response": []
+		},
+		{
+			"name": "Create Container",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"status\": \"{{status}}\", \"severity\": \"{{severity}}\", \"label\": \"{{label}}\", \"name\": \"{{name}}\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/rest/container",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"rest",
+						"container"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Artifact",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"{{name}}\",\n    \"label\": \"{{lable}}\",\n    \"container_id\": {{id}},\n    \"cef\": {{cef}},\n    \"cef_types\": {{cef_types}},\n    \"source_data_identifier\": \"{{source}}\",\n    \"run_automation\": {{boolean}}\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/rest/artifact",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"rest",
+						"artifact"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Action Result",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"_filter_action\": \"{{action}}\", \"include_expensive\":\"\", \"sort\": \"{{sort}}\", \"order\": \"{{order}}\", \"page_size\": {{page_size}}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/rest/app_run",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"rest",
+						"app_run"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find Artifacts",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/rest/artifact?_filter_cef__icontains={{filtervalue}}&page_size={{pagesize}}&pretty",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"rest",
+						"artifact"
+					],
+					"query": [
+						{
+							"key": "_filter_cef__icontains",
+							"value": "{{filtervalue}}"
+						},
+						{
+							"key": "page_size",
+							"value": "{{pagesize}}"
+						},
+						{
+							"key": "pretty",
+							"value": ""
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Listitem",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const addListitem_listname = pm.variables.get(\"addListitem_listname\")",
+							"const addListitem_content = pm.variables.get(\"addListitem_content\")",
+							"if(!(addListitem_listname && addListitem_content)){",
+							"    throw new Error(\"Please set Required variables from collection variables\")",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Successfully Added List\", function () {",
+							"    if (pm.response.code == 404) { ",
+							"        if(pm.response.json().hasOwnProperty(\"message\")){",
+							"            const base_url = pm.variables.get(\"base_url\")",
+							"            const addListitem_listname = pm.variables.get(\"addListitem_listname\")",
+							"            const addListitem_content = pm.variables.get(\"addListitem_content\")",
+							"            const request = {",
+							"                url: `https://${base_url}/rest/decided_list`,",
+							"                method: \"post\",",
+							"                header: {",
+							"                    'Authorization': `Basic ${pm.environment.get('authCreds')}`,",
+							"                    'Content-Type': 'application/json',",
+							"                },",
+							"                body: JSON.stringify({",
+							"                    'content': [addListitem_content], ",
+							"                    'name': addListitem_listname",
+							"                })",
+							"            }",
+							"        pm.sendRequest(request, (err) => {",
+							"            if (err) throw new Error(err)    ",
+							"            pm.response.to.have.status(404)",
+							"        });",
+							"    }",
+							"}",
+							"});",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"content\": [{{AddListitem_content}}], \"name\": \"{{AddListitem_listname}}\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/rest/decided_list/{{addListitem_listname}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"rest",
+						"decided_list",
+						"{{addListitem_listname}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Notes",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"container_id\": {{container_id}}, \"title\": {{title}}, \"content\": {{content}}, \"note_type\": {{general}}, \"phase\": {{phase}}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/rest/note",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"rest",
+						"note"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Artifact tags",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const base_url = pm.variables.get(\"base_url\")",
+							"const updatetag_artifactid = pm.variables.get(\"updatetag_artifactid\")",
+							"",
+							"if(UpdateTag_artifactid){",
+							"    ",
+							"    const request = {",
+							"        url: `https://${base_url}/rest/artifact/${updatetag_artifactid}`,",
+							"        method: \"get\",",
+							"        header: {",
+							"            'Authorization': `Basic ${pm.environment.get('authCreds')}`,",
+							"            'Content-Type': 'application/json',",
+							"        }",
+							"    }",
+							"    pm.sendRequest(request, (err, response) => {",
+							"        if (err) throw new Error(err)",
+							"        else{",
+							"            if(response.json().hasOwnProperty(\"message\")) throw new Error(response.json().message)",
+							"        }",
+							"    });",
+							"}else{",
+							"    throw new Error(\"Please set updatetag_artifactid variable from collection variables\")",
+							"}",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followAuthorizationHeader": true
+			},
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"tags\": [\"{{tags}}\"], \"label\": \"{{label}}\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/rest/artifact/{{updatetag_artifactid}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"rest",
+						"artifact",
+						"{{updatetag_artifactid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Artifacts",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const base_url = pm.variables.get(\"base_url\")",
+							"const updateartifact_id = pm.variables.get(\"updateartifact_id\")",
+							"",
+							"if(updateartifact_id){",
+							"    ",
+							"    const request = {",
+							"        url: `https://${base_url}/rest/artifact/${updateartifact_id}`,",
+							"        method: \"get\",",
+							"        header: {",
+							"            'Authorization': `Basic ${pm.environment.get('authCreds')}`,",
+							"            'Content-Type': 'application/json',",
+							"        }",
+							"    }",
+							"    pm.sendRequest(request, (err, response) => {",
+							"        if (err) throw new Error(err)",
+							"        else{",
+							"            if(response.json().hasOwnProperty(\"message\")) throw new Error(response.json().message)",
+							"        }      ",
+							"    });",
+							"}else{",
+							"    throw new Error(\"Please set updateartifact_id variable from collection variables\")",
+							"   ",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"name\": \"{{name}}\",\n    \"label\": \"{{lable}}\",\n    \"severity\": \"{{severity}}\",\n    \"cef\": \"{{cef_json}}\",\n    \"cef_types\": \"{{cef_type_json}}\",\n    \"tags\": [\n        \"{{tag1}}\"\n    ],\n    \"source_data_identifier\": \"{{playbook}}\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/rest/artifact/{{updateartifact_id}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"rest",
+						"artifact",
+						"{{updateartifact_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Find Listitem",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const findlistitem_listname = pm.variables.get(\"findlistitem_listname\")",
+							"if(!findlistitem_listname){",
+							"    throw new Error(\"Please set findlistitem_listname variable from the collection variables\")",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/rest/decided_list/{{findlistitem_listname}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"rest",
+						"decided_list",
+						"{{findlistitem_listname}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update List",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const updatelist_listname = pm.variables.get(\"updatelist_listname\")",
+							"if(!updatelist_listname){",
+							"    throw new Error(\"Please set updatelist_listname variable from the collection variables\")",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"update_rows\": {\"0\": [\"{{details}}\"]}}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{base_url}}/rest/decided_list/{{updatelist_listname}}",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"rest",
+						"decided_list",
+						"{{updatelist_listname}}"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "basic",
+		"basic": [
+			{
+				"key": "password",
+				"value": "",
+				"type": "string"
+			},
+			{
+				"key": "username",
+				"value": "",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"var CryptoJS = require(\"crypto-js\")",
+					"var base_url = pm.variables.get(\"base_url\")",
+					"var username = pm.environment.get('username')",
+					"var password = pm.environment.get('password')",
+					"",
+					"if(!(username && password))  throw new Error(\"Please set username and password in environment variables\")",
+					"if(!base_url) throw new Error(\"Please set base_url varible from collections variables\")",
+					"",
+					"let credsParsed = CryptoJS.enc.Utf8.parse(`${pm.environment.get('username')}:${pm.environment.get('password')}`);",
+					"let credsEncoded = CryptoJS.enc.Base64.stringify(credsParsed);",
+					"pm.environment.set('authCreds', credsEncoded);",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": ""
+		},
+		{
+			"key": "updatetag_artifactid",
+			"value": ""
+		},
+		{
+			"key": "updateartifact_id",
+			"value": ""
+		},
+		{
+			"key": "addlistitem_listname",
+			"value": ""
+		},
+		{
+			"key": "addlistitem_content",
+			"value": ""
+		},
+		{
+			"key": "importexportcontainer_containerid",
+			"value": ""
+		},
+		{
+			"key": "export_baseurl",
+			"value": ""
+		},
+		{
+			"key": "importexportartifact_artifactid",
+			"value": ""
+		},
+		{
+			"key": "filtervalue",
+			"value": ""
+		},
+		{
+			"key": "pagesize",
+			"value": ""
+		},
+		{
+			"key": "findlistitem_listname",
+			"value": ""
+		},
+		{
+			"key": "updatelist_listname",
+			"value": ""
+		},
+		{
+			"value": "",
+			"disabled": true
+		}
+	]
+}
