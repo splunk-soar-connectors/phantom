@@ -3,5 +3,6 @@ exclude_files.txt
 Makefile
 .git*
 .gitlab-ci.yml
-whitesource-results
+whitesource*
+gl-*.csv
 *.postman_collection.json
