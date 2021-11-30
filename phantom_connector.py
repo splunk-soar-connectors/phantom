@@ -1044,7 +1044,8 @@ class PhantomConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Failed to add one or more artifacts")
         return phantom.APP_SUCCESS
 
-    def _create_container_copy(self, action_result, container_id, destination, source, source_local=False, destination_local=False, keep_owner=False):
+    def _create_container_copy(self, action_result, container_id, destination, source, source_local=False,
+                               destination_local=False, keep_owner=False, run_automation=True, label=None):
         """ destination: where new container is being made """
         """ source: where the original container is """
         """ Create a copy of this existing container, including all of its artifacts """
@@ -1067,7 +1068,8 @@ class PhantomConnector(BaseConnector):
         container.pop('ingest_app')
         container.pop('tenant')
         container.pop('id')
-
+        if label:
+            container['label'] = label
         if keep_owner:
             container['owner_id'] = container.pop('owner')
         else:
@@ -1120,7 +1122,7 @@ class PhantomConnector(BaseConnector):
                 artifact['run_automation'] = False
                 artifact['container_id'] = new_container_id
                 artifact['owner_id'] = artifact.pop('owner')
-            artifacts[-1]['run_automation'] = True
+            artifacts[-1]['run_automation'] = run_automation
 
             self._base_uri = destination
             ret_val = self._add_artifact_list(action_result, artifacts, ignore_auth=destination_local)
@@ -1187,6 +1189,8 @@ class PhantomConnector(BaseConnector):
     def _export_container(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
+        label = param.get('label')
+        run_automation = param.get('run_automation', True)
 
         container_id = param.get('container_id')
         ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')
@@ -1196,7 +1200,8 @@ class PhantomConnector(BaseConnector):
         destination = self._base_uri
         source = self.get_phantom_base_url()
 
-        return self._create_container_copy(action_result, container_id, destination, source, source_local=True, keep_owner=param.get('keep_owner', False))
+        return self._create_container_copy(action_result, container_id, destination, source, source_local=True, keep_owner=param.get('keep_owner', False),
+                                           run_automation=run_automation, label=label)
 
     def _import_container(self, param):
 
