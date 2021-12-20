@@ -32,3 +32,4 @@ PHANTOM_ERR_UNABLE_RETRIEVE_ID = "Unable to retrieve ID of newly created contain
 PHANTOM_ERR_ACTION_RESULT_NOT_FOUND = "No action results found matching given criteria"
 PHANTOM_ERR_NON_EMPTY_PARAM_VALUE = "Please provide row_values_as_list parameter as a non-empty JSON formatted list"
 PHANTOM_ERR_SPECIFY_IP_HOSTNAME = "Accessing 127.0.0.1 is not allowed. Please specify the actual IP or hostname used by the Phantom instance in the Asset config"
+PHANTOM_ERR_GET_VAULT_INFO = "Failed to get the vault info: {}"

@@ -235,7 +235,8 @@ class PhantomConnector(BaseConnector):
                 del headers['ph-auth-token']
 
         try:
-            response = request_func(self._base_uri + endpoint,
+            url = '{0}{1}'.format(self._base_uri, endpoint)
+            response = request_func(url,
                     auth=auth,
                     json=data,
                     headers=headers if (headers) else None,
@@ -707,7 +708,7 @@ class PhantomConnector(BaseConnector):
 
         # PAPP-9543 append a random string to the filename to make concurrent action runs succeed
         random_suffix = '_' + ''.join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16))
-        save_as = save_as + random_suffix
+        save_as = '{0}{1}'.format(save_as, random_suffix)
 
         # if the path contains a directory
         if (os.path.dirname(save_as)):
@@ -750,24 +751,18 @@ class PhantomConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault: {0}".format(message))
 
         try:
-            query_params = {
-                '_filter_vault_document__hash': '"{}"'.format(vault_id.lower()),
-                'page_size': 0,
-                'pretty': ''
-            }
-            ret_val, response, resp_data = self._make_rest_call('/rest/container_attachment', action_result, params=query_params)
+            success, message, resp_data = ph_rules.vault_info(vault_id=vault_id.lower())
 
-            for resp_element in resp_data['data']:
+            if not success:
+                return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_GET_VAULT_INFO.format(message))
+
+            for resp_element in resp_data:
                 resp_filename = resp_element['name']
 
                 if file_name == resp_filename:
                     vault_info = resp_element
                     break
 
-            for k in list(vault_info.keys()):
-                if k.startswith('_pretty_'):
-                    name = k[8:]
-                    vault_info[name] = vault_info.pop(k)
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Failed to retrieve info about file added to vault {}".format(self._get_error_message_from_exception(e)))
 
@@ -886,26 +881,17 @@ class PhantomConnector(BaseConnector):
             return action_result.get_status()
 
         try:
-            query_params = {
-                '_filter_vault_document__hash': '"{}"'.format(vault_id),
-                'page_size': 1,
-                'pretty': ''
-            }
-            ret_val, response, resp_data = self._make_rest_call('/rest/container_attachment', action_result, params=query_params)
+            success, message, vault_info = ph_rules.vault_info(vault_id=vault_id)
 
-            if phantom.is_fail(ret_val):
-                return action_result.get_status()
+            if not success:
+                return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_GET_VAULT_INFO.format(message))
 
-            if resp_data.get("count") == 0:
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred while accessing the vault ID. Please verify the provided vault ID in the action parameter")
+            vault_info = list(vault_info)[0]
 
-            vault_info = resp_data['data'][0]
-            for k in list(vault_info.keys()):
-                if k.startswith('_pretty_'):
-                    name = k[8:]
-                    vault_info[name] = vault_info.pop(k)
             file_path = vault_info['path']
             file_name = vault_info['name']
+        except IndexError:
+            return action_result.set_status(phantom.APP_ERROR, "Error occurred while accessing the vault ID. Please verify the provided vault ID in the action parameter")
         except Exception as e:
             return action_result.set_status(phantom.APP_ERROR, "Failed to get vault item info: {}".format(self._get_error_message_from_exception(e)))
 
@@ -1523,6 +1509,7 @@ if __name__ == '__main__':
 
     import pudb
     import argparse
+    import sys
 
     pudb.set_trace()
 
@@ -1547,7 +1534,8 @@ if __name__ == '__main__':
     if (username and password):
         try:
             print("Accessing the Login page")
-            r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
+            login_url = '{}login'.format(BaseConnector._get_phantom_base_url())
+            r = requests.get(login_url, verify=False)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -1556,15 +1544,15 @@ if __name__ == '__main__':
             data['csrfmiddlewaretoken'] = csrftoken
 
             headers = dict()
-            headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
+            headers['Cookie'] = 'csrftoken={}'.format(csrftoken)
+            headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
+            r2 = requests.post(login_url, verify=False, data=data, headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print("Unable to get session id from the platfrom. Error: " + str(e))
-            exit(1)
+            print("Unable to get session id from the platfrom. Error: {}".format(str(e)))
+            sys.exit(1)
 
     with open(args.input_test_json) as f:
         in_json = f.read()
@@ -1581,4 +1569,4 @@ if __name__ == '__main__':
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
-    exit(0)
+    sys.exit(0)
