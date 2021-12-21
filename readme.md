@@ -14,25 +14,25 @@
 [comment]: # ""
 The auth_token config parameter is for use with Phantom instances. If both the token and
 username/password are given, the username and password will be used to authenticate to the Phantom
-instance.  
-  
+instance.
+
 Note that the IP (or name) being used must match the allowed IP in the remote Phantom instance's
-REST asset configuration.  
-  
+REST asset configuration.
+
 In case the **phantom_server** configuration parameter is set to the current Phantom instance, i.e.,
 the Phantom server through which the app is being used, then the **verify_certificate** should be
-set to False in the asset configuration.  
-  
+set to False in the asset configuration.
+
 For information on how to obtain an authorization token, see Provisioning an Authorization Token in
-the Phantom REST Overview documentation.  
-  
+the Phantom REST Overview documentation.
+
 If the value provided in the **phantom_server** configuration parameter is 0.0.0.0 then the **test
 connectivity** passes successfully and the actions will run on the current phantom instance, i.e.,
-the server through which the app is being used.  
-  
+the server through which the app is being used.
+
 See [KB article 7](https://my.phantom.us/kb/7/) and [KB article 16](https://my.phantom.us/kb/16/) on
-how to create and verify a valid HTTPS certificate for your Phantom instance.  
-  
+how to create and verify a valid HTTPS certificate for your Phantom instance.
+
 For security reasons, accessing 127.0.0.1 is not allowed.
 
 ## Playbook Backward Compatibility
@@ -42,7 +42,7 @@ For security reasons, accessing 127.0.0.1 is not allowed.
     corresponding action blocks or by providing appropriate values to these action parameters to
     ensure the correct functioning of the playbooks created on the earlier versions of the app.
 
-      
+
 
     -   Update List - The **row_values_as_list** parameter, has been changed from the
         comma-separated new values to a JSON formatted list of new values. This will allow the user
@@ -53,7 +53,7 @@ For security reasons, accessing 127.0.0.1 is not allowed.
         string) or a JSON dictionary, with the keys matching the keys of the **cef_dictionary** and
         the values being lists of possible contains for the CEF field. In case, the **contains**
         parameter is a string(or a comma-separated list of string), the provided value will map to
-        the **cef_name** parameter.  
+        the **cef_name** parameter.
         The output datapaths, **action_result.summary.artifact id** and
         **action_result.summary.container id** have been replaced with
         **action_result.summary.artifact_id** and **action_result.summary.container_id** ,
@@ -67,7 +67,7 @@ For security reasons, accessing 127.0.0.1 is not allowed.
 
     -   Update Artifact Tags - The following output datapaths have been added:
 
-          
+
 
         -   action_result.summary.tags_added
         -   action_result.summary.tags_already_absent
@@ -78,7 +78,7 @@ For security reasons, accessing 127.0.0.1 is not allowed.
         your existing playbooks according to the new parameters. Below is the list of the added
         parameters:
 
-          
+
 
         -   name: Artifact name (Always overwrites, if provided)
         -   label: Artifact label (Always overwrites, if provided)
