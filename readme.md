@@ -91,6 +91,14 @@ For security reasons, accessing 127.0.0.1 is not allowed.
 
         For further details, check the **update artifact** section.
 
+## Port Information
+The app uses HTTP/ HTTPS protocol for communicating with the ServiceNow server. Below are the default ports used by Splunk SOAR.
+
+SERVICE NAME | TRANSPORT PROTOCOL | PORT
+------------ | ------------------ | ----
+**http** | tcp | 80
+**https** | tcp | 443
+
 ## Known Issues
 
 -   The **find listitem** action is unable to fetch the list, where the **list name** contains a
