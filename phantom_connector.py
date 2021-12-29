@@ -631,7 +631,7 @@ class PhantomConnector(BaseConnector):
         cef_name = param.get('cef_name')
         cef_value = param.get('cef_value')
         cef_dict = param.get('cef_dictionary')
-        run_automation = param.get('run_automation', True)
+        run_automation = param.get('run_automation', False)
 
         ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')
         if phantom.is_fail(ret_val):
@@ -1205,7 +1205,7 @@ class PhantomConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         label = param.get('label')
-        run_automation = param.get('run_automation', True)
+        run_automation = param.get('run_automation', False)
 
         container_id = param.get('container_id')
         ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')

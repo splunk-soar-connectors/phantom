@@ -6,7 +6,7 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.3.4",
+    "app_version": "3.4.0",
     "latest_tested_version": [
         "Splunk Phantom PlatformAPI v5.0.1",
         "SOAR On-prem v5.0.1.66250",
@@ -1211,8 +1211,7 @@
                 "run_automation": {
                     "description": "Run automation on newly created artifact(s) (default: true)",
                     "data_type": "boolean",
-                    "order": 8,
-                    "default": true
+                    "order": 8
                 }
             },
             "render": {
