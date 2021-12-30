@@ -92,7 +92,7 @@ For security reasons, accessing 127.0.0.1 is not allowed.
         For further details, check the **update artifact** section.
 
 ## Port Information
-The app uses HTTP/ HTTPS protocol for communicating with the ServiceNow server. Below are the default ports used by Splunk SOAR.
+The app uses HTTP/ HTTPS protocol for communicating with the Phantom server. Below are the default ports used by Splunk SOAR.
 
 SERVICE NAME | TRANSPORT PROTOCOL | PORT
 ------------ | ------------------ | ----
