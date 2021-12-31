@@ -1,6 +1,6 @@
 # File: phantom_connector.py
 #
-# Copyright (c) 2016-2021 Splunk Inc.
+# Copyright (c) 2016-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -716,7 +716,7 @@ class PhantomConnector(BaseConnector):
         save_as = file_name or '_invalid_file_name_'
 
         # PAPP-9543 append a random string to the filename to make concurrent action runs succeed
-        random_suffix = '_' + ''.join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16))
+        random_suffix = '_{}'.format(''.join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16)))
         save_as = '{0}{1}'.format(save_as, random_suffix)
 
         # if the path contains a directory
@@ -1563,7 +1563,7 @@ if __name__ == '__main__':
         try:
             print("Accessing the Login page")
             login_url = '{}login'.format(BaseConnector._get_phantom_base_url())
-            r = requests.get(login_url, verify=verify, timeout=60)
+            r = requests.get(login_url, verify=verify)  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -1576,7 +1576,8 @@ if __name__ == '__main__':
             headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=verify, data=data, headers=headers, timeout=60)
+            r2 = requests.post(login_url, verify=verify, data=data,  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+                            headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platfrom. Error: {}".format(str(e)))
