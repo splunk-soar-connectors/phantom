@@ -1209,8 +1209,9 @@
                     "order": 7
                 },
                 "run_automation": {
-                    "description": "Run automation on newly created artifact(s) (default: true)",
+                    "description": "Run automation on newly created artifact(s) (default: false)",
                     "data_type": "boolean",
+                    "default": false,
                     "order": 8
                 }
             },

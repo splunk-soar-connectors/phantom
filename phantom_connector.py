@@ -486,8 +486,9 @@ class PhantomConnector(BaseConnector):
             return action_result.set_status(phantom.APP_ERROR, msg)
 
         action_result.set_summary({'tags_added': ', '.join((list(add_tags - tags_already_added))),
-        'tags_removed': ', '.join((list(remove_tags - tags_already_removed))),
-         'tags_already_present': ', '.join((list(tags_already_added))), 'tags_already_absent': ', '.join((list(tags_already_removed)))})
+                                'tags_removed': ', '.join((list(remove_tags - tags_already_removed))),
+                                'tags_already_present': ', '.join((list(tags_already_added))),
+                                'tags_already_absent': ', '.join((list(tags_already_removed)))})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
