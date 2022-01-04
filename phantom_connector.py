@@ -1,6 +1,6 @@
 # File: phantom_connector.py
 #
-# Copyright (c) 2016-2021 Splunk Inc.
+# Copyright (c) 2016-2022 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,38 +15,35 @@
 #
 #
 # Phantom imports
+import ast
+import bz2
+import datetime
+import gzip
+import json
+import os
+import random
+import socket
+import string
+import tarfile
+import time
+import zipfile
+
+import magic
+import requests
+from bs4 import BeautifulSoup
+from requests.exceptions import SSLError, Timeout
+
 import phantom.app as phantom
-
-from phantom.base_connector import BaseConnector
-from phantom.action_result import ActionResult
-
-from phantom.cef import CEF_NAME_MAPPING
-from phantom.cef import CEF_JSON
-from phantom.utils import CONTAINS_VALIDATORS
-import phantom.utils as ph_utils
 import phantom.rules as ph_rules
+import phantom.utils as ph_utils
+from phantom.action_result import ActionResult
+from phantom.base_connector import BaseConnector
+from phantom.cef import CEF_JSON, CEF_NAME_MAPPING
+from phantom.utils import CONTAINS_VALIDATORS
 from phantom.vault import Vault
-
 # Constants imports
 from phantom_consts import *
 
-import ast
-import json
-import requests
-from requests.exceptions import Timeout, SSLError
-
-import socket
-from bs4 import BeautifulSoup
-import os
-import zipfile
-import magic
-import tarfile
-import gzip
-import bz2
-import datetime
-import time
-import random
-import string
 try:
     from urllib.parse import quote
 except Exception:
@@ -148,7 +145,8 @@ class PhantomConnector(BaseConnector):
         try:
             resp_json = response.json()
         except Exception as e:
-            return RetVal3(action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_PARSE_JSON_RESPONSE.format(self._get_error_message_from_exception(e))), response)
+            return RetVal3(action_result.set_status(phantom.APP_ERROR,
+                        PHANTOM_ERR_PARSE_JSON_RESPONSE.format(self._get_error_message_from_exception(e))), response)
 
         if isinstance(resp_json, list):
             # Let's not parse it here
@@ -156,12 +154,12 @@ class PhantomConnector(BaseConnector):
 
         failed = resp_json.get('failed', False)
 
-        if (failed):
+        if failed:
             return RetVal3(
                     action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_SERVER.format(response.status_code,
                         self._get_error_details(resp_json))), response)
 
-        if (200 <= response.status_code < 399):
+        if 200 <= response.status_code < 399:
             return RetVal3(phantom.APP_SUCCESS, response, resp_json)
 
         return RetVal3(
@@ -172,7 +170,7 @@ class PhantomConnector(BaseConnector):
 
         # store the r_text in debug data, it will get dumped in the logs if an error occurs
         if hasattr(action_result, 'add_debug_data'):
-            if (response is not None):
+            if response is not None:
                 action_result.add_debug_data({'r_text': response.text})
                 action_result.add_debug_data({'r_headers': response.headers})
                 action_result.add_debug_data({'r_status_code': response.status_code})
@@ -183,7 +181,7 @@ class PhantomConnector(BaseConnector):
         if (('json' in response.headers.get('Content-Type', '')) or ('javascript' in response.headers.get('Content-Type'))):
             return self._process_json_response(response, action_result)
 
-        if ('html' in response.headers.get('Content-Type', '')):
+        if 'html' in response.headers.get('Content-Type', ''):
             return self._process_html_response(response, action_result)
 
         # it's not an html or json, handle if it is a successfull empty reponse
@@ -201,14 +199,15 @@ class PhantomConnector(BaseConnector):
         config = self.get_config()
 
         # Create the headers
-        if (headers is None):
+        if headers is None:
             headers = {}
 
         if headers:
             try:
                 headers = json.loads(headers)
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Unable to load headers as JSON: {}".format(self._get_error_message_from_exception(e)))
+                return action_result.set_status(phantom.APP_ERROR,
+                            "Unable to load headers as JSON: {}".format(self._get_error_message_from_exception(e)))
 
         # auth_token is a bit tricky, it can be in the params or config
         auth_token = config.get('auth_token')
@@ -216,12 +215,12 @@ class PhantomConnector(BaseConnector):
         if ((auth_token) and ('ph-auth-token' not in headers)):
             headers['ph-auth-token'] = auth_token
 
-        if ('Content-Type' not in headers):
+        if 'Content-Type' not in headers:
             headers.update({'Content-Type': 'application/json'})
 
         request_func = getattr(requests, method)
 
-        if (not request_func):
+        if not request_func:
             action_result.set_status(phantom.APP_ERROR, "Unsupported HTTP method '{0}' requested".format(method))
 
         auth = self._auth
@@ -229,26 +228,30 @@ class PhantomConnector(BaseConnector):
         # To avoid '//' in the URL(due to self._base_uri + endpoint)
         self._base_uri = self._base_uri.strip('/')
 
-        if (ignore_auth):
+        if ignore_auth:
             auth = None
-            if ('ph-auth-token' in headers):
+            if 'ph-auth-token' in headers:
                 del headers['ph-auth-token']
 
         try:
-            response = request_func(self._base_uri + endpoint,
+            url = '{0}{1}'.format(self._base_uri, endpoint)
+            response = request_func(url,
                     auth=auth,
                     json=data,
-                    headers=headers if (headers) else None,
+                    headers=headers if headers else None,
                     verify=False if ignore_auth else self._verify_cert,
                     params=params,
                     timeout=TIMEOUT)
 
         except Timeout as e:
-            return RetVal3(action_result.set_status(phantom.APP_ERROR, "Request timed out: {}".format(self._get_error_message_from_exception(e))), None, None)
+            return RetVal3(action_result.set_status(phantom.APP_ERROR,
+                        "Request timed out: {}".format(self._get_error_message_from_exception(e))), None, None)
         except SSLError as e:
-            return (action_result.set_status(phantom.APP_ERROR, "HTTPS SSL validation failed: {}".format(self._get_error_message_from_exception(e))), None, None)
+            return (action_result.set_status(phantom.APP_ERROR,
+                        "HTTPS SSL validation failed: {}".format(self._get_error_message_from_exception(e))), None, None)
         except Exception as e:
-            return (action_result.set_status(phantom.APP_ERROR, "Error connecting to server. Error Details: {}".format(self._get_error_message_from_exception(e))), None, None)
+            return (action_result.set_status(phantom.APP_ERROR,
+                        "Error connecting to server. Error Details: {}".format(self._get_error_message_from_exception(e))), None, None)
 
         return self._process_response(response, action_result)
 
@@ -258,7 +261,7 @@ class PhantomConnector(BaseConnector):
 
         ret_val, response, resp_data = self._make_rest_call('/rest/version', action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed")
             return action_result.set_status(phantom.APP_ERROR, 'Failed to connect: {}'.format(action_result.get_message()))
 
@@ -283,13 +286,15 @@ class PhantomConnector(BaseConnector):
         try:
             clean_json = json.loads(dirty_json)
             if not clean_json:
-                action_result.set_status(phantom.APP_ERROR, "Please provide a non-empty JSON in {parameter} parameter".format(parameter=parameter))
+                action_result.set_status(phantom.APP_ERROR,
+                        "Please provide a non-empty JSON in {parameter} parameter".format(parameter=parameter))
                 return None
             if not isinstance(clean_json, dict):
                 action_result.set_status(phantom.APP_ERROR, "Please provide {parameter} parameter in JSON format".format(parameter=parameter))
                 return None
         except Exception as e:
-            action_result.set_status(phantom.APP_ERROR, "Could not load JSON from {parameter} parameter".format(parameter=parameter), self._get_error_message_from_exception(e))
+            action_result.set_status(phantom.APP_ERROR,
+                        "Could not load JSON from {parameter} parameter".format(parameter=parameter), self._get_error_message_from_exception(e))
             return None
 
         return clean_json
@@ -313,7 +318,8 @@ class PhantomConnector(BaseConnector):
         # Check if at least one of the following parameters have been supplied:
         if not any((name, label, severity, cef_json, cef_types_json, tags, art_json)):
             req_params = 'name, label, severity, cef_json, cef_types_json, tags, artifact_json'
-            return action_result.set_status(phantom.APP_ERROR, 'At least one of the following parameters are required to update an artifact: {}'.format(req_params))
+            return action_result.set_status(phantom.APP_ERROR,
+                    'At least one of the following parameters are required to update an artifact: {}'.format(req_params))
 
         endpoint = "/rest/artifact/{}".format(artifact_id)
 
@@ -434,7 +440,7 @@ class PhantomConnector(BaseConnector):
         # First get the artifacts json
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress("Unable to get artifact, please check the artifact id")
             return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_GET_ARTIFACT.format(action_result.get_message()))
 
@@ -472,15 +478,17 @@ class PhantomConnector(BaseConnector):
         # Post our changes
         ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=art_data, method="post")
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             self.save_progress("Unable to modify artifact")
             msg = PHANTOM_ERR_UPDATE_ARTIFACT.format(action_result.get_message())
             if not resp_label:
                 msg = "{}. {}".format("The reason of the failure can be the unavailability of the label in the provided artifact", msg)
             return action_result.set_status(phantom.APP_ERROR, msg)
 
-        action_result.set_summary({'tags_added': ', '.join((list(add_tags - tags_already_added))), 'tags_removed': ', '.join((list(remove_tags - tags_already_removed))),
-         'tags_already_present': ', '.join((list(tags_already_added))), 'tags_already_absent': ', '.join((list(tags_already_removed)))})
+        action_result.set_summary({'tags_added': ', '.join((list(add_tags - tags_already_added))),
+                                'tags_removed': ', '.join((list(remove_tags - tags_already_removed))),
+                                'tags_already_present': ', '.join((list(tags_already_added))),
+                                'tags_already_absent': ', '.join((list(tags_already_removed)))})
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
@@ -551,7 +559,8 @@ class PhantomConnector(BaseConnector):
         if cef_key and exact_match:
             endpoint = '/rest/artifact?_filter_cef__{}={}&page_size=0&pretty'.format(quote(cef_key, safe=''), repr(url_enc_values))
         elif cef_key:
-            endpoint = '/rest/artifact?_filter_cef__{}__{}={}&page_size=0&pretty'.format(quote(cef_key, safe=''), "icontains", repr(url_enc_values))
+            endpoint = '/rest/artifact?_filter_cef__{}__{}={}&page_size=0&pretty'.format(quote(cef_key, safe=''),
+                                                                                        "icontains", repr(url_enc_values))
         else:
             endpoint = '/rest/artifact?_filter_cef__{}={}&page_size=0&pretty'.format("icontains", repr(url_enc_values))
 
@@ -584,12 +593,13 @@ class PhantomConnector(BaseConnector):
                     # perform str() operation on even the already string/basestring data.
                     # This works for every situation except for the unicode characters for which it will fail.
                     # Hence, we are avoiding the str() on already string/basestring formatted data.
-                    if (isinstance(curr_value, dict)):
+                    if isinstance(curr_value, dict):
                         curr_value = json.dumps(curr_value)
-                    if (not isinstance(curr_value, str)):  # For python 3
+                    if not isinstance(curr_value, str):  # For python 3
                         curr_value = str(curr_value)
                 except Exception as e:
-                    return action_result.set_status(phantom.APP_ERROR, 'Error occurred while processing the artifacts data: {}'.format(self._get_error_message_from_exception(e)))
+                    return action_result.set_status(phantom.APP_ERROR,
+                            'Error occurred while processing the artifacts data: {}'.format(self._get_error_message_from_exception(e)))
 
                 if values in curr_value.lower() or (exact_match and values.strip('"') == curr_value.lower()):
                     key = k
@@ -622,7 +632,7 @@ class PhantomConnector(BaseConnector):
         cef_name = param.get('cef_name')
         cef_value = param.get('cef_value')
         cef_dict = param.get('cef_dictionary')
-        run_automation = param.get('run_automation', True)
+        run_automation = param.get('run_automation', False)
 
         ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')
         if phantom.is_fail(ret_val):
@@ -638,7 +648,8 @@ class PhantomConnector(BaseConnector):
                 if not isinstance(loaded_cef, dict):
                     return action_result.set_status(phantom.APP_ERROR, "Please provide cef_dictionary parameter in JSON format")
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Could not load JSON from CEF parameter: {}".format(self._get_error_message_from_exception(e)))
+                return action_result.set_status(phantom.APP_ERROR,
+                                "Could not load JSON from CEF parameter: {}".format(self._get_error_message_from_exception(e)))
 
         if contains:
             try:
@@ -688,7 +699,7 @@ class PhantomConnector(BaseConnector):
         if not resp_data:
             return action_result.get_status()
 
-        if (phantom.is_fail(success)):
+        if phantom.is_fail(success):
             artifact_id = resp_data.get('existing_artifact_id')
             if not artifact_id:
                 return action_result.get_status()
@@ -706,11 +717,11 @@ class PhantomConnector(BaseConnector):
         save_as = file_name or '_invalid_file_name_'
 
         # PAPP-9543 append a random string to the filename to make concurrent action runs succeed
-        random_suffix = '_' + ''.join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16))
-        save_as = save_as + random_suffix
+        random_suffix = '_{}'.format(''.join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16)))
+        save_as = '{0}{1}'.format(save_as, random_suffix)
 
         # if the path contains a directory
-        if (os.path.dirname(save_as)):
+        if os.path.dirname(save_as):
             save_as = '-'.join(save_as.split(os.sep))
 
         if hasattr(Vault, 'get_vault_tmp_dir'):
@@ -739,41 +750,38 @@ class PhantomConnector(BaseConnector):
                 return (action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to Vault. Error Details:{}".format(
                     self._get_error_message_from_exception(e))))
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error occurred while adding file to Vault. Error Details:{}".format(self._get_error_message_from_exception(e)))
+            return action_result.set_status(phantom.APP_ERROR,
+                            "Error occurred while adding file to Vault. Error Details:{}".format(self._get_error_message_from_exception(e)))
 
         try:
             success, message, vault_id = ph_rules.vault_add(container=container_id, file_location=save_path, file_name=file_name)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault: {}".format(self._get_error_message_from_exception(e)))
+            return action_result.set_status(phantom.APP_ERROR,
+                                        "Failed to add file into vault: {}".format(self._get_error_message_from_exception(e)))
 
         if not success:
             return action_result.set_status(phantom.APP_ERROR, "Failed to add file into vault: {0}".format(message))
 
         try:
-            query_params = {
-                '_filter_vault_document__hash': '"{}"'.format(vault_id.lower()),
-                'page_size': 0,
-                'pretty': ''
-            }
-            ret_val, response, resp_data = self._make_rest_call('/rest/container_attachment', action_result, params=query_params)
+            success, message, resp_data = ph_rules.vault_info(vault_id=vault_id.lower())
 
-            for resp_element in resp_data['data']:
+            if not success:
+                return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_GET_VAULT_INFO.format(message))
+
+            for resp_element in resp_data:
                 resp_filename = resp_element['name']
 
                 if file_name == resp_filename:
                     vault_info = resp_element
                     break
 
-            for k in list(vault_info.keys()):
-                if k.startswith('_pretty_'):
-                    name = k[8:]
-                    vault_info[name] = vault_info.pop(k)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to retrieve info about file added to vault {}".format(self._get_error_message_from_exception(e)))
+            return action_result.set_status(phantom.APP_ERROR,
+                            "Failed to retrieve info about file added to vault {}".format(self._get_error_message_from_exception(e)))
 
         action_result.add_data(vault_info)
 
-        if (recursive):
+        if recursive:
 
             file_path = vault_info['path']
 
@@ -781,7 +789,7 @@ class PhantomConnector(BaseConnector):
 
             file_type = magic.from_file(file_path, mime=True)
 
-            if (file_type not in SUPPORTED_FILES):
+            if file_type not in SUPPORTED_FILES:
                 return (phantom.APP_SUCCESS)
 
             self._extract_file(action_result, file_path, file_name, recursive, container_id)
@@ -792,16 +800,16 @@ class PhantomConnector(BaseConnector):
     def _extract_file(self, action_result, file_path, file_name, recursive, container_id=None):
 
         self._level += 1
-        if (container_id is None):
+        if container_id is None:
             container_id = self.get_container_id()
 
         file_type = magic.from_file(file_path, mime=True)
 
-        if (file_type not in SUPPORTED_FILES):
+        if file_type not in SUPPORTED_FILES:
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
 
         data = None
-        if (file_type == 'application/x-bzip2'):
+        if file_type == 'application/x-bzip2':
             # gz and bz2 don't provide a nice way to test, so trial and error
             try:
                 with bz2.BZ2File(file_path, 'r') as f:
@@ -817,7 +825,7 @@ class PhantomConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_DECOMPRESSING_FILE.format(file_type, action_result.get_message()))
 
-        elif (file_type == 'application/x-gzip' or file_type == 'application/gzip'):
+        elif file_type == 'application/x-gzip' or file_type == 'application/gzip':
             try:
                 with gzip.GzipFile(file_path, 'r') as f:
                     data = f.read()
@@ -832,8 +840,8 @@ class PhantomConnector(BaseConnector):
             if phantom.is_fail(ret_val):
                 return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_DECOMPRESSING_FILE.format(file_type, action_result.get_message()))
 
-        elif (file_type == 'application/zip'):
-            if (not zipfile.is_zipfile(file_path)):
+        elif file_type == 'application/zip':
+            if not zipfile.is_zipfile(file_path):
                 return action_result.set_status(phantom.APP_ERROR, "Unable to deflate zip file")
 
             try:
@@ -851,12 +859,13 @@ class PhantomConnector(BaseConnector):
                         if phantom.is_fail(ret_val):
                             return ret_val
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Unable to open the zip file: {}. Error message:{}".format(file_path, self._get_error_message_from_exception(e)))
+                return action_result.set_status(phantom.APP_ERROR,
+                            "Unable to open the zip file: {}. Error message:{}".format(file_path, self._get_error_message_from_exception(e)))
 
             return (phantom.APP_SUCCESS)
 
         # a tgz is also a tar file, so first extract it and add it to the vault
-        elif (tarfile.is_tarfile(file_path)):
+        elif tarfile.is_tarfile(file_path):
             with tarfile.open(file_path, 'r') as vault_file:
 
                 for member in vault_file.getmembers():
@@ -865,7 +874,8 @@ class PhantomConnector(BaseConnector):
                     if not member.isfile():
                         continue
 
-                    ret_val = self._add_file_to_vault(action_result, vault_file.extractfile(member).read(), os.path.basename(member.name), recursive, container_id)
+                    ret_val = self._add_file_to_vault(action_result, vault_file.extractfile(member).read(),
+                                                    os.path.basename(member.name), recursive, container_id)
 
                     if phantom.is_fail(ret_val):
                         return action_result.set_status(phantom.APP_ERROR, "Error decompressing tar file.")
@@ -886,28 +896,21 @@ class PhantomConnector(BaseConnector):
             return action_result.get_status()
 
         try:
-            query_params = {
-                '_filter_vault_document__hash': '"{}"'.format(vault_id),
-                'page_size': 1,
-                'pretty': ''
-            }
-            ret_val, response, resp_data = self._make_rest_call('/rest/container_attachment', action_result, params=query_params)
+            success, message, vault_info = ph_rules.vault_info(vault_id=vault_id)
 
-            if phantom.is_fail(ret_val):
-                return action_result.get_status()
+            if not success:
+                return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_GET_VAULT_INFO.format(message))
 
-            if resp_data.get("count") == 0:
-                return action_result.set_status(phantom.APP_ERROR, "Error occurred while accessing the vault ID. Please verify the provided vault ID in the action parameter")
+            vault_info = list(vault_info)[0]
 
-            vault_info = resp_data['data'][0]
-            for k in list(vault_info.keys()):
-                if k.startswith('_pretty_'):
-                    name = k[8:]
-                    vault_info[name] = vault_info.pop(k)
             file_path = vault_info['path']
             file_name = vault_info['name']
+        except IndexError:
+            return action_result.set_status(phantom.APP_ERROR,
+                                "Error occurred while accessing the vault ID. Please verify the provided vault ID in the action parameter")
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Failed to get vault item info: {}".format(self._get_error_message_from_exception(e)))
+            return action_result.set_status(phantom.APP_ERROR,
+                                "Failed to get vault item info: {}".format(self._get_error_message_from_exception(e)))
 
         try:
             file_type = magic.from_file(file_path, mime=True)
@@ -916,12 +919,12 @@ class PhantomConnector(BaseConnector):
         except Exception:
             return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_FILE_PATH_NOT_FOUND)
 
-        if (file_type not in SUPPORTED_FILES):
+        if file_type not in SUPPORTED_FILES:
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
 
         ret_val = self._extract_file(action_result, file_path, file_name, param.get('recursive', False), container_id)
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         summary = action_result.update_summary({})
@@ -976,7 +979,7 @@ class PhantomConnector(BaseConnector):
     def _create_list(self, list_name, row, action_result):
 
         try:
-            if type(row) in (str, unicode, int, float, bool):
+            if type(row) in (str, int, float, bool):
                 row = [row]
         except Exception:
             if type(row) in (str, int, float, bool):
@@ -1040,7 +1043,8 @@ class PhantomConnector(BaseConnector):
 
     def _add_artifact_list(self, action_result, artifacts, ignore_auth=False):
         """ Add a list of artifacts """
-        ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifacts, ignore_auth=ignore_auth)
+        ret_val, response, resp_data = self._make_rest_call('/rest/artifact', action_result,
+                                        method='post', data=artifacts, ignore_auth=ignore_auth)
         if phantom.is_fail(ret_val):
             return action_result.set_status(phantom.APP_ERROR, "Error adding artifact: {}".format(action_result.get_message()))
         failed = 0
@@ -1084,12 +1088,13 @@ class PhantomConnector(BaseConnector):
         else:
             container.pop('owner')
 
-        if (destination_local):
+        if destination_local:
             container['asset_id'] = int(self.get_asset_id())
         # container['ingest_app_id'] = container.pop('ingest_app', None)
 
         self._base_uri = destination
-        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result, method='post', data=container, ignore_auth=destination_local)
+        ret_val, response, resp_data = self._make_rest_call('/rest/container', action_result,
+                                method='post', data=container, ignore_auth=destination_local)
 
         if phantom.is_fail(ret_val):
 
@@ -1148,7 +1153,8 @@ class PhantomConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Please provide json formatted dictionary in container_json action parameter")
 
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Error parsing container JSON: {}".format(self._get_error_message_from_exception(e)))
+            return action_result.set_status(phantom.APP_ERROR,
+                                    "Error parsing container JSON: {}".format(self._get_error_message_from_exception(e)))
 
         if artifact_json_list:
             try:
@@ -1160,7 +1166,8 @@ class PhantomConnector(BaseConnector):
                         if not isinstance(artifact, dict):
                             return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_CONTAINER_ARTIFACT)
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR, "Error parsing artifacts list JSON: {}".format(self._get_error_message_from_exception(e)))
+                return action_result.set_status(phantom.APP_ERROR,
+                                "Error parsing artifacts list JSON: {}".format(self._get_error_message_from_exception(e)))
         else:
             artifacts = []
 
@@ -1199,7 +1206,7 @@ class PhantomConnector(BaseConnector):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
         label = param.get('label')
-        run_automation = param.get('run_automation', True)
+        run_automation = param.get('run_automation', False)
 
         container_id = param.get('container_id')
         ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')
@@ -1209,8 +1216,9 @@ class PhantomConnector(BaseConnector):
         destination = self._base_uri
         source = self.get_phantom_base_url()
 
-        return self._create_container_copy(action_result, container_id, destination, source, source_local=True, keep_owner=param.get('keep_owner', False),
-                                           run_automation=run_automation, label=label)
+        return self._create_container_copy(action_result, container_id, destination,
+                    source, source_local=True, keep_owner=param.get('keep_owner', False),
+                    run_automation=run_automation, label=label)
 
     def _import_container(self, param):
 
@@ -1224,7 +1232,8 @@ class PhantomConnector(BaseConnector):
         destination = self.get_phantom_base_url()
         source = self._base_uri
 
-        return self._create_container_copy(action_result, container_id, destination, source, destination_local=True, keep_owner=param.get('keep_owner', False))
+        return self._create_container_copy(action_result, container_id, destination,
+                source, destination_local=True, keep_owner=param.get('keep_owner', False))
 
     def _get_action(self, param):
 
@@ -1379,8 +1388,9 @@ class PhantomConnector(BaseConnector):
             if not row_values:
                 return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_NON_EMPTY_PARAM_VALUE)
         except Exception as e:
-            return action_result.set_status(phantom.APP_ERROR, "Could not load JSON formatted list from the row_values_as_list parameter: {}".format(
-                self._get_error_message_from_exception(e)))
+            return action_result.set_status(phantom.APP_ERROR,
+                "Could not load JSON formatted list from the row_values_as_list parameter: {}".format(
+                    self._get_error_message_from_exception(e)))
 
         data = {
             "update_rows": {
@@ -1389,9 +1399,10 @@ class PhantomConnector(BaseConnector):
         }
 
         # make rest call
-        ret_val, response, resp_data = self._make_rest_call('/rest/decided_list/{}'.format(list_identifier), action_result, data=data, method="post")
+        ret_val, response, resp_data = self._make_rest_call('/rest/decided_list/{}'.format(list_identifier),
+                                        action_result, data=data, method="post")
 
-        if (phantom.is_fail(ret_val)):
+        if phantom.is_fail(ret_val):
             return action_result.get_status()
 
         # Add the response into the data section
@@ -1443,12 +1454,13 @@ class PhantomConnector(BaseConnector):
         # Split hostname from port
         host = host.split(':')[0]
 
-        if (ph_utils.is_ip(host)):
+        if ph_utils.is_ip(host):
             try:
                 packed = socket.inet_aton(host)
                 unpacked = socket.inet_ntoa(packed)
             except Exception as e:
-                return self.set_status(phantom.APP_ERROR, "Unable to do ip to name conversion on {0}".format(host), self._get_error_message_from_exception(e))
+                return self.set_status(phantom.APP_ERROR,
+                            "Unable to do ip to name conversion on {0}".format(host), self._get_error_message_from_exception(e))
         else:
             try:
                 unpacked = socket.gethostbyname(host)
@@ -1485,35 +1497,35 @@ class PhantomConnector(BaseConnector):
         result = None
         action = self.get_action_identifier()
 
-        if (action == 'find_artifacts'):
+        if action == 'find_artifacts':
             result = self._find_artifacts(param)
-        elif (action == 'add_artifact'):
+        elif action == 'add_artifact':
             result = self._add_artifact(param)
-        elif (action == 'add_listitem'):
+        elif action == 'add_listitem':
             result = self._add_listitem(param)
-        elif (action == 'find_listitem'):
+        elif action == 'find_listitem':
             result = self._find_listitem(param)
-        elif (action == 'deflate_item'):
+        elif action == 'deflate_item':
             result = self._deflate_item(param)
-        elif (action == 'test_asset_connectivity'):
+        elif action == 'test_asset_connectivity':
             result = self._test_connectivity(param)
-        elif (action == 'create_container'):
+        elif action == 'create_container':
             result = self._create_container(param)
-        elif (action == 'export_container'):
+        elif action == 'export_container':
             result = self._export_container(param)
-        elif (action == 'import_container'):
+        elif action == 'import_container':
             result = self._import_container(param)
-        elif (action == 'get_action'):
+        elif action == 'get_action':
             result = self._get_action(param)
-        elif (action == 'update_list'):
+        elif action == 'update_list':
             result = self._update_list(param)
-        elif (action == 'no_op'):
+        elif action == 'no_op':
             return self._no_op(param)
-        elif (action == "update_artifact"):
+        elif action == "update_artifact":
             return self._update_artifact(param)
-        elif (action == "add_note"):
+        elif action == "add_note":
             return self._add_note(param)
-        elif (action == "tag_artifact"):
+        elif action == "tag_artifact":
             return self._tag_artifact(param)
 
         return result
@@ -1521,8 +1533,10 @@ class PhantomConnector(BaseConnector):
 
 if __name__ == '__main__':
 
-    import pudb
     import argparse
+    import sys
+
+    import pudb
 
     pudb.set_trace()
 
@@ -1531,23 +1545,26 @@ if __name__ == '__main__':
     argparser.add_argument('input_test_json', help='Input Test JSON file')
     argparser.add_argument('-u', '--username', help='username', required=False)
     argparser.add_argument('-p', '--password', help='password', required=False)
+    argparser.add_argument('-v', '--verify', action='store_true', help='verify', required=False, default=False)
 
     args = argparser.parse_args()
     session_id = None
 
     username = args.username
     password = args.password
+    verify = args.verify
 
-    if (username is not None and password is None):
+    if username is not None and password is None:
 
         # User specified a username but not a password, so ask
         import getpass
         password = getpass.getpass("Password: ")
 
-    if (username and password):
+    if username and password:
         try:
             print("Accessing the Login page")
-            r = requests.get(BaseConnector._get_phantom_base_url() + "login", verify=False)
+            login_url = '{}login'.format(BaseConnector._get_phantom_base_url())
+            r = requests.get(login_url, verify=verify)  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -1556,15 +1573,16 @@ if __name__ == '__main__':
             data['csrfmiddlewaretoken'] = csrftoken
 
             headers = dict()
-            headers['Cookie'] = 'csrftoken=' + csrftoken
-            headers['Referer'] = BaseConnector._get_phantom_base_url() + 'login'
+            headers['Cookie'] = 'csrftoken={}'.format(csrftoken)
+            headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(BaseConnector._get_phantom_base_url() + "login", verify=False, data=data, headers=headers)
+            r2 = requests.post(login_url, verify=verify, data=data,  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+                            headers=headers)
             session_id = r2.cookies['sessionid']
         except Exception as e:
-            print("Unable to get session id from the platfrom. Error: " + str(e))
-            exit(1)
+            print("Unable to get session id from the platfrom. Error: {}".format(str(e)))
+            sys.exit(1)
 
     with open(args.input_test_json) as f:
         in_json = f.read()
@@ -1574,11 +1592,11 @@ if __name__ == '__main__':
         connector = PhantomConnector()
         connector.print_progress_message = True
 
-        if (session_id is not None):
+        if session_id is not None:
             in_json['user_session_token'] = session_id
             connector._set_csrf_info(csrftoken, headers['Referer'])
 
         ret_val = connector._handle_action(json.dumps(in_json), None)
         print(json.dumps(json.loads(ret_val), indent=4))
 
-    exit(0)
+    sys.exit(0)
