@@ -2,7 +2,7 @@
 # Phantom
 
 Publisher: Splunk  
-Connector Version: 3\.4\.1  
+Connector Version: 3\.4\.2  
 Product Vendor: Phantom  
 Product Name: Phantom  
 Product Version Supported (regex): "\.\*"  
