@@ -6,14 +6,14 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.4.3",
+    "app_version": "3.4.4",
     "latest_tested_version": [
         "Splunk Phantom PlatformAPI v5.0.1",
         "SOAR On-prem v5.0.1.66250",
         "SOAR Cloud v5.1.0.70187"
     ],
     "python_version": "3",
-    "utctime_updated": "2022-01-10T13:19:51.000000Z",
+    "utctime_updated": "2022-01-13T00:26:58.000000Z",
     "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
