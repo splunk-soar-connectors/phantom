@@ -657,6 +657,20 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.container",
+                    "data_type": "numeric",
+                    "example_values": [
+                        1234
+                    ]
+                },
+                {
+                    "data_path": "action_result.data.*.container_name",
+                    "data_type": "string",
+                    "example_values": [
+                        "phantom_test"
+                    ]
+                },
+                {
                     "data_path": "action_result.data.*.found in",
                     "data_type": "string",
                     "example_values": [
@@ -717,20 +731,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.container",
-                    "data_type": "numeric",
-                    "example_values": [
-                        1234
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*.container_name",
-                    "data_type": "string",
-                    "example_values": [
-                        "phantom_test"
                     ]
                 }
             ],
@@ -938,6 +938,10 @@
                     "data_type": "string"
                 },
                 {
+                    "data_path": "action_result.data.*",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.summary.found_matches",
                     "data_type": "numeric",
                     "example_values": [
@@ -945,7 +949,18 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.summary.list_id",
+                    "data_type": "numeric",
+                    "example_values": [
+                        18
+                    ]
+                },
+                {
                     "data_path": "action_result.summary.locations",
+                    "data_type": "numeric"
+                },
+                {
+                    "data_path": "action_result.summary.locations.*",
                     "data_type": "numeric"
                 },
                 {
@@ -977,21 +992,6 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
-                    ]
-                },
-                {
-                    "data_path": "action_result.data.*",
-                    "data_type": "string"
-                },
-                {
-                    "data_path": "action_result.summary.locations.*",
-                    "data_type": "numeric"
-                },
-                {
-                    "data_path": "action_result.summary.list_id",
-                    "data_type": "numeric",
-                    "example_values": [
-                        18
                     ]
                 }
             ],
@@ -1565,6 +1565,10 @@
                     ]
                 },
                 {
+                    "data_path": "action_result.data.*.task",
+                    "data_type": "string"
+                },
+                {
                     "data_path": "action_result.data.*.user",
                     "data_type": "string"
                 },
@@ -1612,10 +1616,6 @@
                     "example_values": [
                         1
                     ]
-                },
-                {
-                    "data_path": "action_result.data.*.task",
-                    "data_type": "string"
                 }
             ],
             "versions": "EQ(*)"
