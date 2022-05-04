@@ -2,15 +2,15 @@
 # Phantom
 
 Publisher: Splunk  
-Connector Version: 3\.4\.3  
+Connector Version: 3\.5\.0  
 Product Vendor: Phantom  
 Product Name: Phantom  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.0\.0  
+Minimum Product Version: 5\.2\.0  
 
 This App exposes various Phantom APIs as actions
 
-[comment]: # " File: readme.md"
+[comment]: # " File: README.md"
 [comment]: # "  Copyright (c) 2016-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
@@ -27,25 +27,28 @@ This App exposes various Phantom APIs as actions
 The auth_token config parameter is for use with Phantom instances. If both the token and
 username/password are given, the username and password will be used to authenticate to the Phantom
 instance.  
-
+  
 Note that the IP (or name) being used must match the allowed IP in the remote Phantom instance's
 REST asset configuration.  
-
+  
 In case the **phantom_server** configuration parameter is set to the current Phantom instance, i.e.,
 the Phantom server through which the app is being used, then the **verify_certificate** should be
 set to False in the asset configuration.  
-
+  
 For information on how to obtain an authorization token, see Provisioning an Authorization Token in
 the Phantom REST Overview documentation.  
-
+  
 If the value provided in the **phantom_server** configuration parameter is 0.0.0.0 then the **test
 connectivity** passes successfully and the actions will run on the current phantom instance, i.e.,
 the server through which the app is being used.  
-
+  
 See [KB article 7](https://my.phantom.us/kb/7/) and [KB article 16](https://my.phantom.us/kb/16/) on
 how to create and verify a valid HTTPS certificate for your Phantom instance.  
-
-For security reasons, accessing 127.0.0.1 is not allowed.
+  
+For security reasons, accessing 127.0.0.1 is not allowed.  
+  
+For NRI instances, the Device IP/Hostname configuration parameter needs to specify the port number
+as well. (Eg. x.x.x.x:9999)
 
 ## Playbook Backward Compatibility
 
@@ -54,7 +57,7 @@ For security reasons, accessing 127.0.0.1 is not allowed.
     corresponding action blocks or by providing appropriate values to these action parameters to
     ensure the correct functioning of the playbooks created on the earlier versions of the app.
 
-
+      
 
     -   Update List - The **row_values_as_list** parameter, has been changed from the
         comma-separated new values to a JSON formatted list of new values. This will allow the user
@@ -79,7 +82,7 @@ For security reasons, accessing 127.0.0.1 is not allowed.
 
     -   Update Artifact Tags - The following output datapaths have been added:
 
-
+          
 
         -   action_result.summary.tags_added
         -   action_result.summary.tags_already_absent
@@ -90,7 +93,7 @@ For security reasons, accessing 127.0.0.1 is not allowed.
         your existing playbooks according to the new parameters. Below is the list of the added
         parameters:
 
-
+          
 
         -   name: Artifact name (Always overwrites, if provided)
         -   label: Artifact label (Always overwrites, if provided)
@@ -177,45 +180,45 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**artifact\_id** |  required  | ID of artifact to update | string |  `phantom artifact id`
-**name** |  optional  | Artifact name \(Always overwrites, if provided\) | string |
-**label** |  optional  | Artifact label \(Always overwrites, if provided\) | string |
-**severity** |  optional  | Artifact severity \(Always overwrites, if provided\) | string |
-**cef\_json** |  optional  | JSON format of the CEF fields you want in the artifact | string |
-**cef\_types\_json** |  optional  | JSON format of the CEF types \(e\.g\., \{'myIP'\: \['ip', 'ipv6'\]\}\) | string |
-**tags** |  optional  | Comma\-separated list of tags to add or replace in the artifact | string |
-**overwrite** |  optional  | Overwrite artifacts with provided input \(applies to\: cef\_json, contains\_json, tags\) | boolean |
-**artifact\_json** |  optional  | JSON format of entire artifact \(Always overwrites provided keys\) | string |
+**artifact\_id** |  required  | ID of artifact to update | string |  `phantom artifact id` 
+**name** |  optional  | Artifact name \(Always overwrites, if provided\) | string | 
+**label** |  optional  | Artifact label \(Always overwrites, if provided\) | string | 
+**severity** |  optional  | Artifact severity \(Always overwrites, if provided\) | string | 
+**cef\_json** |  optional  | JSON format of the CEF fields you want in the artifact | string | 
+**cef\_types\_json** |  optional  | JSON format of the CEF types \(e\.g\., \{'myIP'\: \['ip', 'ipv6'\]\}\) | string | 
+**tags** |  optional  | Comma\-separated list of tags to add or replace in the artifact | string | 
+**overwrite** |  optional  | Overwrite artifacts with provided input \(applies to\: cef\_json, contains\_json, tags\) | boolean | 
+**artifact\_json** |  optional  | JSON format of entire artifact \(Always overwrites provided keys\) | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.artifact\_id | string |  `phantom artifact id`
-action\_result\.parameter\.artifact\_json | string |
-action\_result\.parameter\.cef\_json | string |
-action\_result\.parameter\.cef\_types\_json | string |
-action\_result\.parameter\.label | string |
-action\_result\.parameter\.name | string |
-action\_result\.parameter\.overwrite | boolean |
-action\_result\.parameter\.severity | string |
-action\_result\.parameter\.tags | string |
-action\_result\.data\.\*\.requested\_artifact\.cef\.deleted\_field | string |
-action\_result\.data\.\*\.requested\_artifact\.cef\.new\_field | string |
-action\_result\.data\.\*\.requested\_artifact\.cef\.test | string |
-action\_result\.data\.\*\.requested\_artifact\.cef\_types\.new\_field | string |
-action\_result\.data\.\*\.requested\_artifact\.description | string |
-action\_result\.data\.\*\.requested\_artifact\.label | string |
-action\_result\.data\.\*\.requested\_artifact\.name | string |
-action\_result\.data\.\*\.requested\_artifact\.severity | string |
-action\_result\.data\.\*\.requested\_artifact\.source\_data\_identifier | string |
-action\_result\.data\.\*\.requested\_artifact\.tags | string |
-action\_result\.data\.\*\.response\.id | numeric |
-action\_result\.data\.\*\.response\.success | boolean |
-action\_result\.summary | string |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |  
+action\_result\.status | string | 
+action\_result\.parameter\.artifact\_id | string |  `phantom artifact id` 
+action\_result\.parameter\.artifact\_json | string | 
+action\_result\.parameter\.cef\_json | string | 
+action\_result\.parameter\.cef\_types\_json | string | 
+action\_result\.parameter\.label | string | 
+action\_result\.parameter\.name | string | 
+action\_result\.parameter\.overwrite | boolean | 
+action\_result\.parameter\.severity | string | 
+action\_result\.parameter\.tags | string | 
+action\_result\.data\.\*\.requested\_artifact\.cef\.deleted\_field | string | 
+action\_result\.data\.\*\.requested\_artifact\.cef\.new\_field | string | 
+action\_result\.data\.\*\.requested\_artifact\.cef\.test | string | 
+action\_result\.data\.\*\.requested\_artifact\.cef\_types\.new\_field | string | 
+action\_result\.data\.\*\.requested\_artifact\.description | string | 
+action\_result\.data\.\*\.requested\_artifact\.label | string | 
+action\_result\.data\.\*\.requested\_artifact\.name | string | 
+action\_result\.data\.\*\.requested\_artifact\.severity | string | 
+action\_result\.data\.\*\.requested\_artifact\.source\_data\_identifier | string | 
+action\_result\.data\.\*\.requested\_artifact\.tags | string | 
+action\_result\.data\.\*\.response\.id | numeric | 
+action\_result\.data\.\*\.response\.success | boolean | 
+action\_result\.summary | string | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'add note'
 Add a note to a container
@@ -228,24 +231,24 @@ If the <b>container\_id</b> parameter is left empty, then it will be initialized
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**title** |  required  | Title for the note | string |
-**content** |  optional  | Note content | string |
-**container\_id** |  optional  | The container id \(defaults to current container\) | numeric |  `phantom container id`
-**phase\_id** |  optional  | Phase the note will be associated with | string |
+**title** |  required  | Title for the note | string | 
+**content** |  optional  | Note content | string | 
+**container\_id** |  optional  | The container id \(defaults to current container\) | numeric |  `phantom container id` 
+**phase\_id** |  optional  | Phase the note will be associated with | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.container\_id | numeric |  `phantom container id`
-action\_result\.parameter\.content | string |
-action\_result\.parameter\.phase\_id | string |
-action\_result\.parameter\.title | string |
-action\_result\.data | string |
-action\_result\.summary | string |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |  
+action\_result\.status | string | 
+action\_result\.parameter\.container\_id | numeric |  `phantom container id` 
+action\_result\.parameter\.content | string | 
+action\_result\.parameter\.phase\_id | string | 
+action\_result\.parameter\.title | string | 
+action\_result\.data | string | 
+action\_result\.summary | string | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'update artifact tags'
 Add/Remove tags from an artifact
@@ -256,25 +259,25 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**artifact\_id** |  required  | The artifact id | string |  `phantom artifact id`
-**add\_tags** |  optional  | Comma\-separated list of tags to add to the artifact | string |
-**remove\_tags** |  optional  | Comma\-separated list of tags to remove from the artifact | string |
+**artifact\_id** |  required  | The artifact id | string |  `phantom artifact id` 
+**add\_tags** |  optional  | Comma\-separated list of tags to add to the artifact | string | 
+**remove\_tags** |  optional  | Comma\-separated list of tags to remove from the artifact | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.add\_tags | string |
-action\_result\.parameter\.artifact\_id | string |  `phantom artifact id`
-action\_result\.parameter\.remove\_tags | string |
-action\_result\.data | string |
-action\_result\.summary\.tags\_added | string |
-action\_result\.summary\.tags\_already\_absent | string |
-action\_result\.summary\.tags\_already\_present | string |
-action\_result\.summary\.tags\_removed | string |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |  
+action\_result\.status | string | 
+action\_result\.parameter\.add\_tags | string | 
+action\_result\.parameter\.artifact\_id | string |  `phantom artifact id` 
+action\_result\.parameter\.remove\_tags | string | 
+action\_result\.data | string | 
+action\_result\.summary\.tags\_added | string | 
+action\_result\.summary\.tags\_already\_absent | string | 
+action\_result\.summary\.tags\_already\_present | string | 
+action\_result\.summary\.tags\_removed | string | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'find artifacts'
 Find artifacts containing a CEF value
@@ -287,32 +290,32 @@ If the <b>limit\_search</b> parameter is set to true, then the action will searc
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**cef\_key** |  optional  | Key of the cef dict you are querying\: act, app, applicationProtocol, baseEventCount, bytesIn, etc\. It will search the entire cef dictionary if blank | string |
-**values** |  required  | Find this value in artifacts | string |  `\*`
-**exact\_match** |  optional  | Exact match \(default\: true\) | boolean |
-**limit\_search** |  optional  | Limit search to specified containers \(default\: false\) | boolean |
-**container\_ids** |  optional  | List of space or comma separated container ids\. the word "current" will be replaced by the current container id | string |
+**cef\_key** |  optional  | Key of the cef dict you are querying\: act, app, applicationProtocol, baseEventCount, bytesIn, etc\. It will search the entire cef dictionary if blank | string | 
+**values** |  required  | Find this value in artifacts | string |  `\*` 
+**exact\_match** |  optional  | Exact match \(default\: true\) | boolean | 
+**limit\_search** |  optional  | Limit search to specified containers \(default\: false\) | boolean | 
+**container\_ids** |  optional  | List of space or comma separated container ids\. the word "current" will be replaced by the current container id | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.cef\_key | string |
-action\_result\.parameter\.container\_ids | string |
-action\_result\.parameter\.exact\_match | boolean |
-action\_result\.parameter\.limit\_search | boolean |
-action\_result\.parameter\.values | string |  `\*`
-action\_result\.data\.\*\.found in | string |
-action\_result\.data\.\*\.id | numeric |
-action\_result\.data\.\*\.matched | string |
-action\_result\.data\.\*\.name | string |
-action\_result\.summary\.artifacts\_found | numeric |
-action\_result\.summary\.server | string |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
-action\_result\.data\.\*\.container | numeric |
-action\_result\.data\.\*\.container\_name | string |  
+action\_result\.status | string | 
+action\_result\.parameter\.cef\_key | string | 
+action\_result\.parameter\.container\_ids | string | 
+action\_result\.parameter\.exact\_match | boolean | 
+action\_result\.parameter\.limit\_search | boolean | 
+action\_result\.parameter\.values | string |  `\*` 
+action\_result\.data\.\*\.container | numeric | 
+action\_result\.data\.\*\.container\_name | string | 
+action\_result\.data\.\*\.found in | string | 
+action\_result\.data\.\*\.id | numeric | 
+action\_result\.data\.\*\.matched | string | 
+action\_result\.data\.\*\.name | string | 
+action\_result\.summary\.artifacts\_found | numeric | 
+action\_result\.summary\.server | string | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'add listitem'
 Add value to a custom list
@@ -325,23 +328,23 @@ To add a row containing a single value to a list simply pass the value\. However
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**list** |  required  | Name or ID of a custom list | string |
-**new\_row** |  required  | New Row \(string or JSON list\) | string |  `\*`
-**create** |  optional  | Create list if it does not exist \(default\: false\) | boolean |
+**list** |  required  | Name or ID of a custom list | string | 
+**new\_row** |  required  | New Row \(string or JSON list\) | string |  `\*` 
+**create** |  optional  | Create list if it does not exist \(default\: false\) | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.create | boolean |
-action\_result\.parameter\.list | string |
-action\_result\.parameter\.new\_row | string |  `\*`
-action\_result\.data\.\*\.failed | boolean |
-action\_result\.data\.\*\.success | boolean |
-action\_result\.summary\.server | string |  `url`
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |  
+action\_result\.status | string | 
+action\_result\.parameter\.create | boolean | 
+action\_result\.parameter\.list | string | 
+action\_result\.parameter\.new\_row | string |  `\*` 
+action\_result\.data\.\*\.failed | boolean | 
+action\_result\.data\.\*\.success | boolean | 
+action\_result\.summary\.server | string |  `url` 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'find listitem'
 Find value in a custom list
@@ -354,29 +357,29 @@ Row and column coordinates for each matching value can be found in the result su
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**list** |  required  | Name or ID of a custom list | string |
-**column\_index** |  optional  | Search in column number \(0 based\) | numeric |
-**values** |  required  | Value to search for | string |  `\*`
-**exact\_match** |  optional  | Exact match \(default\: true\) | boolean |
+**list** |  required  | Name or ID of a custom list | string | 
+**column\_index** |  optional  | Search in column number \(0 based\) | numeric | 
+**values** |  required  | Value to search for | string |  `\*` 
+**exact\_match** |  optional  | Exact match \(default\: true\) | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.column\_index | numeric |
-action\_result\.parameter\.exact\_match | boolean |
-action\_result\.parameter\.list | string |
-action\_result\.parameter\.values | string |  `\*`
-action\_result\.data | string |
-action\_result\.summary\.found\_matches | numeric |
-action\_result\.summary\.locations | numeric |
-action\_result\.summary\.server | string |  `url`
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
-action\_result\.data\.\* | string |
-action\_result\.summary\.locations\.\* | numeric |
-action\_result\.summary\.list\_id | numeric |  
+action\_result\.status | string | 
+action\_result\.parameter\.column\_index | numeric | 
+action\_result\.parameter\.exact\_match | boolean | 
+action\_result\.parameter\.list | string | 
+action\_result\.parameter\.values | string |  `\*` 
+action\_result\.data | string | 
+action\_result\.data\.\* | string | 
+action\_result\.summary\.found\_matches | numeric | 
+action\_result\.summary\.list\_id | numeric | 
+action\_result\.summary\.locations | numeric | 
+action\_result\.summary\.locations\.\* | numeric | 
+action\_result\.summary\.server | string |  `url` 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'add artifact'
 Add a new artifact to a container
@@ -389,39 +392,39 @@ If the <b>container\_id</b> parameter is left empty, then it will be initialized
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**name** |  optional  | Name of the new artifact | string |
-**container\_id** |  optional  | Numeric container ID for the new artifact | numeric |  `phantom container id`
-**label** |  optional  | Artifact label \(default\: event\) | string |
-**source\_data\_identifier** |  required  | Source Data Idenitifier | string |
-**cef\_name** |  optional  | CEF Name | string |
-**cef\_value** |  optional  | Value | string |  `\*`
-**cef\_dictionary** |  optional  | CEF JSON | string |
-**contains** |  optional  | Data type for each CEF field | string |
-**run\_automation** |  optional  | Run automation on newly created artifact\(s\) \(default\: false\) | boolean |
+**name** |  optional  | Name of the new artifact | string | 
+**container\_id** |  optional  | Numeric container ID for the new artifact | numeric |  `phantom container id` 
+**label** |  optional  | Artifact label \(default\: event\) | string | 
+**source\_data\_identifier** |  required  | Source Data Idenitifier | string | 
+**cef\_name** |  optional  | CEF Name | string | 
+**cef\_value** |  optional  | Value | string |  `\*` 
+**cef\_dictionary** |  optional  | CEF JSON | string | 
+**contains** |  optional  | Data type for each CEF field | string | 
+**run\_automation** |  optional  | Run automation on newly created artifact\(s\) \(default\: false\) | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.cef\_dictionary | string |
-action\_result\.parameter\.cef\_name | string |
-action\_result\.parameter\.cef\_value | string |  `\*`
-action\_result\.parameter\.container\_id | numeric |  `phantom container id`
-action\_result\.parameter\.contains | string |
-action\_result\.parameter\.label | string |
-action\_result\.parameter\.name | string |
-action\_result\.parameter\.run\_automation | string |
-action\_result\.parameter\.source\_data\_identifier | string |
-action\_result\.data\.\*\.existing\_artifact\_id | numeric |
-action\_result\.data\.\*\.failed | boolean |
-action\_result\.data\.\*\.id | numeric |
-action\_result\.data\.\*\.success | boolean |
-action\_result\.summary\.artifact\_id | numeric |
-action\_result\.summary\.container\_id | numeric |
-action\_result\.summary\.server | string |  `url`
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |  
+action\_result\.status | string | 
+action\_result\.parameter\.cef\_dictionary | string | 
+action\_result\.parameter\.cef\_name | string | 
+action\_result\.parameter\.cef\_value | string |  `\*` 
+action\_result\.parameter\.container\_id | numeric |  `phantom container id` 
+action\_result\.parameter\.contains | string | 
+action\_result\.parameter\.label | string | 
+action\_result\.parameter\.name | string | 
+action\_result\.parameter\.run\_automation | string | 
+action\_result\.parameter\.source\_data\_identifier | string | 
+action\_result\.data\.\*\.existing\_artifact\_id | numeric | 
+action\_result\.data\.\*\.failed | boolean | 
+action\_result\.data\.\*\.id | numeric | 
+action\_result\.data\.\*\.success | boolean | 
+action\_result\.summary\.artifact\_id | numeric | 
+action\_result\.summary\.container\_id | numeric | 
+action\_result\.summary\.server | string |  `url` 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'deflate item'
 Deflates an item from the vault
@@ -434,40 +437,40 @@ The action will be supported only if the <b>phantom\_server</b> parameter \(in t
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**vault\_id** |  required  | Vault ID | string |  `sha1`  `vault id`
-**container\_id** |  optional  | Destination container id | numeric |  `phantom container id`
-**recursive** |  optional  | Extract recursively  \(default\: false\) | boolean |
+**vault\_id** |  required  | Vault ID | string |  `sha1`  `vault id` 
+**container\_id** |  optional  | Destination container id | numeric |  `phantom container id` 
+**recursive** |  optional  | Extract recursively  \(default\: false\) | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.container\_id | string |  `phantom container id`
-action\_result\.parameter\.recursive | boolean |
-action\_result\.parameter\.vault\_id | string |  `sha1`  `vault id`
-action\_result\.data\.\*\.aka | string |
-action\_result\.data\.\*\.container | string |
-action\_result\.data\.\*\.container\_id | numeric |  `phantom container id`
-action\_result\.data\.\*\.contains | string |
-action\_result\.data\.\*\.create\_time | string |
-action\_result\.data\.\*\.hash | string |  `sha1`
-action\_result\.data\.\*\.id | numeric |
-action\_result\.data\.\*\.metadata\.contains | string |
-action\_result\.data\.\*\.metadata\.md5 | string |  `md5`
-action\_result\.data\.\*\.metadata\.sha1 | string |  `sha1`
-action\_result\.data\.\*\.metadata\.sha256 | string |  `sha256`
-action\_result\.data\.\*\.metadata\.size | numeric |
-action\_result\.data\.\*\.name | string |
-action\_result\.data\.\*\.path | string |
-action\_result\.data\.\*\.size | numeric |
-action\_result\.data\.\*\.user | string |
-action\_result\.data\.\*\.vault\_document | numeric |
-action\_result\.data\.\*\.vault\_id | string |  `sha1`  `vault id`
-action\_result\.summary\.total\_vault\_items | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
-action\_result\.data\.\*\.task | string |  
+action\_result\.status | string | 
+action\_result\.parameter\.container\_id | string |  `phantom container id` 
+action\_result\.parameter\.recursive | boolean | 
+action\_result\.parameter\.vault\_id | string |  `sha1`  `vault id` 
+action\_result\.data\.\*\.aka | string | 
+action\_result\.data\.\*\.container | string | 
+action\_result\.data\.\*\.container\_id | numeric |  `phantom container id` 
+action\_result\.data\.\*\.contains | string | 
+action\_result\.data\.\*\.create\_time | string | 
+action\_result\.data\.\*\.hash | string |  `sha1` 
+action\_result\.data\.\*\.id | numeric | 
+action\_result\.data\.\*\.metadata\.contains | string | 
+action\_result\.data\.\*\.metadata\.md5 | string |  `md5` 
+action\_result\.data\.\*\.metadata\.sha1 | string |  `sha1` 
+action\_result\.data\.\*\.metadata\.sha256 | string |  `sha256` 
+action\_result\.data\.\*\.metadata\.size | numeric | 
+action\_result\.data\.\*\.name | string | 
+action\_result\.data\.\*\.path | string | 
+action\_result\.data\.\*\.size | numeric | 
+action\_result\.data\.\*\.task | string | 
+action\_result\.data\.\*\.user | string | 
+action\_result\.data\.\*\.vault\_document | numeric | 
+action\_result\.data\.\*\.vault\_id | string |  `sha1`  `vault id` 
+action\_result\.summary\.total\_vault\_items | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'export container'
 Export local container to the configured Phantom asset
@@ -480,25 +483,25 @@ This action exports a container \(that matches the <b>container\_id</b>\) from t
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**container\_id** |  required  | Container ID to copy | numeric |  `phantom container id`
-**keep\_owner** |  optional  | Keep Owner | boolean |
-**label** |  optional  | Label to name the export container\. If blank, the export container will have the same name as the local container | string |
-**run\_automation** |  optional  | Run active playbooks | boolean |
+**container\_id** |  required  | Container ID to copy | numeric |  `phantom container id` 
+**keep\_owner** |  optional  | Keep Owner | boolean | 
+**label** |  optional  | Label to name the export container\. If blank, the export container will have the same name as the local container | string | 
+**run\_automation** |  optional  | Run active playbooks | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.container\_id | string |  `phantom container id`
-action\_result\.parameter\.keep\_owner | boolean |
-action\_result\.parameter\.label | string |
-action\_result\.parameter\.run\_automation | boolean |
-action\_result\.data | string |
-action\_result\.summary\.artifact\_count | numeric |
-action\_result\.summary\.container\_id | numeric |  `phantom container id`
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |  
+action\_result\.status | string | 
+action\_result\.parameter\.container\_id | string |  `phantom container id` 
+action\_result\.parameter\.keep\_owner | boolean | 
+action\_result\.parameter\.label | string | 
+action\_result\.parameter\.run\_automation | boolean | 
+action\_result\.data | string | 
+action\_result\.summary\.artifact\_count | numeric | 
+action\_result\.summary\.container\_id | numeric |  `phantom container id` 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'import container'
 Import a container from an external Phantom instance
@@ -511,21 +514,21 @@ This action imports a container \(that matches the <b>container\_id</b>\) from t
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**container\_id** |  required  | Container ID to copy | numeric |  `phantom container id`
-**keep\_owner** |  optional  | Keep Owner | boolean |
+**container\_id** |  required  | Container ID to copy | numeric |  `phantom container id` 
+**keep\_owner** |  optional  | Keep Owner | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.container\_id | string |  `phantom container id`
-action\_result\.parameter\.keep\_owner | boolean |
-action\_result\.data | string |
-action\_result\.summary\.artifact\_count | numeric |
-action\_result\.summary\.container\_id | numeric |  `phantom container id`
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |  
+action\_result\.status | string | 
+action\_result\.parameter\.container\_id | string |  `phantom container id` 
+action\_result\.parameter\.keep\_owner | boolean | 
+action\_result\.data | string | 
+action\_result\.summary\.artifact\_count | numeric | 
+action\_result\.summary\.container\_id | numeric |  `phantom container id` 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'create container'
 Create a new container on a Phantom instance
@@ -538,22 +541,22 @@ This action creates a new container on the Phantom server, which is configured i
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**container\_json** |  required  | The container JSON object | string |
-**container\_artifacts** |  optional  | List of artifact JSON objects | string |
+**container\_json** |  required  | The container JSON object | string | 
+**container\_artifacts** |  optional  | List of artifact JSON objects | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.container\_artifacts | string |
-action\_result\.parameter\.container\_json | string |
-action\_result\.data | string |
-action\_result\.summary\.artifact\_count | numeric |
-action\_result\.summary\.container\_id | numeric |  `phantom container id`
-action\_result\.summary\.failed\_artifact\_count | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |  
+action\_result\.status | string | 
+action\_result\.parameter\.container\_artifacts | string | 
+action\_result\.parameter\.container\_json | string | 
+action\_result\.data | string | 
+action\_result\.summary\.artifact\_count | numeric | 
+action\_result\.summary\.container\_id | numeric |  `phantom container id` 
+action\_result\.summary\.failed\_artifact\_count | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'get action result'
 Find the results of a previously run action
@@ -566,55 +569,55 @@ This action returns the most recent results of the given <b>action\_name</b> lau
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**action\_name** |  required  | Action name | string |
-**parameters** |  optional  | JSON string of action parameters | string |
-**app** |  optional  | App name | string |
-**asset** |  optional  | Asset name | string |
-**time\_limit** |  optional  | Number of hours to search back | numeric |
-**max\_results** |  optional  | Maximum number of action results to return | numeric |
+**action\_name** |  required  | Action name | string | 
+**parameters** |  optional  | JSON string of action parameters | string | 
+**app** |  optional  | App name | string | 
+**asset** |  optional  | Asset name | string | 
+**time\_limit** |  optional  | Number of hours to search back | numeric | 
+**max\_results** |  optional  | Maximum number of action results to return | numeric | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.action\_name | string |
-action\_result\.parameter\.app | string |
-action\_result\.parameter\.asset | string |
-action\_result\.parameter\.max\_results | numeric |
-action\_result\.parameter\.parameters | string |
-action\_result\.parameter\.time\_limit | numeric |
-action\_result\.data\.\*\.action | string |
-action\_result\.data\.\*\.action\_run | numeric |
-action\_result\.data\.\*\.app | numeric |
-action\_result\.data\.\*\.app\_name | string |
-action\_result\.data\.\*\.app\_version | string |
-action\_result\.data\.\*\.asset | numeric |
-action\_result\.data\.\*\.container | numeric |
-action\_result\.data\.\*\.effective\_user | string |
-action\_result\.data\.\*\.end\_time | string |
-action\_result\.data\.\*\.exception\_occured | boolean |
-action\_result\.data\.\*\.extra\_data | string |
-action\_result\.data\.\*\.id | numeric |
-action\_result\.data\.\*\.message | string |
-action\_result\.data\.\*\.playbook\_run | numeric |
-action\_result\.data\.\*\.result\_data\.\*\.data | numeric |
-action\_result\.data\.\*\.result\_data\.\*\.message | string |
-action\_result\.data\.\*\.result\_data\.\*\.parameter | string |
-action\_result\.data\.\*\.result\_data\.\*\.parameter\.context\.artifact\_id | numeric |
-action\_result\.data\.\*\.result\_data\.\*\.parameter\.context\.guid | string |
-action\_result\.data\.\*\.result\_data\.\*\.parameter\.context\.parent\_action\_run | string |
-action\_result\.data\.\*\.result\_data\.\*\.status | string |
-action\_result\.data\.\*\.result\_data\.\*\.summary | string |
-action\_result\.data\.\*\.result\_summary\.total\_objects | numeric |
-action\_result\.data\.\*\.result\_summary\.total\_objects\_successful | numeric |
-action\_result\.data\.\*\.start\_time | string |
-action\_result\.data\.\*\.status | string |
-action\_result\.data\.\*\.version | numeric |
-action\_result\.summary\.action\_run\_id | numeric |
-action\_result\.summary\.num\_results | numeric |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |  
+action\_result\.status | string | 
+action\_result\.parameter\.action\_name | string | 
+action\_result\.parameter\.app | string | 
+action\_result\.parameter\.asset | string | 
+action\_result\.parameter\.max\_results | numeric | 
+action\_result\.parameter\.parameters | string | 
+action\_result\.parameter\.time\_limit | numeric | 
+action\_result\.data\.\*\.action | string | 
+action\_result\.data\.\*\.action\_run | numeric | 
+action\_result\.data\.\*\.app | numeric | 
+action\_result\.data\.\*\.app\_name | string | 
+action\_result\.data\.\*\.app\_version | string | 
+action\_result\.data\.\*\.asset | numeric | 
+action\_result\.data\.\*\.container | numeric | 
+action\_result\.data\.\*\.effective\_user | string | 
+action\_result\.data\.\*\.end\_time | string | 
+action\_result\.data\.\*\.exception\_occured | boolean | 
+action\_result\.data\.\*\.extra\_data | string | 
+action\_result\.data\.\*\.id | numeric | 
+action\_result\.data\.\*\.message | string | 
+action\_result\.data\.\*\.playbook\_run | numeric | 
+action\_result\.data\.\*\.result\_data\.\*\.data | numeric | 
+action\_result\.data\.\*\.result\_data\.\*\.message | string | 
+action\_result\.data\.\*\.result\_data\.\*\.parameter | string | 
+action\_result\.data\.\*\.result\_data\.\*\.parameter\.context\.artifact\_id | numeric | 
+action\_result\.data\.\*\.result\_data\.\*\.parameter\.context\.guid | string | 
+action\_result\.data\.\*\.result\_data\.\*\.parameter\.context\.parent\_action\_run | string | 
+action\_result\.data\.\*\.result\_data\.\*\.status | string | 
+action\_result\.data\.\*\.result\_data\.\*\.summary | string | 
+action\_result\.data\.\*\.result\_summary\.total\_objects | numeric | 
+action\_result\.data\.\*\.result\_summary\.total\_objects\_successful | numeric | 
+action\_result\.data\.\*\.start\_time | string | 
+action\_result\.data\.\*\.status | string | 
+action\_result\.data\.\*\.version | numeric | 
+action\_result\.summary\.action\_run\_id | numeric | 
+action\_result\.summary\.num\_results | numeric | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'update list'
 Update a list
@@ -627,24 +630,24 @@ Either the <b>list\_name</b> or </b>id</b> is required\. If both, <b>list\_name<
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**list\_name** |  optional  | List name | string |
-**id** |  optional  | List id | numeric |
-**row\_number** |  required  | Row number in list to be modified | numeric |
-**row\_values\_as\_list** |  required  | JSON formatted list of new values for the row | string |
+**list\_name** |  optional  | List name | string | 
+**id** |  optional  | List id | numeric | 
+**row\_number** |  required  | Row number in list to be modified | numeric | 
+**row\_values\_as\_list** |  required  | JSON formatted list of new values for the row | string | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.id | numeric |
-action\_result\.parameter\.list\_name | string |
-action\_result\.parameter\.row\_number | numeric |
-action\_result\.parameter\.row\_values\_as\_list | string |
-action\_result\.data\.\*\.success | boolean |
-action\_result\.summary | string |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |  
+action\_result\.status | string | 
+action\_result\.parameter\.id | numeric | 
+action\_result\.parameter\.list\_name | string | 
+action\_result\.parameter\.row\_number | numeric | 
+action\_result\.parameter\.row\_values\_as\_list | string | 
+action\_result\.data\.\*\.success | boolean | 
+action\_result\.summary | string | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'no op'
 Wait for the specified number of seconds
@@ -655,15 +658,15 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**sleep\_seconds** |  required  | Sleep for this many seconds | numeric |
+**sleep\_seconds** |  required  | Sleep for this many seconds | numeric | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
-action\_result\.status | string |
-action\_result\.parameter\.sleep\_seconds | numeric |
-action\_result\.data | string |
-action\_result\.summary | string |
-action\_result\.message | string |
-summary\.total\_objects | numeric |
-summary\.total\_objects\_successful | numeric |
+action\_result\.status | string | 
+action\_result\.parameter\.sleep\_seconds | numeric | 
+action\_result\.data | string | 
+action\_result\.summary | string | 
+action\_result\.message | string | 
+summary\.total\_objects | numeric | 
+summary\.total\_objects\_successful | numeric | 
