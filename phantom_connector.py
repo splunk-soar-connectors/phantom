@@ -714,7 +714,7 @@ class PhantomConnector(BaseConnector):
         action_result.add_data(resp_data)
 
         action_result.update_summary({'artifact_id': artifact_id, 'container_id': container_id, 'server': self._base_uri})
-
+        self.debug_print("Successfully executed the action")
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _add_file_to_vault(self, action_result, data_stream, file_name, recursive, container_id):
