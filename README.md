@@ -2,15 +2,15 @@
 # Phantom
 
 Publisher: Splunk  
-Connector Version: 3\.4\.3  
+Connector Version: 3\.5\.0  
 Product Vendor: Phantom  
 Product Name: Phantom  
 Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.0\.0  
+Minimum Product Version: 5\.2\.0  
 
 This App exposes various Phantom APIs as actions
 
-[comment]: # " File: readme.md"
+[comment]: # " File: README.md"
 [comment]: # "  Copyright (c) 2016-2022 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
@@ -45,7 +45,10 @@ the server through which the app is being used.
 See [KB article 7](https://my.phantom.us/kb/7/) and [KB article 16](https://my.phantom.us/kb/16/) on
 how to create and verify a valid HTTPS certificate for your Phantom instance.  
   
-For security reasons, accessing 127.0.0.1 is not allowed.
+For security reasons, accessing 127.0.0.1 is not allowed.  
+  
+For NRI instances, the Device IP/Hostname configuration parameter needs to specify the port number
+as well. (Eg. x.x.x.x:9999)
 
 ## Playbook Backward Compatibility
 
@@ -302,6 +305,8 @@ action\_result\.parameter\.container\_ids | string |
 action\_result\.parameter\.exact\_match | boolean | 
 action\_result\.parameter\.limit\_search | boolean | 
 action\_result\.parameter\.values | string |  `\*` 
+action\_result\.data\.\*\.container | numeric | 
+action\_result\.data\.\*\.container\_name | string | 
 action\_result\.data\.\*\.found in | string | 
 action\_result\.data\.\*\.id | numeric | 
 action\_result\.data\.\*\.matched | string | 
@@ -310,9 +315,7 @@ action\_result\.summary\.artifacts\_found | numeric |
 action\_result\.summary\.server | string | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric | 
-action\_result\.data\.\*\.container | numeric | 
-action\_result\.data\.\*\.container\_name | string |   
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'add listitem'
 Add value to a custom list
@@ -368,15 +371,15 @@ action\_result\.parameter\.exact\_match | boolean |
 action\_result\.parameter\.list | string | 
 action\_result\.parameter\.values | string |  `\*` 
 action\_result\.data | string | 
+action\_result\.data\.\* | string | 
 action\_result\.summary\.found\_matches | numeric | 
+action\_result\.summary\.list\_id | numeric | 
 action\_result\.summary\.locations | numeric | 
+action\_result\.summary\.locations\.\* | numeric | 
 action\_result\.summary\.server | string |  `url` 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric | 
-action\_result\.data\.\* | string | 
-action\_result\.summary\.locations\.\* | numeric | 
-action\_result\.summary\.list\_id | numeric |   
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'add artifact'
 Add a new artifact to a container
@@ -460,14 +463,14 @@ action\_result\.data\.\*\.metadata\.size | numeric |
 action\_result\.data\.\*\.name | string | 
 action\_result\.data\.\*\.path | string | 
 action\_result\.data\.\*\.size | numeric | 
+action\_result\.data\.\*\.task | string | 
 action\_result\.data\.\*\.user | string | 
 action\_result\.data\.\*\.vault\_document | numeric | 
 action\_result\.data\.\*\.vault\_id | string |  `sha1`  `vault id` 
 action\_result\.summary\.total\_vault\_items | numeric | 
 action\_result\.message | string | 
 summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric | 
-action\_result\.data\.\*\.task | string |   
+summary\.total\_objects\_successful | numeric |   
 
 ## action: 'export container'
 Export local container to the configured Phantom asset
