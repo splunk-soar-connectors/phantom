@@ -494,6 +494,7 @@ class PhantomConnector(BaseConnector):
 
     def _add_note(self, param):
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         phase_id = param.get('phase_id', None)
@@ -526,6 +527,7 @@ class PhantomConnector(BaseConnector):
 
     def _find_artifacts(self, param):
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         limit_search = param.get("limit_search", False)
         container_ids = param.get("container_ids", "current")
@@ -598,6 +600,7 @@ class PhantomConnector(BaseConnector):
                     if not isinstance(curr_value, str):  # For python 3
                         curr_value = str(curr_value)
                 except Exception as e:
+                    self.debug_print('Error occurred while processing the artifacts data')
                     return action_result.set_status(phantom.APP_ERROR,
                             'Error occurred while processing the artifacts data: {}'.format(self._get_error_message_from_exception(e)))
 
@@ -622,6 +625,7 @@ class PhantomConnector(BaseConnector):
 
     def _add_artifact(self, param):
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         name = param.get('name')
@@ -665,6 +669,7 @@ class PhantomConnector(BaseConnector):
                     contains_list = list(filter(None, contains_list))
                     loaded_contains[cef_name] = contains_list
                 else:
+                    self.debug_print("Please provide contains parameter in JSON format")
                     return action_result.set_status(phantom.APP_ERROR, "Please provide contains parameter in JSON format")
 
         if cef_name and cef_value:
@@ -709,7 +714,7 @@ class PhantomConnector(BaseConnector):
         action_result.add_data(resp_data)
 
         action_result.update_summary({'artifact_id': artifact_id, 'container_id': container_id, 'server': self._base_uri})
-
+        self.debug_print("Successfully executed the action")
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _add_file_to_vault(self, action_result, data_stream, file_name, recursive, container_id):
@@ -934,6 +939,7 @@ class PhantomConnector(BaseConnector):
 
     def _find_listitem(self, param):
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         values = param.get('values')
@@ -973,7 +979,7 @@ class PhantomConnector(BaseConnector):
                         coordinates.append((rownum, cid))
 
         action_result.update_summary({'server': self._base_uri, 'found_matches': found, 'locations': coordinates, 'list_id': list_id})
-
+        self.debug_print("Successfully executed the action")
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _create_list(self, list_name, row, action_result):
@@ -1003,6 +1009,7 @@ class PhantomConnector(BaseConnector):
 
     def _add_listitem(self, param):
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         list_name = param['list']
@@ -1196,6 +1203,7 @@ class PhantomConnector(BaseConnector):
 
     def _create_container(self, param):
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         container_json = param['container_json']
@@ -1204,6 +1212,7 @@ class PhantomConnector(BaseConnector):
 
     def _export_container(self, param):
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
         label = param.get('label')
         run_automation = param.get('run_automation', False)
@@ -1222,6 +1231,7 @@ class PhantomConnector(BaseConnector):
 
     def _import_container(self, param):
 
+        self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
         container_id = param.get('container_id')
@@ -1352,7 +1362,7 @@ class PhantomConnector(BaseConnector):
             action_result.add_data(action_run)
 
         action_result.set_summary({'num_results': len(resp_json['data'])})
-
+        self.debug_print("Successfully executed the action.")
         return action_result.set_status(phantom.APP_SUCCESS)
 
     def _update_list(self, param):
@@ -1411,7 +1421,7 @@ class PhantomConnector(BaseConnector):
         # Add a dictionary that is made up of the most important values from data into the summary
         summary = action_result.update_summary({})
         summary['success'] = True
-
+        self.debug_print("Successfully executed the action.")
         # Return success, no need to set the message, only the status
         # BaseConnector will create a textual message based off of the summary dictionary
         return action_result.set_status(phantom.APP_SUCCESS)
