@@ -802,7 +802,7 @@ class PhantomConnector(BaseConnector):
 
         return (phantom.APP_SUCCESS)
 
-    def _extract_file(self, action_result, file_path, file_name, recursive, container_id=None):
+    def _extract_file(self, action_result, file_path, file_name, recursive, container_id=None, password=None):
 
         self._level += 1
         if container_id is None:
@@ -858,8 +858,12 @@ class PhantomConnector(BaseConnector):
 
                         if not os.path.basename(save_as):
                             continue
+                            
+                        if password:
+                            vault_file.setpassword(str.encode(password))
 
-                        ret_val = self._add_file_to_vault(action_result, vault_file.read(compressed_file), save_as, recursive, container_id)
+                        ret_val = self._add_file_to_vault(action_result, vault_file.read(compressed_file), save_as,
+                                                          recursive, container_id)
 
                         if phantom.is_fail(ret_val):
                             return ret_val
@@ -896,6 +900,7 @@ class PhantomConnector(BaseConnector):
         vault_id = param['vault_id']
 
         container_id = param.get('container_id')
+        password = param.get('password')
         ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -927,7 +932,12 @@ class PhantomConnector(BaseConnector):
         if file_type not in SUPPORTED_FILES:
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
 
-        ret_val = self._extract_file(action_result, file_path, file_name, param.get('recursive', False), container_id)
+        if password:
+            ret_val = self._extract_file(action_result, file_path, file_name, param.get('recursive', False),
+                                         container_id, password=password)
+        else:
+            ret_val = self._extract_file(action_result, file_path, file_name, param.get('recursive', False),
+                                         container_id)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()

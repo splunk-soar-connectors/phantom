@@ -21,6 +21,11 @@
     "fips_compliant": true,
     "license": "Copyright (c) 2016-2022 Splunk Inc.",
     "logo": "logo_splunk.svg",
+    "contributors": [
+      {
+        "name": "import-au"
+      }
+    ],
     "logo_dark": "logo_splunk_dark.svg",
     "test_metadata": {
         "playbook_names": [
@@ -1391,10 +1396,16 @@
                     ],
                     "primary": true
                 },
+                "password": {
+                    "description": "Password for the file",
+                    "data_type": "string",
+                    "order": 2,
+                    "primary": true
+                },
                 "recursive": {
                     "description": "Extract recursively  (default: false)",
                     "data_type": "boolean",
-                    "order": 2,
+                    "order": 3,
                     "default": false
                 }
             },
