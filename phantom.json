@@ -6,8 +6,8 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.5.0",
-    "latest_tested_version": [
+    "app_version": "3.6.0",
+    "latest_tested_versions": [
         "Splunk Phantom PlatformAPI v5.0.1",
         "SOAR On-prem v5.0.1.66250",
         "SOAR Cloud v5.1.0.70187"
@@ -22,9 +22,9 @@
     "license": "Copyright (c) 2016-2022 Splunk Inc.",
     "logo": "logo_splunk.svg",
     "contributors": [
-      {
-        "name": "import-au"
-      }
+        {
+            "name": "import-au"
+        }
     ],
     "logo_dark": "logo_splunk_dark.svg",
     "test_metadata": {
@@ -1371,7 +1371,7 @@
         {
             "action": "deflate item",
             "description": "Deflates an item from the vault",
-            "verbose": "The action will be supported only if the <b>phantom_server</b> parameter (in the asset configurations) is configured to the local Phantom instance, i.e., the instance from which the action is being run.<br><br>The action detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to its vault, else to the current (the container whose context the action is executed) container. The action supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types. In the case where the compressed file contains another compressed file in it, set the <b>recursive</b> parameter to true to deflate the inner compressed file.<br><br>For certain Unicode characters, the file name is not unzipped as it is, by the zipfile module.",
+            "verbose": "The action will be supported only if the <b>phantom_server</b> parameter (in the asset configurations) is configured to the local Phantom instance, i.e., the instance from which the action is being run.<br><br>The action detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to its vault, else to the current (the container whose context the action is executed) container. The action supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types. In the case where the compressed file contains another compressed file in it, set the <b>recursive</b> parameter to true to deflate the inner compressed file.<br><br>If recursion is enabled and a password is specified, the application will use the same password for all nested zip files. The inner zip file will be extracted only if the file is not password protected or if the password matches the nested file.<br><br>For certain Unicode characters, the file name is not unzipped as it is, by the zipfile module.",
             "type": "generic",
             "identifier": "deflate_item",
             "read_only": false,
@@ -1399,8 +1399,7 @@
                 "password": {
                     "description": "Password for the file",
                     "data_type": "string",
-                    "order": 2,
-                    "primary": true
+                    "order": 2
                 },
                 "recursive": {
                     "description": "Extract recursively  (default: false)",
@@ -1430,6 +1429,10 @@
                     "contains": [
                         "phantom container id"
                     ]
+                },
+                {
+                    "data_path": "action_result.parameter.password",
+                    "data_type": "string"
                 },
                 {
                     "data_path": "action_result.parameter.recursive",
@@ -2454,7 +2457,7 @@
             },
             {
                 "module": "certifi",
-                "input_file": "wheels/shared/certifi-2021.10.8-py2.py3-none-any.whl"
+                "input_file": "wheels/py3/certifi-2022.5.18.1-py3-none-any.whl"
             },
             {
                 "module": "chardet",

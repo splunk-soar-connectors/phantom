@@ -717,7 +717,7 @@ class PhantomConnector(BaseConnector):
         self.debug_print("Successfully executed the action")
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _add_file_to_vault(self, action_result, data_stream, file_name, recursive, container_id):
+    def _add_file_to_vault(self, action_result, data_stream, file_name, recursive, container_id, password=None):
 
         save_as = file_name or '_invalid_file_name_'
 
@@ -797,7 +797,7 @@ class PhantomConnector(BaseConnector):
             if file_type not in SUPPORTED_FILES:
                 return (phantom.APP_SUCCESS)
 
-            self._extract_file(action_result, file_path, file_name, recursive, container_id)
+            self._extract_file(action_result, file_path, file_name, recursive, container_id, password=password)
             self._level -= 1
 
         return (phantom.APP_SUCCESS)
@@ -851,6 +851,8 @@ class PhantomConnector(BaseConnector):
 
             try:
                 with zipfile.ZipFile(file_path, 'r') as vault_file:
+                    if password:
+                        vault_file.setpassword(password.encode())
 
                     for compressed_file in vault_file.namelist():
 
@@ -858,12 +860,9 @@ class PhantomConnector(BaseConnector):
 
                         if not os.path.basename(save_as):
                             continue
-                            
-                        if password:
-                            vault_file.setpassword(str.encode(password))
 
                         ret_val = self._add_file_to_vault(action_result, vault_file.read(compressed_file), save_as,
-                                                          recursive, container_id)
+                                                          recursive, container_id, password=password)
 
                         if phantom.is_fail(ret_val):
                             return ret_val
@@ -932,12 +931,8 @@ class PhantomConnector(BaseConnector):
         if file_type not in SUPPORTED_FILES:
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
 
-        if password:
-            ret_val = self._extract_file(action_result, file_path, file_name, param.get('recursive', False),
-                                         container_id, password=password)
-        else:
-            ret_val = self._extract_file(action_result, file_path, file_name, param.get('recursive', False),
-                                         container_id)
+        ret_val = self._extract_file(action_result, file_path, file_name, param.get('recursive', False),
+                                     container_id, password=password)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
