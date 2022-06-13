@@ -100,8 +100,8 @@ class PhantomConnector(BaseConnector):
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
-        except Exception:
-            pass
+        except Exception as e:
+            self.debug_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
@@ -717,7 +717,7 @@ class PhantomConnector(BaseConnector):
         self.debug_print("Successfully executed the action")
         return action_result.set_status(phantom.APP_SUCCESS)
 
-    def _add_file_to_vault(self, action_result, data_stream, file_name, recursive, container_id, password=None):
+    def _add_file_to_vault(self, action_result, data_stream, file_name, recursive, container_id):
 
         save_as = file_name or '_invalid_file_name_'
 
@@ -797,7 +797,7 @@ class PhantomConnector(BaseConnector):
             if file_type not in SUPPORTED_FILES:
                 return (phantom.APP_SUCCESS)
 
-            self._extract_file(action_result, file_path, file_name, recursive, container_id, password=password)
+            self._extract_file(action_result, file_path, file_name, recursive, container_id)
             self._level -= 1
 
         return (phantom.APP_SUCCESS)
@@ -862,7 +862,7 @@ class PhantomConnector(BaseConnector):
                             continue
 
                         ret_val = self._add_file_to_vault(action_result, vault_file.read(compressed_file), save_as,
-                                                          recursive, container_id, password=password)
+                                                          recursive, container_id)
 
                         if phantom.is_fail(ret_val):
                             return ret_val
@@ -1579,7 +1579,7 @@ if __name__ == '__main__':
         try:
             print("Accessing the Login page")
             login_url = '{}login'.format(BaseConnector._get_phantom_base_url())
-            r = requests.get(login_url, verify=verify)  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+            r = requests.get(login_url, verify=verify, timeout=TIMEOUT)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -1592,8 +1592,7 @@ if __name__ == '__main__':
             headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=verify, data=data,  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
-                            headers=headers)
+            r2 = requests.post(login_url, verify=verify, data=data, headers=headers, timeout=TIMEOUT)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platfrom. Error: {}".format(str(e)))
