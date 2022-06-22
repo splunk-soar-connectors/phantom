@@ -184,7 +184,7 @@ class PhantomConnector(BaseConnector):
         if 'html' in response.headers.get('Content-Type', ''):
             return self._process_html_response(response, action_result)
 
-        # it's not an html or json, handle if it is a successfull empty reponse
+        # it's not an html or json, handle if it is a successful empty response
         if (200 <= response.status_code < 399) and (not response.text):
             return RetVal3(phantom.APP_SUCCESS, response, action_result)
 
@@ -850,6 +850,7 @@ class PhantomConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Unable to deflate zip file")
 
             try:
+                compressed_file = ''
                 with zipfile.ZipFile(file_path, 'r') as vault_file:
                     if password:
                         vault_file.setpassword(password.encode())
@@ -867,8 +868,9 @@ class PhantomConnector(BaseConnector):
                         if phantom.is_fail(ret_val):
                             return ret_val
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR,
-                            "Unable to open the zip file: {}. Error message:{}".format(file_path, self._get_error_message_from_exception(e)))
+                error_msg = self._get_error_message_from_exception(e)
+                error_msg = error_msg.replace(compressed_file, file_name)
+                return action_result.set_status(phantom.APP_ERROR, "Unable to open the zip file: {}. {}".format(file_path, error_msg))
 
             return (phantom.APP_SUCCESS)
 
