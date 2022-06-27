@@ -439,6 +439,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **vault\_id** |  required  | Vault ID | string |  `sha1`  `vault id` 
 **container\_id** |  optional  | Destination container id | numeric |  `phantom container id` 
+**password** | optional | Password for the file | string |
 **recursive** |  optional  | Extract recursively  \(default\: false\) | boolean | 
 
 #### Action Output

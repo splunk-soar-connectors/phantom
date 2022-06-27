@@ -100,8 +100,8 @@ class PhantomConnector(BaseConnector):
                     error_msg = e.args[1]
                 elif len(e.args) == 1:
                     error_msg = e.args[0]
-        except Exception:
-            pass
+        except Exception as e:
+            self.debug_print("Error occurred while fetching exception information. Details: {}".format(str(e)))
 
         return "Error Code: {0}. Error Message: {1}".format(error_code, error_msg)
 
@@ -184,7 +184,7 @@ class PhantomConnector(BaseConnector):
         if 'html' in response.headers.get('Content-Type', ''):
             return self._process_html_response(response, action_result)
 
-        # it's not an html or json, handle if it is a successfull empty reponse
+        # it's not an html or json, handle if it is a successful empty response
         if (200 <= response.status_code < 399) and (not response.text):
             return RetVal3(phantom.APP_SUCCESS, response, action_result)
 
@@ -802,7 +802,7 @@ class PhantomConnector(BaseConnector):
 
         return (phantom.APP_SUCCESS)
 
-    def _extract_file(self, action_result, file_path, file_name, recursive, container_id=None):
+    def _extract_file(self, action_result, file_path, file_name, recursive, container_id=None, password=None):
 
         self._level += 1
         if container_id is None:
@@ -850,7 +850,10 @@ class PhantomConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, "Unable to deflate zip file")
 
             try:
+                compressed_file = ''
                 with zipfile.ZipFile(file_path, 'r') as vault_file:
+                    if password:
+                        vault_file.setpassword(password.encode())
 
                     for compressed_file in vault_file.namelist():
 
@@ -859,13 +862,15 @@ class PhantomConnector(BaseConnector):
                         if not os.path.basename(save_as):
                             continue
 
-                        ret_val = self._add_file_to_vault(action_result, vault_file.read(compressed_file), save_as, recursive, container_id)
+                        ret_val = self._add_file_to_vault(action_result, vault_file.read(compressed_file), save_as,
+                                                          recursive, container_id)
 
                         if phantom.is_fail(ret_val):
                             return ret_val
             except Exception as e:
-                return action_result.set_status(phantom.APP_ERROR,
-                            "Unable to open the zip file: {}. Error message:{}".format(file_path, self._get_error_message_from_exception(e)))
+                error_msg = self._get_error_message_from_exception(e)
+                error_msg = error_msg.replace(compressed_file, file_name)
+                return action_result.set_status(phantom.APP_ERROR, "Unable to open the zip file: {}. {}".format(file_path, error_msg))
 
             return (phantom.APP_SUCCESS)
 
@@ -896,6 +901,7 @@ class PhantomConnector(BaseConnector):
         vault_id = param['vault_id']
 
         container_id = param.get('container_id')
+        password = param.get('password')
         ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -927,7 +933,8 @@ class PhantomConnector(BaseConnector):
         if file_type not in SUPPORTED_FILES:
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
 
-        ret_val = self._extract_file(action_result, file_path, file_name, param.get('recursive', False), container_id)
+        ret_val = self._extract_file(action_result, file_path, file_name, param.get('recursive', False),
+                                     container_id, password=password)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -1574,7 +1581,7 @@ if __name__ == '__main__':
         try:
             print("Accessing the Login page")
             login_url = '{}login'.format(BaseConnector._get_phantom_base_url())
-            r = requests.get(login_url, verify=verify)  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
+            r = requests.get(login_url, verify=verify, timeout=TIMEOUT)
             csrftoken = r.cookies['csrftoken']
 
             data = dict()
@@ -1587,8 +1594,7 @@ if __name__ == '__main__':
             headers['Referer'] = login_url
 
             print("Logging into Platform to get the session id")
-            r2 = requests.post(login_url, verify=verify, data=data,  # nosemgrep: python.requests.best-practice.use-timeout.use-timeout
-                            headers=headers)
+            r2 = requests.post(login_url, verify=verify, data=data, headers=headers, timeout=TIMEOUT)
             session_id = r2.cookies['sessionid']
         except Exception as e:
             print("Unable to get session id from the platfrom. Error: {}".format(str(e)))
