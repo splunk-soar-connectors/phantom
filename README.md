@@ -2,7 +2,7 @@
 # Phantom
 
 Publisher: Splunk  
-Connector Version: 3\.5\.0  
+Connector Version: 3\.6\.0  
 Product Vendor: Phantom  
 Product Name: Phantom  
 Product Version Supported (regex): "\.\*"  
@@ -432,28 +432,30 @@ Deflates an item from the vault
 Type: **generic**  
 Read only: **False**
 
-The action will be supported only if the <b>phantom\_server</b> parameter \(in the asset configurations\) is configured to the local Phantom instance, i\.e\., the instance from which the action is being run\.<br><br>The action detects if the input vault item is a compressed file and deflates it\. Every file found after deflation is then added to the vault\. If <b>container\_id</b> is specified will add to its vault, else to the current \(the container whose context the action is executed\) container\. The action supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types\. In the case where the compressed file contains another compressed file in it, set the <b>recursive</b> parameter to true to deflate the inner compressed file\.<br><br>For certain Unicode characters, the file name is not unzipped as it is, by the zipfile module\.
+The action will be supported only if the <b>phantom\_server</b> parameter \(in the asset configurations\) is configured to the local Phantom instance, i\.e\., the instance from which the action is being run\.<br><br>The action detects if the input vault item is a compressed file and deflates it\. Every file found after deflation is then added to the vault\. If <b>container\_id</b> is specified will add to its vault, else to the current \(the container whose context the action is executed\) container\. The action supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types\. In the case where the compressed file contains another compressed file in it, set the <b>recursive</b> parameter to true to deflate the inner compressed file\.<br><br>If recursion is enabled and a password is specified, the application will use the password for given zip file only\. The inner zip file will be extracted only if the file is not password protected\. Among the different compression methods, only the zip supports password protection functionality\.<br><br>For certain Unicode characters, the file name is not unzipped as it is, by the zipfile module\.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **vault\_id** |  required  | Vault ID | string |  `sha1`  `vault id` 
 **container\_id** |  optional  | Destination container id | numeric |  `phantom container id` 
-**password** | optional | Password for the file | string |
+**password** |  optional  | Password for the file | string | 
 **recursive** |  optional  | Extract recursively  \(default\: false\) | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
-action\_result\.parameter\.container\_id | string |  `phantom container id` 
+action\_result\.parameter\.container\_id | numeric |  `phantom container id` 
+action\_result\.parameter\.password | string | 
 action\_result\.parameter\.recursive | boolean | 
 action\_result\.parameter\.vault\_id | string |  `sha1`  `vault id` 
-action\_result\.data\.\*\.aka | string | 
+action\_result\.data\.\*\.aka\.\* | string | 
 action\_result\.data\.\*\.container | string | 
 action\_result\.data\.\*\.container\_id | numeric |  `phantom container id` 
-action\_result\.data\.\*\.contains | string | 
+action\_result\.data\.\*\.contains\.\* | string | 
 action\_result\.data\.\*\.create\_time | string | 
+action\_result\.data\.\*\.created\_via | string | 
 action\_result\.data\.\*\.hash | string |  `sha1` 
 action\_result\.data\.\*\.id | numeric | 
 action\_result\.data\.\*\.metadata\.contains | string | 
@@ -461,6 +463,7 @@ action\_result\.data\.\*\.metadata\.md5 | string |  `md5`
 action\_result\.data\.\*\.metadata\.sha1 | string |  `sha1` 
 action\_result\.data\.\*\.metadata\.sha256 | string |  `sha256` 
 action\_result\.data\.\*\.metadata\.size | numeric | 
+action\_result\.data\.\*\.mime\_type | string | 
 action\_result\.data\.\*\.name | string | 
 action\_result\.data\.\*\.path | string | 
 action\_result\.data\.\*\.size | numeric | 
@@ -493,7 +496,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 DATA PATH | TYPE | CONTAINS
 --------- | ---- | --------
 action\_result\.status | string | 
-action\_result\.parameter\.container\_id | string |  `phantom container id` 
+action\_result\.parameter\.container\_id | numeric |  `phantom container id` 
 action\_result\.parameter\.keep\_owner | boolean | 
 action\_result\.parameter\.label | string | 
 action\_result\.parameter\.run\_automation | boolean | 
