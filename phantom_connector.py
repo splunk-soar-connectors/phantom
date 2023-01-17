@@ -1,6 +1,6 @@
 # File: phantom_connector.py
 #
-# Copyright (c) 2016-2022 Splunk Inc.
+# Copyright (c) 2016-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -48,6 +48,12 @@ try:
     from urllib.parse import quote
 except Exception:
     from urllib import quote
+
+
+# A list of files that MS OOXML archives will contain.
+# OOXML documents are zip files with metadata, assets and data as various
+# archive entries. We do not want to the deflate action to extract these.
+OOXML_FILES = frozenset(['[Content_Types].xml', '_rels/.rels'])
 
 
 def determine_contains(value):
@@ -802,6 +808,10 @@ class PhantomConnector(BaseConnector):
 
         return (phantom.APP_SUCCESS)
 
+    @classmethod
+    def _is_ooxml_zip(cls, member_filenames):
+        return OOXML_FILES.issubset(member_filenames)
+
     def _extract_file(self, action_result, file_path, file_name, recursive, container_id=None, password=None):
 
         self._level += 1
@@ -855,7 +865,15 @@ class PhantomConnector(BaseConnector):
                     if password:
                         vault_file.setpassword(password.encode())
 
-                    for compressed_file in vault_file.namelist():
+                    archived_files = vault_file.namelist()
+
+                    # The Office Document format is application/zip per file
+                    # but is not a standard zip file. (e.g. xlsx is application/zip) but if
+                    # we unzip it we will have possibly hundreds of small garbage files
+                    if self._is_ooxml_zip(archived_files):
+                        return phantom.APP_SUCCESS
+
+                    for compressed_file in archived_files:
 
                         save_as = os.path.basename(compressed_file)
 
