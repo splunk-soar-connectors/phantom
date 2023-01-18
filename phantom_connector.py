@@ -871,6 +871,7 @@ class PhantomConnector(BaseConnector):
                     # but is not a standard zip file. (e.g. xlsx is application/zip) but if
                     # we unzip it we will have possibly hundreds of small garbage files
                     if self._is_ooxml_zip(archived_files):
+                        self.debug_print(f'Skipping extraction of OOXML archive file: {file_name}')
                         return phantom.APP_SUCCESS
 
                     for compressed_file in archived_files:
