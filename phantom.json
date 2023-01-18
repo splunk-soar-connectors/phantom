@@ -17,7 +17,7 @@
     "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
-    "min_phantom_version": "5.3.0",
+    "min_phantom_version": "5.2.0",
     "fips_compliant": true,
     "license": "Copyright (c) 2016-2023 Splunk Inc.",
     "logo": "logo_splunk.svg",
