@@ -27,6 +27,7 @@ import string
 import tarfile
 import time
 import zipfile
+from pathlib import Path
 
 import magic
 import requests
@@ -812,6 +813,15 @@ class PhantomConnector(BaseConnector):
     def _is_ooxml_zip(cls, member_filenames):
         return OOXML_FILES.issubset(member_filenames)
 
+    def _has_allowed_archive_extension(self, file_name, allowed_extensions):
+        if allowed_extensions:
+            allowed_extension_suffixes = set(allowed_extensions.split(','))
+            file_extension = Path(file_name).suffix.lstrip('.')
+            if file_extension not in allowed_extension_suffixes:
+                return False
+
+        return True
+
     def _extract_file(self, action_result, file_path, file_name, recursive, container_id=None, password=None):
 
         self._level += 1
@@ -822,6 +832,12 @@ class PhantomConnector(BaseConnector):
 
         if file_type not in SUPPORTED_FILES:
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
+
+        config = self.get_config()
+        allowed_extensions = config.get('deflate_item_extensions', '')
+        if not self._has_allowed_archive_extension(file_name, allowed_extensions):
+            self.debug_print(f'Skipping extraction of {file_name} since it is not in the allowed extensions list: {allowed_extensions}')
+            return phantom.APP_SUCCESS
 
         data = None
         if file_type == 'application/x-bzip2':
