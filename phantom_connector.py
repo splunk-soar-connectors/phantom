@@ -809,11 +809,12 @@ class PhantomConnector(BaseConnector):
 
         return (phantom.APP_SUCCESS)
 
-    @classmethod
-    def _is_ooxml_zip(cls, member_filenames):
+    @staticmethod
+    def _is_ooxml_zip(member_filenames):
         return OOXML_FILES.issubset(member_filenames)
 
-    def _has_allowed_archive_extension(self, file_name, allowed_extensions):
+    @staticmethod
+    def _has_allowed_archive_extension(file_name, allowed_extensions):
         if allowed_extensions:
             allowed_extension_suffixes = set(allowed_extensions.split(','))
             file_extension = Path(file_name).suffix.lstrip('.')
@@ -882,13 +883,6 @@ class PhantomConnector(BaseConnector):
                         vault_file.setpassword(password.encode())
 
                     archived_files = vault_file.namelist()
-
-                    # The Office Document format is application/zip per file
-                    # but is not a standard zip file. (e.g. xlsx is application/zip) but if
-                    # we unzip it we will have possibly hundreds of small garbage files
-                    if self._is_ooxml_zip(archived_files):
-                        self.debug_print(f'Skipping extraction of OOXML archive file: {file_name}')
-                        return phantom.APP_SUCCESS
 
                     for compressed_file in archived_files:
 

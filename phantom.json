@@ -63,8 +63,7 @@
         "deflate_item_extensions": {
             "data_type": "string",
             "order": 5,
-            "description": "Only files with the specified extensions (comma-separated) will be deflated. If blank, file extension will not be checked",
-            "default": "bz,bz2,bzip,bzip2,gz,gzip,tar,tgz,zip"
+            "description": "Only files with the specified extensions (comma-separated) will be deflated. If blank, file extension will not be checked"
         }
     },
     "actions": [
