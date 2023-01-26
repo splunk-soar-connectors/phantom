@@ -1,2 +1,2 @@
 **Unreleased**
-* [PAPP-29231] Ignore OOXML files in deflate action
+* [PAPP-29231] Add an optional file extension allowlist for 'deflate item'
