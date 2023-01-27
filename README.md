@@ -2,7 +2,7 @@
 # Phantom
 
 Publisher: Splunk  
-Connector Version: 3\.6\.0  
+Connector Version: 3\.6\.1  
 Product Vendor: Phantom  
 Product Name: Phantom  
 Product Version Supported (regex): "\.\*"  
@@ -11,7 +11,7 @@ Minimum Product Version: 5\.2\.0
 This App exposes various Phantom APIs as actions
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2016-2022 Splunk Inc."
+[comment]: # "  Copyright (c) 2016-2023 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
 [comment]: # "you may not use this file except in compliance with the License."
@@ -139,6 +139,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 **username** |  optional  | string | Username \(for HTTP basic auth\)
 **password** |  optional  | password | Password \(for HTTP basic auth\)
 **verify\_certificate** |  optional  | boolean | Verify HTTPS certificate \(default\: false\)
+**deflate\_item\_extensions** |  optional  | string | Only files with the specified extensions \(comma\-separated\) will be deflated\. If blank, file extension will not be checked
 
 ### Supported Actions  
 [test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity  
