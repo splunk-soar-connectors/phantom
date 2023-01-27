@@ -1,6 +1,6 @@
 # File: phantom_connector.py
 #
-# Copyright (c) 2016-2022 Splunk Inc.
+# Copyright (c) 2016-2023 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import string
 import tarfile
 import time
 import zipfile
+from pathlib import Path
 
 import magic
 import requests
@@ -48,6 +49,12 @@ try:
     from urllib.parse import quote
 except Exception:
     from urllib import quote
+
+
+# A list of files that MS OOXML archives will contain.
+# OOXML documents are zip files with metadata, assets and data as various
+# archive entries. We do not want to the deflate action to extract these.
+OOXML_FILES = frozenset(['[Content_Types].xml', '_rels/.rels'])
 
 
 def determine_contains(value):
@@ -802,6 +809,20 @@ class PhantomConnector(BaseConnector):
 
         return (phantom.APP_SUCCESS)
 
+    @staticmethod
+    def _is_ooxml_zip(member_filenames):
+        return OOXML_FILES.issubset(member_filenames)
+
+    @staticmethod
+    def _has_allowed_archive_extension(file_name, allowed_extensions):
+        if allowed_extensions:
+            allowed_extension_suffixes = set(allowed_extensions.split(','))
+            file_extension = Path(file_name).suffix.lstrip('.')
+            if file_extension not in allowed_extension_suffixes:
+                return False
+
+        return True
+
     def _extract_file(self, action_result, file_path, file_name, recursive, container_id=None, password=None):
 
         self._level += 1
@@ -812,6 +833,12 @@ class PhantomConnector(BaseConnector):
 
         if file_type not in SUPPORTED_FILES:
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
+
+        config = self.get_config()
+        allowed_extensions = config.get('deflate_item_extensions', '')
+        if not self._has_allowed_archive_extension(file_name, allowed_extensions):
+            self.debug_print(f'Skipping extraction of {file_name} since it is not in the allowed extensions list: {allowed_extensions}')
+            return phantom.APP_SUCCESS
 
         data = None
         if file_type == 'application/x-bzip2':
@@ -855,7 +882,9 @@ class PhantomConnector(BaseConnector):
                     if password:
                         vault_file.setpassword(password.encode())
 
-                    for compressed_file in vault_file.namelist():
+                    archived_files = vault_file.namelist()
+
+                    for compressed_file in archived_files:
 
                         save_as = os.path.basename(compressed_file)
 

@@ -6,7 +6,7 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.6.0",
+    "app_version": "3.6.1",
     "latest_tested_versions": [
         "Splunk Phantom PlatformAPI v5.3.1",
         "SOAR On-prem v5.3.1.84890",
@@ -19,7 +19,7 @@
     "product_version_regex": ".*",
     "min_phantom_version": "5.2.0",
     "fips_compliant": true,
-    "license": "Copyright (c) 2016-2022 Splunk Inc.",
+    "license": "Copyright (c) 2016-2023 Splunk Inc.",
     "logo": "logo_splunk.svg",
     "contributors": [
         {
@@ -59,6 +59,11 @@
             "order": 4,
             "description": "Verify HTTPS certificate (default: false)",
             "default": false
+        },
+        "deflate_item_extensions": {
+            "data_type": "string",
+            "order": 5,
+            "description": "Only files with the specified extensions (comma-separated) will be deflated. If blank, file extension will not be checked"
         }
     },
     "actions": [
