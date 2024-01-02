@@ -1,8 +1,0 @@
-docker-compose.yml
-exclude_files.txt
-Makefile
-.git*
-.gitlab-ci.yml
-whitesource*
-gl-*.csv
-*.postman_collection.json
