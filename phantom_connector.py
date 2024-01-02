@@ -1,6 +1,6 @@
 # File: phantom_connector.py
 #
-# Copyright (c) 2016-2023 Splunk Inc.
+# Copyright (c) 2016-2024 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -746,9 +746,9 @@ class PhantomConnector(BaseConnector):
             with open(save_path, 'wb') as uncompressed_file:
                 uncompressed_file.write(data_stream)
         except IOError as e:
-            error_msg = self._get_error_message_from_exception(e)
+            error_message = self._get_error_message_from_exception(e)
             try:
-                if "File name too long" in error_msg:
+                if "File name too long" in error_message:
                     new_file_name = "ph_long_file_name_{}{}".format(self._level, random_suffix)
                     save_path = os.path.join(vault_tmp_dir, new_file_name)
                     self.debug_print("Original filename: {}".format(file_name))
@@ -897,9 +897,9 @@ class PhantomConnector(BaseConnector):
                         if phantom.is_fail(ret_val):
                             return ret_val
             except Exception as e:
-                error_msg = self._get_error_message_from_exception(e)
-                error_msg = error_msg.replace(compressed_file, file_name)
-                return action_result.set_status(phantom.APP_ERROR, "Unable to open the zip file: {}. {}".format(file_path, error_msg))
+                error_message = self._get_error_message_from_exception(e)
+                error_message = error_message.replace(compressed_file, file_name)
+                return action_result.set_status(phantom.APP_ERROR, "Unable to open the zip file: {}. {}".format(file_path, error_message))
 
             return (phantom.APP_SUCCESS)
 

@@ -2,16 +2,16 @@
 # Phantom
 
 Publisher: Splunk  
-Connector Version: 3\.6\.1  
+Connector Version: 3.6.2  
 Product Vendor: Phantom  
 Product Name: Phantom  
-Product Version Supported (regex): "\.\*"  
-Minimum Product Version: 5\.2\.0  
+Product Version Supported (regex): ".\*"  
+Minimum Product Version: 5.2.0  
 
 This App exposes various Phantom APIs as actions
 
 [comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2016-2023 Splunk Inc."
+[comment]: # "  Copyright (c) 2016-2024 Splunk Inc."
 [comment]: # ""
 [comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
 [comment]: # "you may not use this file except in compliance with the License."
@@ -134,12 +134,12 @@ The below configuration variables are required for this Connector to operate.  T
 
 VARIABLE | REQUIRED | TYPE | DESCRIPTION
 -------- | -------- | ---- | -----------
-**phantom\_server** |  required  | string | Phantom IP or Hostname \(e\.g\. 10\.1\.1\.10 or valid\_phantom\_hostname\)
-**auth\_token** |  optional  | password | Phantom Auth token
-**username** |  optional  | string | Username \(for HTTP basic auth\)
-**password** |  optional  | password | Password \(for HTTP basic auth\)
-**verify\_certificate** |  optional  | boolean | Verify HTTPS certificate \(default\: false\)
-**deflate\_item\_extensions** |  optional  | string | Only files with the specified extensions \(comma\-separated\) will be deflated\. If blank, file extension will not be checked
+**phantom_server** |  required  | string | Phantom IP or Hostname (e.g. 10.1.1.10 or valid_phantom_hostname)
+**auth_token** |  optional  | password | Phantom Auth token
+**username** |  optional  | string | Username (for HTTP basic auth)
+**password** |  optional  | password | Password (for HTTP basic auth)
+**verify_certificate** |  optional  | boolean | Verify HTTPS certificate (default: false)
+**deflate_item_extensions** |  optional  | string | Only files with the specified extensions (comma-separated) will be deflated. If blank, file extension will not be checked
 
 ### Supported Actions  
 [test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity  
@@ -176,50 +176,50 @@ Update or overwrite Phantom artifact with the provided input
 Type: **generic**  
 Read only: **False**
 
-<h4>Overwrite</h4>By default, this action will append or update these fields\: "cef\_json", "cef\_types\_json", and "tags", unless "overwrite" is enabled\. In which case, those parameters will replace the entirety of current versions of what that artifact contains\.<h4>Optional Fields</h4>While all are not required, for the action to run, at least one of the following optional parameters need to be provided\:<table><thead><tr><th>PARAMETER</th><th>EXAMPLE</th></tr></thead><tbody><tr><td>name</td><td>Artifact Name</td></tr><tr><td>label</td><td>artifact\_label</td></tr><tr><td>severity</td><td>high</td></tr><tr><td>cef\_json</td><td>\{"key1"\: "value1", "goodDomain"\: "www\.splunk\.com", "remove\_me"\: ""\}</td></tr><tr><td>cef\_types\_json</td><td>\{"goodDomain"\: \["domain"\]\}</td></tr><tr><td>tags</td><td>tag1, tag3 <i>or</i> \["tag2", "tag4"\]</td></tr><tr><td>artifact\_json</td><td>\{"source\_data\_identifier"\: "myTicket1234", "label"\: "new\_label"\}</td></tr></tbody></table><h4>Artifact JSON</h4>Artifact JSON should be used for more advanced aspects of Phantom artifacts\. See Phantom REST API docs, specifically regarding artifacts\.
+<h4>Overwrite</h4>By default, this action will append or update these fields: "cef_json", "cef_types_json", and "tags", unless "overwrite" is enabled. In which case, those parameters will replace the entirety of current versions of what that artifact contains.<h4>Optional Fields</h4>While all are not required, for the action to run, at least one of the following optional parameters need to be provided:<table><thead><tr><th>PARAMETER</th><th>EXAMPLE</th></tr></thead><tbody><tr><td>name</td><td>Artifact Name</td></tr><tr><td>label</td><td>artifact_label</td></tr><tr><td>severity</td><td>high</td></tr><tr><td>cef_json</td><td>{"key1": "value1", "goodDomain": "www.splunk.com", "remove_me": ""}</td></tr><tr><td>cef_types_json</td><td>{"goodDomain": ["domain"]}</td></tr><tr><td>tags</td><td>tag1, tag3 <i>or</i> ["tag2", "tag4"]</td></tr><tr><td>artifact_json</td><td>{"source_data_identifier": "myTicket1234", "label": "new_label"}</td></tr></tbody></table><h4>Artifact JSON</h4>Artifact JSON should be used for more advanced aspects of Phantom artifacts. See Phantom REST API docs, specifically regarding artifacts.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**artifact\_id** |  required  | ID of artifact to update | string |  `phantom artifact id` 
-**name** |  optional  | Artifact name \(Always overwrites, if provided\) | string | 
-**label** |  optional  | Artifact label \(Always overwrites, if provided\) | string | 
-**severity** |  optional  | Artifact severity \(Always overwrites, if provided\) | string | 
-**cef\_json** |  optional  | JSON format of the CEF fields you want in the artifact | string | 
-**cef\_types\_json** |  optional  | JSON format of the CEF types \(e\.g\., \{'myIP'\: \['ip', 'ipv6'\]\}\) | string | 
-**tags** |  optional  | Comma\-separated list of tags to add or replace in the artifact | string | 
-**overwrite** |  optional  | Overwrite artifacts with provided input \(applies to\: cef\_json, contains\_json, tags\) | boolean | 
-**artifact\_json** |  optional  | JSON format of entire artifact \(Always overwrites provided keys\) | string | 
+**artifact_id** |  required  | ID of artifact to update | string |  `phantom artifact id` 
+**name** |  optional  | Artifact name (Always overwrites, if provided) | string | 
+**label** |  optional  | Artifact label (Always overwrites, if provided) | string | 
+**severity** |  optional  | Artifact severity (Always overwrites, if provided) | string | 
+**cef_json** |  optional  | JSON format of the CEF fields you want in the artifact | string | 
+**cef_types_json** |  optional  | JSON format of the CEF types (e.g., {'myIP': ['ip', 'ipv6']}) | string | 
+**tags** |  optional  | Comma-separated list of tags to add or replace in the artifact | string | 
+**overwrite** |  optional  | Overwrite artifacts with provided input (applies to: cef_json, contains_json, tags) | boolean | 
+**artifact_json** |  optional  | JSON format of entire artifact (Always overwrites provided keys) | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.artifact\_id | string |  `phantom artifact id` 
-action\_result\.parameter\.artifact\_json | string | 
-action\_result\.parameter\.cef\_json | string | 
-action\_result\.parameter\.cef\_types\_json | string | 
-action\_result\.parameter\.label | string | 
-action\_result\.parameter\.name | string | 
-action\_result\.parameter\.overwrite | boolean | 
-action\_result\.parameter\.severity | string | 
-action\_result\.parameter\.tags | string | 
-action\_result\.data\.\*\.requested\_artifact\.cef\.deleted\_field | string | 
-action\_result\.data\.\*\.requested\_artifact\.cef\.new\_field | string | 
-action\_result\.data\.\*\.requested\_artifact\.cef\.test | string | 
-action\_result\.data\.\*\.requested\_artifact\.cef\_types\.new\_field | string | 
-action\_result\.data\.\*\.requested\_artifact\.description | string | 
-action\_result\.data\.\*\.requested\_artifact\.label | string | 
-action\_result\.data\.\*\.requested\_artifact\.name | string | 
-action\_result\.data\.\*\.requested\_artifact\.severity | string | 
-action\_result\.data\.\*\.requested\_artifact\.source\_data\_identifier | string | 
-action\_result\.data\.\*\.requested\_artifact\.tags | string | 
-action\_result\.data\.\*\.response\.id | numeric | 
-action\_result\.data\.\*\.response\.success | boolean | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.artifact_id | string |  `phantom artifact id`  |   2388 
+action_result.parameter.artifact_json | string |  |   {"severity": "high", "label": "test label", "description": "Artifact added by Me", "source_data_identifier": "my_custom_sdi"} 
+action_result.parameter.cef_json | string |  |   {"new_field": "new_value", "deleted_field": ""} 
+action_result.parameter.cef_types_json | string |  |   {"new_field": ["new contains"]} 
+action_result.parameter.label | string |  |   test label 
+action_result.parameter.name | string |  |   New Name 
+action_result.parameter.overwrite | boolean |  |   True  False 
+action_result.parameter.severity | string |  |   high 
+action_result.parameter.tags | string |  |   ["tag2"] 
+action_result.data.\*.requested_artifact.cef.deleted_field | string |  |  
+action_result.data.\*.requested_artifact.cef.new_field | string |  |   new_value 
+action_result.data.\*.requested_artifact.cef.test | string |  |   fff 
+action_result.data.\*.requested_artifact.cef_types.new_field | string |  |   new contains 
+action_result.data.\*.requested_artifact.description | string |  |   Artifact added by Me 
+action_result.data.\*.requested_artifact.label | string |  |   test label 
+action_result.data.\*.requested_artifact.name | string |  |   New Name 
+action_result.data.\*.requested_artifact.severity | string |  |   high 
+action_result.data.\*.requested_artifact.source_data_identifier | string |  |   my_custom_sdi 
+action_result.data.\*.requested_artifact.tags | string |  |   tag2 
+action_result.data.\*.response.id | numeric |  |   2388 
+action_result.data.\*.response.success | boolean |  |   True  False 
+action_result.summary | string |  |  
+action_result.message | string |  |   Artifact updated successfully. 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'add note'
 Add a note to a container
@@ -227,29 +227,29 @@ Add a note to a container
 Type: **generic**  
 Read only: **False**
 
-If the <b>container\_id</b> parameter is left empty, then it will be initialized to the current container's id \(from where the action is being run\) and the status will be reflected accordingly\. If the container is a case, a <b>phase\_id</b> parameter can be provided to associate the note to a particular phase\.
+If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id (from where the action is being run) and the status will be reflected accordingly. If the container is a case, a <b>phase_id</b> parameter can be provided to associate the note to a particular phase.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **title** |  required  | Title for the note | string | 
 **content** |  optional  | Note content | string | 
-**container\_id** |  optional  | The container id \(defaults to current container\) | numeric |  `phantom container id` 
-**phase\_id** |  optional  | Phase the note will be associated with | string | 
+**container_id** |  optional  | The container id (defaults to current container) | numeric |  `phantom container id` 
+**phase_id** |  optional  | Phase the note will be associated with | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.container\_id | numeric |  `phantom container id` 
-action\_result\.parameter\.content | string | 
-action\_result\.parameter\.phase\_id | string | 
-action\_result\.parameter\.title | string | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.container_id | numeric |  `phantom container id`  |   35 
+action_result.parameter.content | string |  |   Adding a note via app action 
+action_result.parameter.phase_id | string |  |  
+action_result.parameter.title | string |  |   Note test  Testing note 
+action_result.data | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |   Note created 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'update artifact tags'
 Add/Remove tags from an artifact
@@ -260,25 +260,25 @@ Read only: **False**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**artifact\_id** |  required  | The artifact id | string |  `phantom artifact id` 
-**add\_tags** |  optional  | Comma\-separated list of tags to add to the artifact | string | 
-**remove\_tags** |  optional  | Comma\-separated list of tags to remove from the artifact | string | 
+**artifact_id** |  required  | The artifact id | string |  `phantom artifact id` 
+**add_tags** |  optional  | Comma-separated list of tags to add to the artifact | string | 
+**remove_tags** |  optional  | Comma-separated list of tags to remove from the artifact | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.add\_tags | string | 
-action\_result\.parameter\.artifact\_id | string |  `phantom artifact id` 
-action\_result\.parameter\.remove\_tags | string | 
-action\_result\.data | string | 
-action\_result\.summary\.tags\_added | string | 
-action\_result\.summary\.tags\_already\_absent | string | 
-action\_result\.summary\.tags\_already\_present | string | 
-action\_result\.summary\.tags\_removed | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.add_tags | string |  |   tag1, tag3 
+action_result.parameter.artifact_id | string |  `phantom artifact id`  |   94 
+action_result.parameter.remove_tags | string |  |   tag2, tag4 
+action_result.data | string |  |  
+action_result.summary.tags_added | string |  |   tag1 
+action_result.summary.tags_already_absent | string |  |   tag4 
+action_result.summary.tags_already_present | string |  |   tag3 
+action_result.summary.tags_removed | string |  |   tag2 
+action_result.message | string |  |   Tags added: tag1, Tags removed: tag2, Tags already present: tag3, Tags already absent: tag4 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'find artifacts'
 Find artifacts containing a CEF value
@@ -286,37 +286,37 @@ Find artifacts containing a CEF value
 Type: **investigate**  
 Read only: **True**
 
-If the <b>limit\_search</b> parameter is set to true, then the action will search the required artifact in the provided <b>container\_ids</b> only\. Otherwise, the <b>container\_ids</b> parameter will be ignored\.<br><br>If any non\-integer value is provided in the <b>container\_ids</b> parameter, then all the non\-integer values will be removed and the parameter will be updated accordingly\. If the value of the <b>container\_ids</b> parameter is <b>current</b>, then it will be replaced by the current container's id\(from which the action is being run\) and the status will be reflected accordingly\.<br><br>If the <b>exact\_match</b> parameter is set to false, then the action will return all those artifacts for which the <b>values</b> parameter is a substring of any one of its cef values\. Otherwise it will return those artifacts for which any one of its cef value matches exactly with the <b>values</b> parameter\.<br><br>For the <b>values</b> of type integer, float or string, it is suggested to set the <b>exact\_match</b> parameter to false\.
+If the <b>limit_search</b> parameter is set to true, then the action will search the required artifact in the provided <b>container_ids</b> only. Otherwise, the <b>container_ids</b> parameter will be ignored.<br><br>If any non-integer value is provided in the <b>container_ids</b> parameter, then all the non-integer values will be removed and the parameter will be updated accordingly. If the value of the <b>container_ids</b> parameter is <b>current</b>, then it will be replaced by the current container's id(from which the action is being run) and the status will be reflected accordingly.<br><br>If the <b>exact_match</b> parameter is set to false, then the action will return all those artifacts for which the <b>values</b> parameter is a substring of any one of its cef values. Otherwise it will return those artifacts for which any one of its cef value matches exactly with the <b>values</b> parameter.<br><br>For the <b>values</b> of type integer, float or string, it is suggested to set the <b>exact_match</b> parameter to false.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**cef\_key** |  optional  | Key of the cef dict you are querying\: act, app, applicationProtocol, baseEventCount, bytesIn, etc\. It will search the entire cef dictionary if blank | string | 
+**cef_key** |  optional  | Key of the cef dict you are querying: act, app, applicationProtocol, baseEventCount, bytesIn, etc. It will search the entire cef dictionary if blank | string | 
 **values** |  required  | Find this value in artifacts | string |  `\*` 
-**exact\_match** |  optional  | Exact match \(default\: true\) | boolean | 
-**limit\_search** |  optional  | Limit search to specified containers \(default\: false\) | boolean | 
-**container\_ids** |  optional  | List of space or comma separated container ids\. the word "current" will be replaced by the current container id | string | 
+**exact_match** |  optional  | Exact match (default: true) | boolean | 
+**limit_search** |  optional  | Limit search to specified containers (default: false) | boolean | 
+**container_ids** |  optional  | List of space or comma separated container ids. the word "current" will be replaced by the current container id | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.cef\_key | string | 
-action\_result\.parameter\.container\_ids | string | 
-action\_result\.parameter\.exact\_match | boolean | 
-action\_result\.parameter\.limit\_search | boolean | 
-action\_result\.parameter\.values | string |  `\*` 
-action\_result\.data\.\*\.container | numeric | 
-action\_result\.data\.\*\.container\_name | string | 
-action\_result\.data\.\*\.found in | string | 
-action\_result\.data\.\*\.id | numeric | 
-action\_result\.data\.\*\.matched | string | 
-action\_result\.data\.\*\.name | string | 
-action\_result\.summary\.artifacts\_found | numeric | 
-action\_result\.summary\.server | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.cef_key | string |  |   act  app  applicationProtocol 
+action_result.parameter.container_ids | string |  |   current 
+action_result.parameter.exact_match | boolean |  |   True  False 
+action_result.parameter.limit_search | boolean |  |   True  False 
+action_result.parameter.values | string |  `\*`  |   test_value 
+action_result.data.\*.container | numeric |  |   1234 
+action_result.data.\*.container_name | string |  |   phantom_test 
+action_result.data.\*.found in | string |  |   test_key 
+action_result.data.\*.id | numeric |  |   12345 
+action_result.data.\*.matched | string |  |   test_value 
+action_result.data.\*.name | string |  |   Artifact_demo 
+action_result.summary.artifacts_found | numeric |  |   1 
+action_result.summary.server | string |  |   https://10.1.1.10 
+action_result.message | string |  |   Artifacts found: 1, Server: https://10.1.1.10 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'add listitem'
 Add value to a custom list
@@ -324,28 +324,28 @@ Add value to a custom list
 Type: **generic**  
 Read only: **False**
 
-To add a row containing a single value to a list simply pass the value\. However, to pass multiple values in a row, format it like a JSON array \(e\.g\. \["item1", "item2", "item3"\]\)\.<br><br>The action will update the <b>list</b>, if the <b>list</b> already exists \(even if the <b>create</b> parameter is set to true\)\.<br><br>After creating or updating a list through this action, if the same list is updated from the UI, then the user needs to save those changes before updating the list through this action again, otherwise, the changes made from the UI will be overridden\.
+To add a row containing a single value to a list simply pass the value. However, to pass multiple values in a row, format it like a JSON array (e.g. ["item1", "item2", "item3"]).<br><br>The action will update the <b>list</b>, if the <b>list</b> already exists (even if the <b>create</b> parameter is set to true).<br><br>After creating or updating a list through this action, if the same list is updated from the UI, then the user needs to save those changes before updating the list through this action again, otherwise, the changes made from the UI will be overridden.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **list** |  required  | Name or ID of a custom list | string | 
-**new\_row** |  required  | New Row \(string or JSON list\) | string |  `\*` 
-**create** |  optional  | Create list if it does not exist \(default\: false\) | boolean | 
+**new_row** |  required  | New Row (string or JSON list) | string |  `\*` 
+**create** |  optional  | Create list if it does not exist (default: false) | boolean | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.create | boolean | 
-action\_result\.parameter\.list | string | 
-action\_result\.parameter\.new\_row | string |  `\*` 
-action\_result\.data\.\*\.failed | boolean | 
-action\_result\.data\.\*\.success | boolean | 
-action\_result\.summary\.server | string |  `url` 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.create | boolean |  |   True  False 
+action_result.parameter.list | string |  |   demo_list 
+action_result.parameter.new_row | string |  `\*`  |   ["value1","value2","value3"] 
+action_result.data.\*.failed | boolean |  |  
+action_result.data.\*.success | boolean |  |   True  False 
+action_result.summary.server | string |  `url`  |   https://10.1.1.10 
+action_result.message | string |  |   Server: https://10.1.1.10 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'find listitem'
 Find value in a custom list
@@ -353,34 +353,34 @@ Find value in a custom list
 Type: **investigate**  
 Read only: **True**
 
-Row and column coordinates for each matching value can be found in the result summary under "locations"\. The match is case sensitive\.<br><br>If the <b>exact\_match</b> parameter is set to false, then the action will return all those strings for which the <b>values</b> parameter is its substring\. Otherwise it will return those strings which match exactly with the <b>values</b> parameter\.
+Row and column coordinates for each matching value can be found in the result summary under "locations". The match is case sensitive.<br><br>If the <b>exact_match</b> parameter is set to false, then the action will return all those strings for which the <b>values</b> parameter is its substring. Otherwise it will return those strings which match exactly with the <b>values</b> parameter.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **list** |  required  | Name or ID of a custom list | string | 
-**column\_index** |  optional  | Search in column number \(0 based\) | numeric | 
+**column_index** |  optional  | Search in column number (0 based) | numeric | 
 **values** |  required  | Value to search for | string |  `\*` 
-**exact\_match** |  optional  | Exact match \(default\: true\) | boolean | 
+**exact_match** |  optional  | Exact match (default: true) | boolean | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.column\_index | numeric | 
-action\_result\.parameter\.exact\_match | boolean | 
-action\_result\.parameter\.list | string | 
-action\_result\.parameter\.values | string |  `\*` 
-action\_result\.data | string | 
-action\_result\.data\.\* | string | 
-action\_result\.summary\.found\_matches | numeric | 
-action\_result\.summary\.list\_id | numeric | 
-action\_result\.summary\.locations | numeric | 
-action\_result\.summary\.locations\.\* | numeric | 
-action\_result\.summary\.server | string |  `url` 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.column_index | numeric |  |  
+action_result.parameter.exact_match | boolean |  |   True  False 
+action_result.parameter.list | string |  |   list_demo 
+action_result.parameter.values | string |  `\*`  |   value1 
+action_result.data | string |  |  
+action_result.data.\* | string |  |  
+action_result.summary.found_matches | numeric |  |   1 
+action_result.summary.list_id | numeric |  |   18 
+action_result.summary.locations | numeric |  |  
+action_result.summary.locations.\* | numeric |  |  
+action_result.summary.server | string |  `url`  |   https://10.1.1.10 
+action_result.message | string |  |   Server: https://10.1.1.10, Found matches: 1, Locations: [(1, 0)], List id: 18 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'add artifact'
 Add a new artifact to a container
@@ -388,44 +388,44 @@ Add a new artifact to a container
 Type: **generic**  
 Read only: **False**
 
-If the <b>container\_id</b> parameter is left empty, then it will be initialized to the current container's id \(from which the action is being run\) and the status will be reflected accordingly\.<br><br>CEF fields can be added to the artifact in two ways, either by using the <b>cef\_name</b> and <b>cef\_value</b> parameter or by using the <b>cef\_dictionary</b> parameter\. If the <b>cef\_name</b>, <b>cef\_value</b>, and <b>cef\_dictionary</b> parameters are all included, the action will add the <b>cef\_name</b> field to the <b>cef\_dictionary</b>\.<br><br>Using only the <b>cef\_name</b> and <b>cef\_value</b> parameter will result in the artifact having one CEF field\.<br><br>The <b>cef\_dictionary</b> parameter takes a JSON dictionary with key\-value pairs representing CEF key\-value pairs\. To provide values containing double\-quotes\("\), add a backslash\(\\\) before the double\-quotes\.<br>For e\.g\., \{"X\-Universally\-Unique\-Identifier"\:"test","Content\-Type"\:"multipart/alternative; boundary=<b>\\"</b>Apple\-Mail=\_0DA95D7E\-B791\-4751\-8043\-175949088A2C<b>\\"</b>>","Message\-Id"\:"<abc\@xyz\.com>"\}<br><br>The <b>contains</b> parameter can take a JSON dictionary, with the keys matching the keys of the <b>cef\_dictionary</b> and the values being lists of possible contains for the CEF field\. If a given value in the <b>cef\_dictionary</b> is not present in the <b>contains</b> dictionary, the action will first check the list of default CEF fields\. If not a default CEF field, then the action will attempt to identify the appropriate value for contains\.<br>The <b>contains</b> parameter can also take a string\(or a comma\-separated list of strings\) representing the contains for the <b>cef\_value</b> parameter\. This method should be used only if the <b>cef\_name</b> and <b>cef\_value</b> parameters are used\.<br><br>If the <b>run\_automation</b> parameter is set to true then the active playbooks will run automatically after the artifact is added\. The active playbooks will run on the same container in which the artifact is added\.<br><br>See the <a href="https\://docs\.splunk\.com/Documentation/Phantom/4\.8/PlatformAPI/RESTArtifacts" target="\_blank">REST API Documentation</a> for more information on artifacts, CEF fields, and contains\.
+If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id (from which the action is being run) and the status will be reflected accordingly.<br><br>CEF fields can be added to the artifact in two ways, either by using the <b>cef_name</b> and <b>cef_value</b> parameter or by using the <b>cef_dictionary</b> parameter. If the <b>cef_name</b>, <b>cef_value</b>, and <b>cef_dictionary</b> parameters are all included, the action will add the <b>cef_name</b> field to the <b>cef_dictionary</b>.<br><br>Using only the <b>cef_name</b> and <b>cef_value</b> parameter will result in the artifact having one CEF field.<br><br>The <b>cef_dictionary</b> parameter takes a JSON dictionary with key-value pairs representing CEF key-value pairs. To provide values containing double-quotes("), add a backslash(\\) before the double-quotes.<br>For e.g., {"X-Universally-Unique-Identifier":"test","Content-Type":"multipart/alternative; boundary=<b>\\"</b>Apple-Mail=_0DA95D7E-B791-4751-8043-175949088A2C<b>\\"</b>>","Message-Id":"<abc@xyz.com>"}<br><br>The <b>contains</b> parameter can take a JSON dictionary, with the keys matching the keys of the <b>cef_dictionary</b> and the values being lists of possible contains for the CEF field. If a given value in the <b>cef_dictionary</b> is not present in the <b>contains</b> dictionary, the action will first check the list of default CEF fields. If not a default CEF field, then the action will attempt to identify the appropriate value for contains.<br>The <b>contains</b> parameter can also take a string(or a comma-separated list of strings) representing the contains for the <b>cef_value</b> parameter. This method should be used only if the <b>cef_name</b> and <b>cef_value</b> parameters are used.<br><br>If the <b>run_automation</b> parameter is set to true then the active playbooks will run automatically after the artifact is added. The active playbooks will run on the same container in which the artifact is added.<br><br>See the <a href="https://docs.splunk.com/Documentation/Phantom/4.8/PlatformAPI/RESTArtifacts" target="_blank">REST API Documentation</a> for more information on artifacts, CEF fields, and contains.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **name** |  optional  | Name of the new artifact | string | 
-**container\_id** |  optional  | Numeric container ID for the new artifact | numeric |  `phantom container id` 
-**label** |  optional  | Artifact label \(default\: event\) | string | 
-**source\_data\_identifier** |  required  | Source Data Idenitifier | string | 
-**cef\_name** |  optional  | CEF Name | string | 
-**cef\_value** |  optional  | Value | string |  `\*` 
-**cef\_dictionary** |  optional  | CEF JSON | string | 
+**container_id** |  optional  | Numeric container ID for the new artifact | numeric |  `phantom container id` 
+**label** |  optional  | Artifact label (default: event) | string | 
+**source_data_identifier** |  required  | Source Data Idenitifier | string | 
+**cef_name** |  optional  | CEF Name | string | 
+**cef_value** |  optional  | Value | string |  `\*` 
+**cef_dictionary** |  optional  | CEF JSON | string | 
 **contains** |  optional  | Data type for each CEF field | string | 
-**run\_automation** |  optional  | Run automation on newly created artifact\(s\) \(default\: false\) | boolean | 
+**run_automation** |  optional  | Run automation on newly created artifact(s) (default: false) | boolean | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.cef\_dictionary | string | 
-action\_result\.parameter\.cef\_name | string | 
-action\_result\.parameter\.cef\_value | string |  `\*` 
-action\_result\.parameter\.container\_id | numeric |  `phantom container id` 
-action\_result\.parameter\.contains | string | 
-action\_result\.parameter\.label | string | 
-action\_result\.parameter\.name | string | 
-action\_result\.parameter\.run\_automation | string | 
-action\_result\.parameter\.source\_data\_identifier | string | 
-action\_result\.data\.\*\.existing\_artifact\_id | numeric | 
-action\_result\.data\.\*\.failed | boolean | 
-action\_result\.data\.\*\.id | numeric | 
-action\_result\.data\.\*\.success | boolean | 
-action\_result\.summary\.artifact\_id | numeric | 
-action\_result\.summary\.container\_id | numeric | 
-action\_result\.summary\.server | string |  `url` 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.cef_dictionary | string |  |   {"test_key": "test_value"} 
+action_result.parameter.cef_name | string |  |  
+action_result.parameter.cef_value | string |  `\*`  |  
+action_result.parameter.container_id | numeric |  `phantom container id`  |   1234 
+action_result.parameter.contains | string |  |   domain 
+action_result.parameter.label | string |  |   event 
+action_result.parameter.name | string |  |   Artifact_demo 
+action_result.parameter.run_automation | string |  |   True  False 
+action_result.parameter.source_data_identifier | string |  |  
+action_result.data.\*.existing_artifact_id | numeric |  |  
+action_result.data.\*.failed | boolean |  |  
+action_result.data.\*.id | numeric |  |   123 
+action_result.data.\*.success | boolean |  |   True  False 
+action_result.summary.artifact_id | numeric |  |   12345 
+action_result.summary.container_id | numeric |  |   1234 
+action_result.summary.server | string |  `url`  |   https://10.1.1.10 
+action_result.message | string |  |   Artifact id: 12345, Container id: 1234, Server: https://10.1.1.10 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'deflate item'
 Deflates an item from the vault
@@ -433,49 +433,49 @@ Deflates an item from the vault
 Type: **generic**  
 Read only: **False**
 
-The action will be supported only if the <b>phantom\_server</b> parameter \(in the asset configurations\) is configured to the local Phantom instance, i\.e\., the instance from which the action is being run\.<br><br>The action detects if the input vault item is a compressed file and deflates it\. Every file found after deflation is then added to the vault\. If <b>container\_id</b> is specified will add to its vault, else to the current \(the container whose context the action is executed\) container\. The action supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types\. In the case where the compressed file contains another compressed file in it, set the <b>recursive</b> parameter to true to deflate the inner compressed file\.<br><br>If recursion is enabled and a password is specified, the application will use the password for given zip file only\. The inner zip file will be extracted only if the file is not password protected\. Among the different compression methods, only the zip supports password protection functionality\.<br><br>For certain Unicode characters, the file name is not unzipped as it is, by the zipfile module\.
+The action will be supported only if the <b>phantom_server</b> parameter (in the asset configurations) is configured to the local Phantom instance, i.e., the instance from which the action is being run.<br><br>The action detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to its vault, else to the current (the container whose context the action is executed) container. The action supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types. In the case where the compressed file contains another compressed file in it, set the <b>recursive</b> parameter to true to deflate the inner compressed file.<br><br>If recursion is enabled and a password is specified, the application will use the password for given zip file only. The inner zip file will be extracted only if the file is not password protected. Among the different compression methods, only the zip supports password protection functionality.<br><br>For certain Unicode characters, the file name is not unzipped as it is, by the zipfile module.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**vault\_id** |  required  | Vault ID | string |  `sha1`  `vault id` 
-**container\_id** |  optional  | Destination container id | numeric |  `phantom container id` 
+**vault_id** |  required  | Vault ID | string |  `sha1`  `vault id` 
+**container_id** |  optional  | Destination container id | numeric |  `phantom container id` 
 **password** |  optional  | Password for the file | string | 
-**recursive** |  optional  | Extract recursively  \(default\: false\) | boolean | 
+**recursive** |  optional  | Extract recursively  (default: false) | boolean | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.container\_id | numeric |  `phantom container id` 
-action\_result\.parameter\.password | string | 
-action\_result\.parameter\.recursive | boolean | 
-action\_result\.parameter\.vault\_id | string |  `sha1`  `vault id` 
-action\_result\.data\.\*\.aka\.\* | string | 
-action\_result\.data\.\*\.container | string | 
-action\_result\.data\.\*\.container\_id | numeric |  `phantom container id` 
-action\_result\.data\.\*\.contains\.\* | string | 
-action\_result\.data\.\*\.create\_time | string | 
-action\_result\.data\.\*\.created\_via | string | 
-action\_result\.data\.\*\.hash | string |  `sha1` 
-action\_result\.data\.\*\.id | numeric | 
-action\_result\.data\.\*\.metadata\.contains | string | 
-action\_result\.data\.\*\.metadata\.md5 | string |  `md5` 
-action\_result\.data\.\*\.metadata\.sha1 | string |  `sha1` 
-action\_result\.data\.\*\.metadata\.sha256 | string |  `sha256` 
-action\_result\.data\.\*\.metadata\.size | numeric | 
-action\_result\.data\.\*\.mime\_type | string | 
-action\_result\.data\.\*\.name | string | 
-action\_result\.data\.\*\.path | string | 
-action\_result\.data\.\*\.size | numeric | 
-action\_result\.data\.\*\.task | string | 
-action\_result\.data\.\*\.user | string | 
-action\_result\.data\.\*\.vault\_document | numeric | 
-action\_result\.data\.\*\.vault\_id | string |  `sha1`  `vault id` 
-action\_result\.summary\.total\_vault\_items | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.container_id | numeric |  `phantom container id`  |   3 
+action_result.parameter.password | string |  |   P@$$w0rd 
+action_result.parameter.recursive | boolean |  |   True  False 
+action_result.parameter.vault_id | string |  `sha1`  `vault id`  |   f582ed9120fa3be94852c73e1cd188f2948f677f 
+action_result.data.\*.aka.\* | string |  |   test.txt 
+action_result.data.\*.container | string |  |   phantom_test 
+action_result.data.\*.container_id | numeric |  `phantom container id`  |   1234 
+action_result.data.\*.contains.\* | string |  |   vault id 
+action_result.data.\*.create_time | string |  |   0 minutes ago 
+action_result.data.\*.created_via | string |  |   automation 
+action_result.data.\*.hash | string |  `sha1`  |   0a0e6c7ab7f77d058efd444279b81c4c6a9cf4ce 
+action_result.data.\*.id | numeric |  |   12 
+action_result.data.\*.metadata.contains | string |  |   vault id 
+action_result.data.\*.metadata.md5 | string |  `md5`  |   0db33a0790b6d6d5c2e4425646eee7fc 
+action_result.data.\*.metadata.sha1 | string |  `sha1`  |   fece6c7ab7f77d058efd444279b81c4c6a9cf4ce 
+action_result.data.\*.metadata.sha256 | string |  `sha256`  |   4f2155212cb0f74207bd0e4fd5ecae548ee2bae1d2dcd36c1d0ba0b6254bd4a1 
+action_result.data.\*.metadata.size | numeric |  |   33 
+action_result.data.\*.mime_type | string |  |   text/plain 
+action_result.data.\*.name | string |  |   tgz-test 
+action_result.data.\*.path | string |  |  
+action_result.data.\*.size | numeric |  |   10240 
+action_result.data.\*.task | string |  |  
+action_result.data.\*.user | string |  |  
+action_result.data.\*.vault_document | numeric |  |  
+action_result.data.\*.vault_id | string |  `sha1`  `vault id`  |   b90e6c7ab7f77d058efd444279b81c4c6a9cf4ce 
+action_result.summary.total_vault_items | numeric |  |   9 
+action_result.message | string |  |   Total vault items: 9 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'export container'
 Export local container to the configured Phantom asset
@@ -483,30 +483,30 @@ Export local container to the configured Phantom asset
 Type: **generic**  
 Read only: **False**
 
-This action exports a container \(that matches the <b>container\_id</b>\) from the local Phantom instance \(the instance from where the action is being run\) to the configured Phantom asset \(that the action is being executed on\)\.<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the local phantom instance and the configured Phantom asset does not match\.<br><br>Set the <b>keep\_owner</b> parameter to true if you want the owner of the container on the configured Phantom instance to match the owner on the local instance\. Note that this will be based on Owner ID, not Owner Name\.
+This action exports a container (that matches the <b>container_id</b>) from the local Phantom instance (the instance from where the action is being run) to the configured Phantom asset (that the action is being executed on).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the local phantom instance and the configured Phantom asset does not match.<br><br>Set the <b>keep_owner</b> parameter to true if you want the owner of the container on the configured Phantom instance to match the owner on the local instance. Note that this will be based on Owner ID, not Owner Name.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**container\_id** |  required  | Container ID to copy | numeric |  `phantom container id` 
-**keep\_owner** |  optional  | Keep Owner | boolean | 
-**label** |  optional  | Label to name the export container\. If blank, the export container will have the same name as the local container | string | 
-**run\_automation** |  optional  | Run active playbooks | boolean | 
+**container_id** |  required  | Container ID to copy | numeric |  `phantom container id` 
+**keep_owner** |  optional  | Keep Owner | boolean | 
+**label** |  optional  | Label to name the export container. If blank, the export container will have the same name as the local container | string | 
+**run_automation** |  optional  | Run active playbooks | boolean | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.container\_id | numeric |  `phantom container id` 
-action\_result\.parameter\.keep\_owner | boolean | 
-action\_result\.parameter\.label | string | 
-action\_result\.parameter\.run\_automation | boolean | 
-action\_result\.data | string | 
-action\_result\.summary\.artifact\_count | numeric | 
-action\_result\.summary\.container\_id | numeric |  `phantom container id` 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.container_id | numeric |  `phantom container id`  |   3 
+action_result.parameter.keep_owner | boolean |  |   True  False 
+action_result.parameter.label | string |  |   events 
+action_result.parameter.run_automation | boolean |  |   True  False 
+action_result.data | string |  |  
+action_result.summary.artifact_count | numeric |  |   268 
+action_result.summary.container_id | numeric |  `phantom container id`  |   94 
+action_result.message | string |  |   Container id: 94, Artifact count: 268 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'import container'
 Import a container from an external Phantom instance
@@ -514,26 +514,26 @@ Import a container from an external Phantom instance
 Type: **generic**  
 Read only: **False**
 
-This action imports a container \(that matches the <b>container\_id</b>\) from the configured Phantom asset \(that the action is being executed on\) into the local Phantom instance \(the instance from where the action is being run\)\.<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the configured Phantom asset and the local phantom instance does not match\.<br><br>Set the <b>keep\_owner</b> parameter to true if you want the owner of the container on the local Phantom instance to match the owner on the configured instance\. Note that this will be based on Owner ID, not Owner Name\.
+This action imports a container (that matches the <b>container_id</b>) from the configured Phantom asset (that the action is being executed on) into the local Phantom instance (the instance from where the action is being run).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the configured Phantom asset and the local phantom instance does not match.<br><br>Set the <b>keep_owner</b> parameter to true if you want the owner of the container on the local Phantom instance to match the owner on the configured instance. Note that this will be based on Owner ID, not Owner Name.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**container\_id** |  required  | Container ID to copy | numeric |  `phantom container id` 
-**keep\_owner** |  optional  | Keep Owner | boolean | 
+**container_id** |  required  | Container ID to copy | numeric |  `phantom container id` 
+**keep_owner** |  optional  | Keep Owner | boolean | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.container\_id | string |  `phantom container id` 
-action\_result\.parameter\.keep\_owner | boolean | 
-action\_result\.data | string | 
-action\_result\.summary\.artifact\_count | numeric | 
-action\_result\.summary\.container\_id | numeric |  `phantom container id` 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.container_id | string |  `phantom container id`  |   3 
+action_result.parameter.keep_owner | boolean |  |   True  False 
+action_result.data | string |  |  
+action_result.summary.artifact_count | numeric |  |   268 
+action_result.summary.container_id | numeric |  `phantom container id`  |   94 
+action_result.message | string |  |   Container id: 94, Artifact count: 268 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'create container'
 Create a new container on a Phantom instance
@@ -541,27 +541,27 @@ Create a new container on a Phantom instance
 Type: **generic**  
 Read only: **False**
 
-This action creates a new container on the Phantom server, which is configured in the <b>phantom\_server</b> asset parameter\. The <b>container\_json</b> parameter needs to be a JSON string\. It is mandatory to provide a <b>label</b> key in the <b>container\_json</b> parameter\. The action will fail if the <b>container\_json</b> has a label that does not exist on the destination Phantom asset\.<br>E\.g\., \{"name"\:"Test Container","label"\:"events"\}<br><br>The <b>container\_artifacts</b> is an optional parameter that needs to be a list of artifact objects as a JSON string\. Each artifact JSON object should contain the following keys\: <b>cef, cef\_types, data, description, end\_time, ingest\_app\_id, kill\_chain, label, name, owner\_id, severity, source\_data\_identifier, start\_time, tags, type</b>\. All other keys will be ignored\.<br>E\.g\., \[\{"name"\: "artifact 1", "label"\:"label1", "cef"\: \{"test"\: "123"\}\},\{"name"\: "artifact 2", "label"\:"label2", "cef"\: \{"test"\: "456"\}\}\]<br><br>See <a href="https\://docs\.splunk\.com/Documentation/Phantom/4\.8/PlatformAPI/RESTArtifacts" target="\_blank"><b>Splunk Phantom Documentation</b></a> for further details\.
+This action creates a new container on the Phantom server, which is configured in the <b>phantom_server</b> asset parameter. The <b>container_json</b> parameter needs to be a JSON string. It is mandatory to provide a <b>label</b> key in the <b>container_json</b> parameter. The action will fail if the <b>container_json</b> has a label that does not exist on the destination Phantom asset.<br>E.g., {"name":"Test Container","label":"events"}<br><br>The <b>container_artifacts</b> is an optional parameter that needs to be a list of artifact objects as a JSON string. Each artifact JSON object should contain the following keys: <b>cef, cef_types, data, description, end_time, ingest_app_id, kill_chain, label, name, owner_id, severity, source_data_identifier, start_time, tags, type</b>. All other keys will be ignored.<br>E.g., [{"name": "artifact 1", "label":"label1", "cef": {"test": "123"}},{"name": "artifact 2", "label":"label2", "cef": {"test": "456"}}]<br><br>See <a href="https://docs.splunk.com/Documentation/Phantom/4.8/PlatformAPI/RESTArtifacts" target="_blank"><b>Splunk Phantom Documentation</b></a> for further details.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**container\_json** |  required  | The container JSON object | string | 
-**container\_artifacts** |  optional  | List of artifact JSON objects | string | 
+**container_json** |  required  | The container JSON object | string | 
+**container_artifacts** |  optional  | List of artifact JSON objects | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.container\_artifacts | string | 
-action\_result\.parameter\.container\_json | string | 
-action\_result\.data | string | 
-action\_result\.summary\.artifact\_count | numeric | 
-action\_result\.summary\.container\_id | numeric |  `phantom container id` 
-action\_result\.summary\.failed\_artifact\_count | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.container_artifacts | string |  |   [{"name": "A human friendly name for artifact (1)", "label": "event", "source_data_identifier": 1},{"name": "A human friendly name for artifact (2)", "label": "event", "source_data_identifier": 2},{"name": "A human friendly name for artifact (3)", "label": "event", "source_data_identifier": 3}] 
+action_result.parameter.container_json | string |  |   {"severity": "medium", "label": "events", "version": 1, "asset": 7, "status": "new", "description": "New Container from Phantom Helper", "tags": [],  "data": {}, "name": "This is a container"} 
+action_result.data | string |  |  
+action_result.summary.artifact_count | numeric |  |   3  5 
+action_result.summary.container_id | numeric |  `phantom container id`  |   82  77 
+action_result.summary.failed_artifact_count | numeric |  |   7 
+action_result.message | string |  |   Container id: 82, Artifact count: 3 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'get action result'
 Find the results of a previously run action
@@ -569,60 +569,60 @@ Find the results of a previously run action
 Type: **investigate**  
 Read only: **True**
 
-This action returns the most recent results of the given <b>action\_name</b> launched with the given <b>parameters</b> within the given <b>time\_limit</b>\.<br><br>The action will limit the number of results returned to the value in <b>max\_results</b>\. By default, the limit is 10\. To get all the results, set the<b>max\_results</b> parameter to 0\.<br><br>The <b>parameters</b> parameter takes a JSON string in the format\:<br><br><pre>\{<br>    &quot;parameter\_name1&quot;\: &quot;parameter\_value1&quot;<br>    &quot;parameter\_name2&quot;\: &quot;parameter\_value2&quot;<br>    \.\.\.<br>\}</pre><br>The <b>app</b> parameter takes an app name, and if it is included, the action will only search for action results from that app\. Similarly, the <b>asset</b> parameter takes an asset name, and if it is included, the action will only search for action results from that asset\.
+This action returns the most recent results of the given <b>action_name</b> launched with the given <b>parameters</b> within the given <b>time_limit</b>.<br><br>The action will limit the number of results returned to the value in <b>max_results</b>. By default, the limit is 10. To get all the results, set the<b>max_results</b> parameter to 0.<br><br>The <b>parameters</b> parameter takes a JSON string in the format:<br><br><pre>{<br>    &quot;parameter_name1&quot;: &quot;parameter_value1&quot;<br>    &quot;parameter_name2&quot;: &quot;parameter_value2&quot;<br>    ...<br>}</pre><br>The <b>app</b> parameter takes an app name, and if it is included, the action will only search for action results from that app. Similarly, the <b>asset</b> parameter takes an asset name, and if it is included, the action will only search for action results from that asset.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**action\_name** |  required  | Action name | string | 
+**action_name** |  required  | Action name | string | 
 **parameters** |  optional  | JSON string of action parameters | string | 
 **app** |  optional  | App name | string | 
 **asset** |  optional  | Asset name | string | 
-**time\_limit** |  optional  | Number of hours to search back | numeric | 
-**max\_results** |  optional  | Maximum number of action results to return | numeric | 
+**time_limit** |  optional  | Number of hours to search back | numeric | 
+**max_results** |  optional  | Maximum number of action results to return | numeric | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.action\_name | string | 
-action\_result\.parameter\.app | string | 
-action\_result\.parameter\.asset | string | 
-action\_result\.parameter\.max\_results | numeric | 
-action\_result\.parameter\.parameters | string | 
-action\_result\.parameter\.time\_limit | numeric | 
-action\_result\.data\.\*\.action | string | 
-action\_result\.data\.\*\.action\_run | numeric | 
-action\_result\.data\.\*\.app | numeric | 
-action\_result\.data\.\*\.app\_name | string | 
-action\_result\.data\.\*\.app\_version | string | 
-action\_result\.data\.\*\.asset | numeric | 
-action\_result\.data\.\*\.container | numeric | 
-action\_result\.data\.\*\.effective\_user | string | 
-action\_result\.data\.\*\.end\_time | string | 
-action\_result\.data\.\*\.exception\_occured | boolean | 
-action\_result\.data\.\*\.extra\_data | string | 
-action\_result\.data\.\*\.id | numeric | 
-action\_result\.data\.\*\.message | string | 
-action\_result\.data\.\*\.playbook\_run | numeric | 
-action\_result\.data\.\*\.result\_data\.\*\.data | numeric | 
-action\_result\.data\.\*\.result\_data\.\*\.message | string | 
-action\_result\.data\.\*\.result\_data\.\*\.parameter | string | 
-action\_result\.data\.\*\.result\_data\.\*\.parameter\.context\.artifact\_id | numeric | 
-action\_result\.data\.\*\.result\_data\.\*\.parameter\.context\.guid | string | 
-action\_result\.data\.\*\.result\_data\.\*\.parameter\.context\.parent\_action\_run | string | 
-action\_result\.data\.\*\.result\_data\.\*\.status | string | 
-action\_result\.data\.\*\.result\_data\.\*\.summary | string | 
-action\_result\.data\.\*\.result\_summary\.total\_objects | numeric | 
-action\_result\.data\.\*\.result\_summary\.total\_objects\_successful | numeric | 
-action\_result\.data\.\*\.start\_time | string | 
-action\_result\.data\.\*\.status | string | 
-action\_result\.data\.\*\.version | numeric | 
-action\_result\.summary\.action\_run\_id | numeric | 
-action\_result\.summary\.num\_results | numeric | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.action_name | string |  |   blacklist ip 
+action_result.parameter.app | string |  |   Phantom 
+action_result.parameter.asset | string |  |   test_phantom 
+action_result.parameter.max_results | numeric |  |   5 
+action_result.parameter.parameters | string |  |   {"ip": "1.8.9.0"} 
+action_result.parameter.time_limit | numeric |  |   24 
+action_result.data.\*.action | string |  |   blacklist ip 
+action_result.data.\*.action_run | numeric |  |   2724 
+action_result.data.\*.app | numeric |  |   121 
+action_result.data.\*.app_name | string |  |   Phantom 
+action_result.data.\*.app_version | string |  |   1.0.0 
+action_result.data.\*.asset | numeric |  |   137 
+action_result.data.\*.container | numeric |  |   1154 
+action_result.data.\*.effective_user | string |  |  
+action_result.data.\*.end_time | string |  |   2017-11-06T20:30:27.991000Z 
+action_result.data.\*.exception_occured | boolean |  |   True  False 
+action_result.data.\*.extra_data | string |  |  
+action_result.data.\*.id | numeric |  |   2761 
+action_result.data.\*.message | string |  |   Successfully blacklisted IP 
+action_result.data.\*.playbook_run | numeric |  |   1056 
+action_result.data.\*.result_data.\*.data | numeric |  |  
+action_result.data.\*.result_data.\*.message | string |  |   IP blacklisted successfully 
+action_result.data.\*.result_data.\*.parameter | string |  |  
+action_result.data.\*.result_data.\*.parameter.context.artifact_id | numeric |  |   0 
+action_result.data.\*.result_data.\*.parameter.context.guid | string |  |   293d0369-4801-417d-a1af-a73cf1200d3d 
+action_result.data.\*.result_data.\*.parameter.context.parent_action_run | string |  |  
+action_result.data.\*.result_data.\*.status | string |  |   success 
+action_result.data.\*.result_data.\*.summary | string |  |  
+action_result.data.\*.result_summary.total_objects | numeric |  |   1 
+action_result.data.\*.result_summary.total_objects_successful | numeric |  |   1 
+action_result.data.\*.start_time | string |  |   2017-11-06T20:30:04.879000Z 
+action_result.data.\*.status | string |  |   success  failed 
+action_result.data.\*.version | numeric |  |   1 
+action_result.summary.action_run_id | numeric |  |   2761 
+action_result.summary.num_results | numeric |  |  
+action_result.message | string |  |   Action run id: 2761 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'update list'
 Update a list
@@ -630,29 +630,29 @@ Update a list
 Type: **generic**  
 Read only: **False**
 
-Either the <b>list\_name</b> or </b>id</b> is required\. If both, <b>list\_name</b> and <b>id</b> parameters are provided and both of them point to different lists, then the <b>list\_name</b> parameter will be preferred and the action will update the list specified in the list\_name parameter\.
+Either the <b>list_name</b> or </b>id</b> is required. If both, <b>list_name</b> and <b>id</b> parameters are provided and both of them point to different lists, then the <b>list_name</b> parameter will be preferred and the action will update the list specified in the list_name parameter.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**list\_name** |  optional  | List name | string | 
+**list_name** |  optional  | List name | string | 
 **id** |  optional  | List id | numeric | 
-**row\_number** |  required  | Row number in list to be modified | numeric | 
-**row\_values\_as\_list** |  required  | JSON formatted list of new values for the row | string | 
+**row_number** |  required  | Row number in list to be modified | numeric | 
+**row_values_as_list** |  required  | JSON formatted list of new values for the row | string | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.id | numeric | 
-action\_result\.parameter\.list\_name | string | 
-action\_result\.parameter\.row\_number | numeric | 
-action\_result\.parameter\.row\_values\_as\_list | string | 
-action\_result\.data\.\*\.success | boolean | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric |   
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.id | numeric |  |  
+action_result.parameter.list_name | string |  |   my first list 
+action_result.parameter.row_number | numeric |  |   0 
+action_result.parameter.row_values_as_list | string |  |   ["this", "is", "a", "test"] 
+action_result.data.\*.success | boolean |  |   True 
+action_result.summary | string |  |  
+action_result.message | string |  |  
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1   
 
 ## action: 'no op'
 Wait for the specified number of seconds
@@ -663,15 +663,15 @@ Read only: **True**
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
-**sleep\_seconds** |  required  | Sleep for this many seconds | numeric | 
+**sleep_seconds** |  required  | Sleep for this many seconds | numeric | 
 
 #### Action Output
-DATA PATH | TYPE | CONTAINS
---------- | ---- | --------
-action\_result\.status | string | 
-action\_result\.parameter\.sleep\_seconds | numeric | 
-action\_result\.data | string | 
-action\_result\.summary | string | 
-action\_result\.message | string | 
-summary\.total\_objects | numeric | 
-summary\.total\_objects\_successful | numeric | 
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string |  |   success  failed 
+action_result.parameter.sleep_seconds | numeric |  |   15 
+action_result.data | string |  |  
+action_result.summary | string |  |  
+action_result.message | string |  |   Slept for 15 seconds 
+summary.total_objects | numeric |  |   1 
+summary.total_objects_successful | numeric |  |   1 
