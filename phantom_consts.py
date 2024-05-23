@@ -14,6 +14,8 @@
 # and limitations under the License.
 TIMEOUT = 120
 INVALID_RESPONSE = 'Server did not return a valid JSON response.'
+
+# list of file types supported for deflation
 SUPPORTED_FILES = ['application/zip', 'application/x-gzip', 'application/x-tar', 'application/x-bzip2', 'application/gzip']
 
 # Consts for error messages
