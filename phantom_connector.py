@@ -931,7 +931,7 @@ class PhantomConnector(BaseConnector):
 
         if file_type not in OPEN_XML_FORMATS:
             # fallback to the default magic definitions
-            file_type = magic.from_file(file_path)
+            file_type = magic.from_file(file_path, mime=True)
 
         return file_type, file_type in SUPPORTED_FILES
 
