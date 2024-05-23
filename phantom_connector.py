@@ -929,6 +929,10 @@ class PhantomConnector(BaseConnector):
         m = magic.Magic(mime=True, magic_file=msooxml_magic_file_path)
         file_type = m.from_file(file_path)
 
+        if file_type not in OPEN_XML_FORMATS:
+            # fallback to the default magic definitions
+            file_type = magic.from_file(file_path)
+
         return file_type, file_type in SUPPORTED_FILES
 
     def _deflate_item(self, param):
