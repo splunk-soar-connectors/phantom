@@ -31,19 +31,19 @@ import zipfile
 from pathlib import Path
 from typing import Tuple
 
+import requests
+from bs4 import BeautifulSoup
+from requests.exceptions import SSLError, Timeout
+
 import magic
 import phantom.app as phantom
 import phantom.rules as ph_rules
 import phantom.utils as ph_utils
-import requests
-from bs4 import BeautifulSoup
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 from phantom.cef import CEF_JSON, CEF_NAME_MAPPING
 from phantom.utils import CONTAINS_VALIDATORS
 from phantom.vault import Vault
-from requests.exceptions import SSLError, Timeout
-
 # Constants imports
 from phantom_consts import *
 
