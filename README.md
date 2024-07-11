@@ -6,7 +6,7 @@ Connector Version: 3.6.2
 Product Vendor: Phantom  
 Product Name: Phantom  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 6.1.1  
+Minimum Product Version: 6.2.1  
 
 This App exposes various Phantom APIs as actions
 
