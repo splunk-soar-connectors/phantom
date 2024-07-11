@@ -31,11 +31,11 @@ import zipfile
 from pathlib import Path
 from typing import Tuple
 
+import magic
 import requests
 from bs4 import BeautifulSoup
 from requests.exceptions import SSLError, Timeout
 
-import magic
 import phantom.app as phantom
 import phantom.rules as ph_rules
 import phantom.utils as ph_utils
@@ -925,7 +925,7 @@ class PhantomConnector(BaseConnector):
         files which lead to an enormous deflation process run
         hanging the service.
         """
-        msooxml_magic_file_path = os.path.join(pathlib.Path(__file__).parent.resolve(), "magic", "msooxml")
+        msooxml_magic_file_path = os.path.join(pathlib.Path(__file__).parent.resolve(), "magic_files", "msooxml")
         m = magic.Magic(mime=True, magic_file=msooxml_magic_file_path)
         file_type = m.from_file(file_path)
 
