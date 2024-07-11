@@ -921,7 +921,7 @@ class PhantomConnector(BaseConnector):
         Checks if the file is supported for deflation.
 
         This method patches invalid behavior of some Operating
-        Systems recognizing MS Office files (eg. xslx) as zip
+        Systems recognizing MS Office files (eg. xlsx) as zip
         files which lead to an enormous deflation process run
         hanging the service.
         """
