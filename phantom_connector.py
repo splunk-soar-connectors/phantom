@@ -795,7 +795,7 @@ class PhantomConnector(BaseConnector):
 
             file_name = vault_info['name']
 
-            file_type, is_supported = self.is_deflation_supported_file(file_path)
+            file_type, is_supported = self.check_deflation_supported_file(file_path)
 
             if not is_supported:
                 return (phantom.APP_SUCCESS)
@@ -821,7 +821,7 @@ class PhantomConnector(BaseConnector):
         if container_id is None:
             container_id = self.get_container_id()
 
-        file_type, is_supported = self.is_deflation_supported_file(file_path)
+        file_type, is_supported = self.check_deflation_supported_file(file_path)
 
         if not is_supported:
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
@@ -916,7 +916,7 @@ class PhantomConnector(BaseConnector):
         return action_result.set_status(phantom.APP_SUCCESS)
 
     @staticmethod
-    def is_deflation_supported_file(file_path) -> Tuple[str, bool]:
+    def check_deflation_supported_file(file_path) -> Tuple[str, bool]:
         """
         Checks if the file is supported for deflation.
 
@@ -930,7 +930,7 @@ class PhantomConnector(BaseConnector):
         file_type = m.from_file(file_path)
 
         if file_type not in OPEN_XML_FORMATS:
-            # fallback to the default magic definitions
+            # fallback to the default magic files definitions
             file_type = magic.from_file(file_path, mime=True)
 
         return file_type, file_type in SUPPORTED_FILES
@@ -965,7 +965,7 @@ class PhantomConnector(BaseConnector):
                                 "Failed to get vault item info: {}".format(self._get_error_message_from_exception(e)))
 
         try:
-            file_type, is_supported = self.is_deflation_supported_file(file_path)
+            file_type, is_supported = self.check_deflation_supported_file(file_path)
         except IOError:
             return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_FILE_PATH_NOT_FOUND)
         except Exception:
