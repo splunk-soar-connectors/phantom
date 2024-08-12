@@ -14,6 +14,16 @@
 # and limitations under the License.
 TIMEOUT = 120
 INVALID_RESPONSE = 'Server did not return a valid JSON response.'
+
+OPEN_XML_FORMATS = [
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "application/vnd.ms-visio.drawing.main+xml",
+    "application/x-silverlight-app",
+]
+
+# list of file types supported for deflation
 SUPPORTED_FILES = ['application/zip', 'application/x-gzip', 'application/x-tar', 'application/x-bzip2', 'application/gzip']
 
 # Consts for error messages

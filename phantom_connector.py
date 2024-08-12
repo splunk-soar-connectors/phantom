@@ -21,6 +21,7 @@ import datetime
 import gzip
 import json
 import os
+import pathlib
 import random
 import socket
 import string
@@ -28,6 +29,7 @@ import tarfile
 import time
 import zipfile
 from pathlib import Path
+from typing import Tuple
 
 import magic
 import requests
@@ -49,12 +51,6 @@ try:
     from urllib.parse import quote
 except Exception:
     from urllib import quote
-
-
-# A list of files that MS OOXML archives will contain.
-# OOXML documents are zip files with metadata, assets and data as various
-# archive entries. We do not want to the deflate action to extract these.
-OOXML_FILES = frozenset(['[Content_Types].xml', '_rels/.rels'])
 
 
 def determine_contains(value):
@@ -799,19 +795,15 @@ class PhantomConnector(BaseConnector):
 
             file_name = vault_info['name']
 
-            file_type = magic.from_file(file_path, mime=True)
+            file_type, is_supported = self.check_deflation_supported_file(file_path)
 
-            if file_type not in SUPPORTED_FILES:
+            if not is_supported:
                 return (phantom.APP_SUCCESS)
 
             self._extract_file(action_result, file_path, file_name, recursive, container_id)
             self._level -= 1
 
         return (phantom.APP_SUCCESS)
-
-    @staticmethod
-    def _is_ooxml_zip(member_filenames):
-        return OOXML_FILES.issubset(member_filenames)
 
     @staticmethod
     def _has_allowed_archive_extension(file_name, allowed_extensions):
@@ -829,9 +821,9 @@ class PhantomConnector(BaseConnector):
         if container_id is None:
             container_id = self.get_container_id()
 
-        file_type = magic.from_file(file_path, mime=True)
+        file_type, is_supported = self.check_deflation_supported_file(file_path)
 
-        if file_type not in SUPPORTED_FILES:
+        if not is_supported:
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
 
         config = self.get_config()
@@ -923,6 +915,26 @@ class PhantomConnector(BaseConnector):
 
         return action_result.set_status(phantom.APP_SUCCESS)
 
+    @staticmethod
+    def check_deflation_supported_file(file_path) -> Tuple[str, bool]:
+        """
+        Checks if the file is supported for deflation.
+
+        This method patches invalid behavior of some Operating
+        Systems recognizing MS Office files (eg. xlsx) as zip
+        files which lead to an enormous deflation process run
+        hanging the service.
+        """
+        msooxml_magic_file_path = os.path.join(pathlib.Path(__file__).parent.resolve(), "magic_files", "msooxml")
+        m = magic.Magic(mime=True, magic_file=msooxml_magic_file_path)
+        file_type = m.from_file(file_path)
+
+        if file_type not in OPEN_XML_FORMATS:
+            # fallback to the default magic files definitions
+            file_type = magic.from_file(file_path, mime=True)
+
+        return file_type, file_type in SUPPORTED_FILES
+
     def _deflate_item(self, param):
 
         action_result = self.add_action_result(ActionResult(dict(param)))
@@ -953,13 +965,13 @@ class PhantomConnector(BaseConnector):
                                 "Failed to get vault item info: {}".format(self._get_error_message_from_exception(e)))
 
         try:
-            file_type = magic.from_file(file_path, mime=True)
+            file_type, is_supported = self.check_deflation_supported_file(file_path)
         except IOError:
             return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_FILE_PATH_NOT_FOUND)
         except Exception:
             return action_result.set_status(phantom.APP_ERROR, PHANTOM_ERR_FILE_PATH_NOT_FOUND)
 
-        if file_type not in SUPPORTED_FILES:
+        if not is_supported:
             return action_result.set_status(phantom.APP_ERROR, "Deflation of file type: {0} not supported".format(file_type))
 
         ret_val = self._extract_file(action_result, file_path, file_name, param.get('recursive', False),
