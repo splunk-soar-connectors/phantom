@@ -2,11 +2,11 @@
 # Phantom
 
 Publisher: Splunk  
-Connector Version: 3.6.2  
+Connector Version: 3.6.3  
 Product Vendor: Phantom  
 Product Name: Phantom  
 Product Version Supported (regex): ".\*"  
-Minimum Product Version: 5.2.0  
+Minimum Product Version: 6.2.1  
 
 This App exposes various Phantom APIs as actions
 
