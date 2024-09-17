@@ -1223,6 +1223,12 @@
                     "data_type": "boolean",
                     "default": false,
                     "order": 8
+                },
+                "determine_contains": {
+                    "description": "Determine contains for any CEF fields without a provided contains value. (default: true)",
+                    "data_type": "boolean",
+                    "default": true,
+                    "order": 9
                 }
             },
             "render": {

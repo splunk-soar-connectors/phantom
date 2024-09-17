@@ -402,6 +402,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **cef_dictionary** |  optional  | CEF JSON | string | 
 **contains** |  optional  | Data type for each CEF field | string | 
 **run_automation** |  optional  | Run automation on newly created artifact(s) (default: false) | boolean | 
+**determine_contains** |  optional  | Determine contains for any CEF fields without a provided contains value. (default: true) | boolean |
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES

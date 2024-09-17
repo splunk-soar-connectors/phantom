@@ -640,6 +640,7 @@ class PhantomConnector(BaseConnector):
         cef_value = param.get('cef_value')
         cef_dict = param.get('cef_dictionary')
         run_automation = param.get('run_automation', False)
+        should_determine_contains = param.get('determine_contains', True)
 
         ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')
         if phantom.is_fail(ret_val):
@@ -687,20 +688,21 @@ class PhantomConnector(BaseConnector):
         artifact['source_data_identifier'] = sdi
         artifact['run_automation'] = run_automation
 
-        for cef_name in loaded_cef:
+        if should_determine_contains:
+            for cef_name in loaded_cef:
 
-            if loaded_contains.get(cef_name):
-                continue
+                if loaded_contains.get(cef_name):
+                    continue
 
-            if cef_name not in CEF_NAME_MAPPING:
-                determined_contains = determine_contains(loaded_cef[cef_name]) if loaded_cef[cef_name] else None
-                if determined_contains:
-                    artifact['cef_types'][cef_name] = determined_contains
-            else:
-                try:
-                    artifact['cef_types'][cef_name] = CEF_JSON[cef_name]['contains']
-                except Exception:
-                    pass
+                if cef_name not in CEF_NAME_MAPPING:
+                    determined_contains = determine_contains(loaded_cef[cef_name]) if loaded_cef[cef_name] else None
+                    if determined_contains:
+                        artifact['cef_types'][cef_name] = determined_contains
+                else:
+                    try:
+                        artifact['cef_types'][cef_name] = CEF_JSON[cef_name]['contains']
+                    except Exception:
+                        pass
 
         success, response, resp_data = self._make_rest_call('/rest/artifact', action_result, method='post', data=artifact)
 
