@@ -608,7 +608,7 @@
                     "default": "current"
                 },
                 "max_results": {
-                    "description": "Maximum number of artifacts to return",
+                    "description": "Maximum number of artifacts to return per page",
                     "data_type": "numeric",
                     "order": 5,
                     "default": 10
