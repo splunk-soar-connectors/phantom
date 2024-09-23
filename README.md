@@ -296,6 +296,8 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **exact_match** |  optional  | Exact match (default: true) | boolean | 
 **limit_search** |  optional  | Limit search to specified containers (default: false) | boolean | 
 **container_ids** |  optional  | List of space or comma separated container ids. the word "current" will be replaced by the current container id | string | 
+**max_results** |  optional  | Maximum number of artifacts to return per page | numeric | 
+**page** |  optional  | Specific page to return. Numbering starts at 0 | numeric | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
@@ -316,7 +318,9 @@ action_result.summary.artifacts_found | numeric |  |   1
 action_result.summary.server | string |  |   https://10.1.1.10 
 action_result.message | string |  |   Artifacts found: 1, Server: https://10.1.1.10 
 summary.total_objects | numeric |  |   1 
-summary.total_objects_successful | numeric |  |   1   
+summary.total_objects_successful | numeric |  |   1 
+action_result.parameter.max_results | numeric |  |   2 
+action_result.parameter.page | numeric |  |   0   
 
 ## action: 'add listitem'
 Add value to a custom list
