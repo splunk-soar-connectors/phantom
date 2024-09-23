@@ -44,3 +44,5 @@ PHANTOM_ERR_NON_EMPTY_PARAM_VALUE = "Please provide row_values_as_list parameter
 PHANTOM_ERR_SPECIFY_IP_HOSTNAME = ("Accessing 127.0.0.1 is not allowed."
 " Please specify the actual IP or hostname used by the Phantom instance in the Asset config")
 PHANTOM_ERR_GET_VAULT_INFO = "Failed to get the vault info: {}"
+
+ARTIFACT_MAX_RESULTS = 10

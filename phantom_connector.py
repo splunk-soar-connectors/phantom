@@ -535,6 +535,7 @@ class PhantomConnector(BaseConnector):
         limit_search = param.get("limit_search", False)
         container_ids = param.get("container_ids", "current")
         values = param.get('values', '')
+        max_results = param.get("max_results", ARTIFACT_MAX_RESULTS)
         if limit_search:
             container_ids = list(
                 set([
@@ -562,12 +563,11 @@ class PhantomConnector(BaseConnector):
         url_enc_values = quote(values, safe='')
 
         if cef_key and exact_match:
-            endpoint = '/rest/artifact?_filter_cef__{}={}&page_size=0&pretty'.format(quote(cef_key, safe=''), repr(url_enc_values))
+            endpoint = f"/rest/artifact?_filter_cef__{quote(cef_key, safe='')}={repr(url_enc_values)}&page_size={max_results}&pretty"
         elif cef_key:
-            endpoint = '/rest/artifact?_filter_cef__{}__{}={}&page_size=0&pretty'.format(quote(cef_key, safe=''),
-                                                                                        "icontains", repr(url_enc_values))
+            endpoint = f"/rest/artifact?_filter_cef__{quote(cef_key, safe='')}__icontains={repr(url_enc_values)}&page_size={max_results}&pretty"
         else:
-            endpoint = '/rest/artifact?_filter_cef__{}={}&page_size=0&pretty'.format("icontains", repr(url_enc_values))
+            endpoint = f"/rest/artifact?_filter_cef__icontains={repr(url_enc_values)}&page_size={max_results}&pretty"
 
         if limit_search:
             endpoint += '&_filter_container__in={}'.format(container_ids)

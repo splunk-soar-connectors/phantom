@@ -606,6 +606,12 @@
                     "data_type": "string",
                     "order": 4,
                     "default": "current"
+                },
+                "max_results": {
+                    "description": "Maximum number of artifacts to return",
+                    "data_type": "numeric",
+                    "order": 5,
+                    "default": 10
                 }
             },
             "render": {
@@ -741,6 +747,13 @@
                     "data_type": "numeric",
                     "example_values": [
                         1
+                    ]
+                },
+                {
+                    "data_path": "action_result.parameter.max_results",
+                    "data_type": "numeric",
+                    "example_values": [
+                        2
                     ]
                 }
             ],
