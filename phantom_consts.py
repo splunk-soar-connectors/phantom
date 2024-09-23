@@ -46,4 +46,4 @@ PHANTOM_ERR_SPECIFY_IP_HOSTNAME = ("Accessing 127.0.0.1 is not allowed."
 PHANTOM_ERR_GET_VAULT_INFO = "Failed to get the vault info: {}"
 
 ARTIFACT_DEFAULT_MAX_RESULTS = 10
-ARTIFACT_DEFAULT_PAGE = 0
+PAGINATION_COMPLETE = "That page contains no results"

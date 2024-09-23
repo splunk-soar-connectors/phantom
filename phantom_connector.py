@@ -536,7 +536,6 @@ class PhantomConnector(BaseConnector):
         container_ids = param.get("container_ids", "current")
         values = param.get('values', '')
         max_results = param.get("max_results", ARTIFACT_DEFAULT_MAX_RESULTS)
-        page = param.get("page", ARTIFACT_DEFAULT_PAGE)
         if limit_search:
             container_ids = list(
                 set([
@@ -564,21 +563,38 @@ class PhantomConnector(BaseConnector):
         url_enc_values = quote(values, safe='')
 
         if cef_key and exact_match:
-            endpoint = f"/rest/artifact?_filter_cef__{quote(cef_key, safe='')}={repr(url_enc_values)}&page_size={max_results}&page={page}&pretty"
+            endpoint = f"/rest/artifact?_filter_cef__{quote(cef_key, safe='')}={repr(url_enc_values)}&pretty"
         elif cef_key:
-            endpoint = f"/rest/artifact?_filter_cef__{quote(cef_key, safe='')}__icontains={repr(url_enc_values)}&page_size={max_results}&page={page}&pretty"
+            endpoint = f"/rest/artifact?_filter_cef__{quote(cef_key, safe='')}__icontains={repr(url_enc_values)}&pretty"
         else:
-            endpoint = f"/rest/artifact?_filter_cef__icontains={repr(url_enc_values)}&page_size={max_results}&page={page}&pretty"
+            endpoint = f"/rest/artifact?_filter_cef__icontains={repr(url_enc_values)}&pretty"
 
         if limit_search:
             endpoint += '&_filter_container__in={}'.format(container_ids)
 
-        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
+        records = list()
+        page = 0
+        page_size = 10
+        while True:
+            count = (page+1)*10
+            if max_results != 0 and count > max_results:
+                page_size = 10 if max_results - (page)*10 == 0 else max_results - (page)*10
+            paginated_endpoint = f"{endpoint}&page_size={page_size}&page={page}"
 
-        if phantom.is_fail(ret_val):
-            return action_result.set_status(phantom.APP_ERROR, 'Error retrieving records: {0}'.format(action_result.get_message()))
+            ret_val, response, resp_data = self._make_rest_call(paginated_endpoint, action_result)
 
-        records = resp_data['data']
+            if phantom.is_fail(ret_val):
+                if PAGINATION_COMPLETE in action_result.get_message():
+                    break
+                return action_result.set_status(phantom.APP_ERROR, 'Error retrieving records: {0}'.format(action_result.get_message()))
+
+            if PAGINATION_COMPLETE in action_result.get_message():
+                    break
+
+            records += resp_data['data']
+            if max_results != 0 and count >= max_results:
+                break
+            page += 1
 
         values = values.lower()
 
