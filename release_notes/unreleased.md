@@ -1,2 +1,2 @@
 **Unreleased**
-* Added pagination and results per page for 'find artifacts' action [PAPP-34742]
+* Added pagination and updated default number of results returned to 10 artifacts for 'find artifacts' action [PAPP-34742]
