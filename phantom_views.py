@@ -110,7 +110,7 @@ def find_listitem(provides, all_results, context):
                 row.append({ 'value': param.get('list') })
                 row.append({ 'value': item_str })
                 len_of_list = len(locations) > idx and locations[idx] or 'Missing Data'
-                if type(len_of_list) == str:
+                if isinstance(len_of_list, str):
                     row.append({ 'value': len_of_list})
                 else:
                     row.append({ 'value': 'Row {}, Column {}'.format(len_of_list[0], len_of_list[1])})
