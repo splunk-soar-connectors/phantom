@@ -13,7 +13,7 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 TIMEOUT = 120
-INVALID_RESPONSE = 'Server did not return a valid JSON response.'
+INVALID_RESPONSE = "Server did not return a valid JSON response."
 
 OPEN_XML_FORMATS = [
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -24,7 +24,7 @@ OPEN_XML_FORMATS = [
 ]
 
 # list of file types supported for deflation
-SUPPORTED_FILES = ['application/zip', 'application/x-gzip', 'application/x-tar', 'application/x-bzip2', 'application/gzip']
+SUPPORTED_FILES = ["application/zip", "application/x-gzip", "application/x-tar", "application/x-bzip2", "application/gzip"]
 
 # Consts for error messages
 PHANTOM_ERR_INVALID_INT = "Please provide a valid {msg} integer value in the '{param}' action parameter"
@@ -41,6 +41,10 @@ PHANTOM_ERR_CONTAINER_ARTIFACT = "Please provide container_artifacts as a list o
 PHANTOM_ERR_UNABLE_RETRIEVE_ID = "Unable to retrieve ID of newly created container"
 PHANTOM_ERR_ACTION_RESULT_NOT_FOUND = "No action results found matching given criteria"
 PHANTOM_ERR_NON_EMPTY_PARAM_VALUE = "Please provide row_values_as_list parameter as a non-empty JSON formatted list"
-PHANTOM_ERR_SPECIFY_IP_HOSTNAME = ("Accessing 127.0.0.1 is not allowed."
-" Please specify the actual IP or hostname used by the Phantom instance in the Asset config")
+PHANTOM_ERR_SPECIFY_IP_HOSTNAME = (
+    "Accessing 127.0.0.1 is not allowed." " Please specify the actual IP or hostname used by the Phantom instance in the Asset config"
+)
 PHANTOM_ERR_GET_VAULT_INFO = "Failed to get the vault info: {}"
+
+ARTIFACT_DEFAULT_MAX_RESULTS = 10
+PAGINATION_COMPLETE = "That page contains no results"
