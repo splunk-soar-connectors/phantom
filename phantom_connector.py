@@ -44,7 +44,6 @@ from phantom.base_connector import BaseConnector
 from phantom.cef import CEF_JSON, CEF_NAME_MAPPING
 from phantom.utils import CONTAINS_VALIDATORS
 from phantom.vault import Vault
-
 # Constants imports
 from phantom_consts import *
 
