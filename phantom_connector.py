@@ -589,7 +589,7 @@ class PhantomConnector(BaseConnector):
                 return action_result.set_status(phantom.APP_ERROR, 'Error retrieving records: {0}'.format(action_result.get_message()))
 
             if PAGINATION_COMPLETE in action_result.get_message():
-                    break
+                break
 
             records += resp_data['data']
             if max_results != 0 and count >= max_results:
