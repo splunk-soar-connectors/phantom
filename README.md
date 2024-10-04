@@ -2,7 +2,7 @@
 # Phantom
 
 Publisher: Splunk  
-Connector Version: 3.6.3  
+Connector Version: 3.7.0  
 Product Vendor: Phantom  
 Product Name: Phantom  
 Product Version Supported (regex): ".\*"  
@@ -286,7 +286,7 @@ Find artifacts containing a CEF value
 Type: **investigate**  
 Read only: **True**
 
-If the <b>limit_search</b> parameter is set to true, then the action will search the required artifact in the provided <b>container_ids</b> only. Otherwise, the <b>container_ids</b> parameter will be ignored.<br><br>If any non-integer value is provided in the <b>container_ids</b> parameter, then all the non-integer values will be removed and the parameter will be updated accordingly. If the value of the <b>container_ids</b> parameter is <b>current</b>, then it will be replaced by the current container's id(from which the action is being run) and the status will be reflected accordingly.<br><br>If the <b>exact_match</b> parameter is set to false, then the action will return all those artifacts for which the <b>values</b> parameter is a substring of any one of its cef values. Otherwise it will return those artifacts for which any one of its cef value matches exactly with the <b>values</b> parameter.<br><br>For the <b>values</b> of type integer, float or string, it is suggested to set the <b>exact_match</b> parameter to false.
+If the <b>limit_search</b> parameter is set to true, then the action will search the required artifact in the provided <b>container_ids</b> only. Otherwise, the <b>container_ids</b> parameter will be ignored.<br><br>If any non-integer value is provided in the <b>container_ids</b> parameter, then all the non-integer values will be removed and the parameter will be updated accordingly. If the value of the <b>container_ids</b> parameter is <b>current</b>, then it will be replaced by the current container's id(from which the action is being run) and the status will be reflected accordingly.<br><br>If the <b>exact_match</b> parameter is set to false, then the action will return all those artifacts for which the <b>values</b> parameter is a substring of any one of its cef values. Otherwise it will return those artifacts for which any one of its cef value matches exactly with the <b>values</b> parameter.<br><br>For the <b>values</b> of type integer, float or string, it is suggested to set the <b>exact_match</b> parameter to false.<br><br>By default, 10 artifacts are returned. If you would like to return more or less than 10 artifacts, update the <b>max_results</b> parameter.
 
 #### Action Parameters
 PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
@@ -296,6 +296,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **exact_match** |  optional  | Exact match (default: true) | boolean | 
 **limit_search** |  optional  | Limit search to specified containers (default: false) | boolean | 
 **container_ids** |  optional  | List of space or comma separated container ids. the word "current" will be replaced by the current container id | string | 
+**max_results** |  optional  | Maximum number of artifacts to return | numeric | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
@@ -316,7 +317,8 @@ action_result.summary.artifacts_found | numeric |  |   1
 action_result.summary.server | string |  |   https://10.1.1.10 
 action_result.message | string |  |   Artifacts found: 1, Server: https://10.1.1.10 
 summary.total_objects | numeric |  |   1 
-summary.total_objects_successful | numeric |  |   1   
+summary.total_objects_successful | numeric |  |   1 
+action_result.parameter.max_results | numeric |  |   2   
 
 ## action: 'add listitem'
 Add value to a custom list
