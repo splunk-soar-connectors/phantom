@@ -682,7 +682,7 @@ class PhantomConnector(BaseConnector):
 
         name = param.get('name')
         container_id = param.get('container_id', self.get_container_id())
-        sdi = param.get('source_data_identifier')
+        sdi = param['source_data_identifier']
         label = param.get('label', 'event')
         contains = param.get('contains')
         cef_name = param.get('cef_name')

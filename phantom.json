@@ -6,7 +6,7 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.7.0",
+    "app_version": "3.7.1",
     "latest_tested_versions": [
         "Splunk Phantom PlatformAPI v5.3.1",
         "SOAR On-prem v5.3.1.84890",
@@ -1320,6 +1320,10 @@
                 {
                     "data_path": "action_result.parameter.source_data_identifier",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.determine_contains",
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.data.*.existing_artifact_id",
