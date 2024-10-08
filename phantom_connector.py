@@ -680,19 +680,19 @@ class PhantomConnector(BaseConnector):
         self.save_progress("In action handler for: {0}".format(self.get_action_identifier()))
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        name = param.get('name')
-        container_id = param.get('container_id', self.get_container_id())
-        sdi = param['source_data_identifier']
-        label = param.get('label', 'event')
-        contains = param.get('contains')
-        cef_name = param.get('cef_name')
-        cef_value = param.get('cef_value')
-        cef_dict = param.get('cef_dictionary')
-        run_automation = param.get('run_automation', False)
-        should_determine_contains = param.get('determine_contains', True)
+        name = param.get("name")
+        container_id = param.get("container_id", self.get_container_id())
+        sdi = param["source_data_identifier"]
+        label = param.get("label", "event")
+        contains = param.get("contains")
+        cef_name = param.get("cef_name")
+        cef_value = param.get("cef_value")
+        cef_dict = param.get("cef_dictionary")
+        run_automation = param.get("run_automation", False)
+        should_determine_contains = param.get("determine_contains", True)
 
-        ret_val, container_id = self._validate_integer(action_result, container_id, 'container_id')
-        
+        ret_val, container_id = self._validate_integer(action_result, container_id, "container_id")
+
         if phantom.is_fail(ret_val):
             return action_result.get_status()
 
@@ -748,13 +748,13 @@ class PhantomConnector(BaseConnector):
                 if cef_name not in CEF_NAME_MAPPING:
                     determined_contains = determine_contains(loaded_cef[cef_name]) if loaded_cef[cef_name] else None
                     if determined_contains:
-                        artifact['cef_types'][cef_name] = determined_contains
+                        artifact["cef_types"][cef_name] = determined_contains
                 else:
                     try:
-                        artifact['cef_types'][cef_name] = CEF_JSON[cef_name]['contains']
+                        artifact["cef_types"][cef_name] = CEF_JSON[cef_name]["contains"]
                     except Exception:
                         pass
-                      
+
         success, response, resp_data = self._make_rest_call("/rest/artifact", action_result, method="post", data=artifact)
 
         if not resp_data:
