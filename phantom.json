@@ -6,7 +6,7 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.7.0",
+    "app_version": "3.7.1",
     "latest_tested_versions": [
         "Splunk Phantom PlatformAPI v5.3.1",
         "SOAR On-prem v5.3.1.84890",
@@ -401,8 +401,7 @@
                     "data_path": "action_result.parameter.title",
                     "data_type": "string",
                     "example_values": [
-                        "Note test",
-                        "Testing note"
+                        "Note test"
                     ]
                 },
                 {
@@ -1234,8 +1233,12 @@
                 "run_automation": {
                     "description": "Run automation on newly created artifact(s) (default: false)",
                     "data_type": "boolean",
-                    "default": false,
                     "order": 8
+                },
+                "determine_contains": {
+                    "description": "Determine contains for any CEF fields without a provided contains value (default: true)",
+                    "data_type": "boolean",
+                    "order": 9
                 }
             },
             "render": {
@@ -1314,6 +1317,10 @@
                 {
                     "data_path": "action_result.parameter.source_data_identifier",
                     "data_type": "string"
+                },
+                {
+                    "data_path": "action_result.parameter.determine_contains",
+                    "data_type": "boolean"
                 },
                 {
                     "data_path": "action_result.data.*.existing_artifact_id",
@@ -1957,16 +1964,14 @@
                     "data_path": "action_result.summary.artifact_count",
                     "data_type": "numeric",
                     "example_values": [
-                        3,
-                        5
+                        3
                     ]
                 },
                 {
                     "data_path": "action_result.summary.container_id",
                     "data_type": "numeric",
-                    "example_values": [
-                        82,
-                        77
+                    "exampsle_values": [
+                        82
                     ],
                     "contains": [
                         "phantom container id"
