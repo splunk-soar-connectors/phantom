@@ -2,7 +2,7 @@
 # Phantom
 
 Publisher: Splunk  
-Connector Version: 3.7.0  
+Connector Version: 3.7.1  
 Product Vendor: Phantom  
 Product Name: Phantom  
 Product Version Supported (regex): ".\*"  
@@ -244,7 +244,7 @@ action_result.status | string |  |   success  failed
 action_result.parameter.container_id | numeric |  `phantom container id`  |   35 
 action_result.parameter.content | string |  |   Adding a note via app action 
 action_result.parameter.phase_id | string |  |  
-action_result.parameter.title | string |  |   Note test  Testing note 
+action_result.parameter.title | string |  |   Note test 
 action_result.data | string |  |  
 action_result.summary | string |  |  
 action_result.message | string |  |   Note created 
@@ -404,7 +404,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 **cef_dictionary** |  optional  | CEF JSON | string | 
 **contains** |  optional  | Data type for each CEF field | string | 
 **run_automation** |  optional  | Run automation on newly created artifact(s) (default: false) | boolean | 
-**determine_contains** |  optional  | Determine contains for any CEF fields without a provided contains value. (default: true) | boolean |
+**determine_contains** |  optional  | Determine contains for any CEF fields without a provided contains value (default: true) | boolean | 
 
 #### Action Output
 DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
@@ -419,6 +419,7 @@ action_result.parameter.label | string |  |   event
 action_result.parameter.name | string |  |   Artifact_demo 
 action_result.parameter.run_automation | string |  |   True  False 
 action_result.parameter.source_data_identifier | string |  |  
+action_result.parameter.determine_contains | boolean |  |  
 action_result.data.\*.existing_artifact_id | numeric |  |  
 action_result.data.\*.failed | boolean |  |  
 action_result.data.\*.id | numeric |  |   123 
@@ -559,8 +560,8 @@ action_result.status | string |  |   success  failed
 action_result.parameter.container_artifacts | string |  |   [{"name": "A human friendly name for artifact (1)", "label": "event", "source_data_identifier": 1},{"name": "A human friendly name for artifact (2)", "label": "event", "source_data_identifier": 2},{"name": "A human friendly name for artifact (3)", "label": "event", "source_data_identifier": 3}] 
 action_result.parameter.container_json | string |  |   {"severity": "medium", "label": "events", "version": 1, "asset": 7, "status": "new", "description": "New Container from Phantom Helper", "tags": [],  "data": {}, "name": "This is a container"} 
 action_result.data | string |  |  
-action_result.summary.artifact_count | numeric |  |   3  5 
-action_result.summary.container_id | numeric |  `phantom container id`  |   82  77 
+action_result.summary.artifact_count | numeric |  |   3 
+action_result.summary.container_id | numeric |  `phantom container id`  |  
 action_result.summary.failed_artifact_count | numeric |  |   7 
 action_result.message | string |  |   Container id: 82, Artifact count: 3 
 summary.total_objects | numeric |  |   1 
