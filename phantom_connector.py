@@ -775,7 +775,7 @@ class PhantomConnector(BaseConnector):
 
     def _add_file_to_vault(self, action_result, data_stream, file_name, recursive, container_id):
 
-        save_as=bytes(file_name or "_invalid_file_name_","utf-8")
+        save_as = bytes(file_name or "_invalid_file_name_", "utf-8")
 
         # PAPP-9543 append a random string to the filename to make concurrent action runs succeed
         random_suffix = "_{}".format("".join(random.SystemRandom().choice(string.ascii_lowercase) for _ in range(16)))
