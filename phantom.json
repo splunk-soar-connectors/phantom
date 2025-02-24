@@ -6,7 +6,7 @@
     "publisher": "Splunk",
     "type": "information",
     "main_module": "phantom_connector.py",
-    "app_version": "3.7.1",
+    "app_version": "3.8.0-test",
     "latest_tested_versions": [
         "Splunk Phantom PlatformAPI v5.3.1",
         "SOAR On-prem v5.3.1.84890",
