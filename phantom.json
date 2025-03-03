@@ -8,9 +8,9 @@
     "main_module": "phantom_connector.py",
     "app_version": "3.8.0",
     "latest_tested_versions": [
-        "Splunk Phantom PlatformAPI v5.3.1",
-        "SOAR On-prem v5.3.1.84890",
-        "SOAR Cloud v5.3.1.84890"
+        "Splunk Phantom PlatformAPI v6.3.1",
+        "SOAR On-prem v6.3.1.176",
+        "SOAR Cloud v6.3.1.176"
     ],
     "python_version": "3",
     "utctime_updated": "2024-08-12T09:44:29.000000Z",
