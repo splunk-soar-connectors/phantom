@@ -1,6 +1,6 @@
 # File: phantom_connector.py
 #
-# Copyright (c) 2016-2024 Splunk Inc.
+# Copyright (c) 2016-2025 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -1207,6 +1207,8 @@ class PhantomConnector(BaseConnector):
         container.pop("start_time", None)
         container.pop("source_data_identifier", None)
         container.pop("ingest_app")
+        # This key is causing an issue when exporting a closed container. Check the PAPP-35442 ticket for details.
+        container.pop("closing_rule_run", None)
         container.pop("tenant")
         container.pop("id")
         if label:
