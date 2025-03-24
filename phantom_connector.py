@@ -1177,6 +1177,8 @@ class PhantomConnector(BaseConnector):
         container.pop("start_time", None)
         container.pop("source_data_identifier", None)
         container.pop("ingest_app")
+        # This key is causing an issue when exporting a closed container. Check the PAPP-35442 ticket for details.
+        container.pop("closing_rule_run", None)
         container.pop("tenant")
         container.pop("id")
         if label:

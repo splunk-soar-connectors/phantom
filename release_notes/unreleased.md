@@ -1,3 +1,2 @@
 **Unreleased**
-
-* chore: batch changes
+* Bug fix for exporting a closed container [PAPP-35442]
