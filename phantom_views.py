@@ -18,7 +18,6 @@ from bs4 import UnicodeDammit
 
 
 def find_artifacts(provides, all_results, context):
-
     headers = ["Container ID", "Container", "Artifact ID", "Artifact Name", "Found in field", "Matched Value"]
 
     context["results"] = results = []
@@ -48,7 +47,6 @@ def find_artifacts(provides, all_results, context):
 
 
 def add_artifact(provides, all_results, context):
-
     headers = ["Artifact ID", "Container ID"]
 
     context["results"] = results = []
@@ -75,7 +73,6 @@ def add_artifact(provides, all_results, context):
 
 
 def find_listitem(provides, all_results, context):
-
     # Fetching the Python major version
     python_version = 2
     try:
@@ -104,16 +101,16 @@ def find_listitem(provides, all_results, context):
                 for i in item:
                     if i:
                         i = UnicodeDammit(i).unicode_markup.encode("utf-8") if python_version == 2 else i
-                    item_str = '{0}"{1}",'.format(item_str, i)
+                    item_str = f'{item_str}"{i}",'
                 item_str = item_str[:-1]
 
                 row.append({"value": param.get("list")})
                 row.append({"value": item_str})
-                len_of_list = len(locations) > idx and locations[idx] or "Missing Data"
+                len_of_list = (len(locations) > idx and locations[idx]) or "Missing Data"
                 if isinstance(len_of_list, str):
                     row.append({"value": len_of_list})
                 else:
-                    row.append({"value": "Row {}, Column {}".format(len_of_list[0], len_of_list[1])})
+                    row.append({"value": f"Row {len_of_list[0]}, Column {len_of_list[1]}"})
                 table_data.append(row)
             results.append(table)
 

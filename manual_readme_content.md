@@ -1,18 +1,3 @@
-[comment]: # " File: README.md"
-[comment]: # "  Copyright (c) 2016-2025 Splunk Inc."
-[comment]: #
-[comment]: # "Licensed under the Apache License, Version 2.0 (the 'License');"
-[comment]: # "you may not use this file except in compliance with the License."
-[comment]: # "You may obtain a copy of the License at"
-[comment]: #
-[comment]: # "    http://www.apache.org/licenses/LICENSE-2.0"
-[comment]: #
-[comment]: # "Unless required by applicable law or agreed to in writing, software distributed under"
-[comment]: # "the License is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,"
-[comment]: # "either express or implied. See the License for the specific language governing permissions"
-[comment]: # "and limitations under the License."
-[comment]: #
-
 The auth_token config parameter is for use with Phantom instances. If both the token and
 username/password are given, the username and password will be used to authenticate to the Phantom
 instance.
@@ -55,7 +40,7 @@ as well. (Eg. x.x.x.x:9999)
     string) or a JSON dictionary, with the keys matching the keys of the **cef_dictionary** and
     the values being lists of possible contains for the CEF field. In case, the **contains**
     parameter is a string(or a comma-separated list of string), the provided value will map to
-    the **cef_name** parameter.  
+    the **cef_name** parameter.\
     The output datapaths, **action_result.summary.artifact id** and
     **action_result.summary.container id** have been replaced with
     **action_result.summary.artifact_id** and **action_result.summary.container_id** ,
@@ -81,7 +66,7 @@ as well. (Eg. x.x.x.x:9999)
     - name: Artifact name (Always overwrites, if provided)
     - label: Artifact label (Always overwrites, if provided)
     - severity: Artifact severity (Always overwrites, if provided)
-    - cef_types_json: JSON format of the CEF types (e.g., {'myIP': \['ip', 'ipv6'\]})
+    - cef_types_json: JSON format of the CEF types (e.g., {'myIP': ['ip', 'ipv6']})
     - tags: Comma-separated list of tags to add or replace in the artifact
     - overwrite: Overwrite artifacts with provided input (applies to: cef_json, contains_json,
       tags)
@@ -95,9 +80,9 @@ The app uses HTTP/ HTTPS protocol for communicating with the Phantom server. Bel
 ports used by Splunk SOAR.
 
 | SERVICE NAME | TRANSPORT PROTOCOL | PORT |
-| ------------ | ------------------ | ---- |
-| http         | tcp                | 80   |
-| https        | tcp                | 443  |
+|--------------|--------------------|------|
+| http | tcp | 80 |
+| https | tcp | 443 |
 
 ## Known Issues
 

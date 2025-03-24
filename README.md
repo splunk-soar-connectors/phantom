@@ -90,7 +90,7 @@ The app uses HTTP/ HTTPS protocol for communicating with the Phantom server. Bel
 ports used by Splunk SOAR.
 
 | SERVICE NAME | TRANSPORT PROTOCOL | PORT |
-| ------------ | ------------------ | ---- |
+|--------------|--------------------|------|
 | http | tcp | 80 |
 | https | tcp | 443 |
 
