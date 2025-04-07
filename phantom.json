@@ -8,16 +8,16 @@
     "main_module": "phantom_connector.py",
     "app_version": "3.7.1",
     "latest_tested_versions": [
-        "Splunk Phantom PlatformAPI v5.3.1",
-        "SOAR On-prem v5.3.1.84890",
-        "SOAR Cloud v5.3.1.84890"
+        "Splunk Phantom PlatformAPI v6.3.1",
+        "SOAR On-prem v6.3.1.176",
+        "SOAR Cloud v6.3.1.176"
     ],
     "python_version": "3",
     "utctime_updated": "2024-08-12T09:44:29.000000Z",
     "product_vendor": "Phantom",
     "product_name": "Phantom",
     "product_version_regex": ".*",
-    "min_phantom_version": "6.2.1",
+    "min_phantom_version": "6.3.0",
     "fips_compliant": true,
     "license": "Copyright (c) 2016-2025 Splunk Inc.",
     "logo": "logo_splunk.svg",
@@ -2501,6 +2501,14 @@
         ]
     },
     "pip39_dependencies": {
+        "wheel": [
+            {
+                "module": "python_magic",
+                "input_file": "wheels/shared/python_magic-0.4.18-py2.py3-none-any.whl"
+            }
+        ]
+    },
+    "pip313_dependencies": {
         "wheel": [
             {
                 "module": "python_magic",
