@@ -1,7 +1,7 @@
 # Phantom
 
 Publisher: Splunk \
-Connector Version: 3.8.1 \
+Connector Version: 3.8.2 \
 Product Vendor: Phantom \
 Product Name: Phantom \
 Minimum Product Version: 6.3.0
