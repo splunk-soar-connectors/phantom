@@ -1,9 +1,9 @@
 # Phantom
 
-Publisher: Splunk \
-Connector Version: 3.8.3 \
-Product Vendor: Phantom \
-Product Name: Phantom \
+Publisher: Splunk <br>
+Connector Version: 3.8.3 <br>
+Product Vendor: Phantom <br>
+Product Name: Phantom <br>
 Minimum Product Version: 6.3.0
 
 This App exposes various Phantom APIs as actions
@@ -121,27 +121,27 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 
 ### Supported Actions
 
-[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity \
-[update artifact](#action-update-artifact) - Update or overwrite Phantom artifact with the provided input \
-[add note](#action-add-note) - Add a note to a container \
-[update artifact tags](#action-update-artifact-tags) - Add/Remove tags from an artifact \
-[find artifacts](#action-find-artifacts) - Find artifacts containing a CEF value \
-[add listitem](#action-add-listitem) - Add value to a custom list \
-[find listitem](#action-find-listitem) - Find value in a custom list \
-[add artifact](#action-add-artifact) - Add a new artifact to a container \
-[deflate item](#action-deflate-item) - Deflates an item from the vault \
-[export container](#action-export-container) - Export local container to the configured Phantom asset \
-[import container](#action-import-container) - Import a container from an external Phantom instance \
-[create container](#action-create-container) - Create a new container on a Phantom instance \
-[get action result](#action-get-action-result) - Find the results of a previously run action \
-[update list](#action-update-list) - Update a list \
+[test connectivity](#action-test-connectivity) - Validate the asset configuration for connectivity <br>
+[update artifact](#action-update-artifact) - Update or overwrite Phantom artifact with the provided input <br>
+[add note](#action-add-note) - Add a note to a container <br>
+[update artifact tags](#action-update-artifact-tags) - Add/Remove tags from an artifact <br>
+[find artifacts](#action-find-artifacts) - Find artifacts containing a CEF value <br>
+[add listitem](#action-add-listitem) - Add value to a custom list <br>
+[find listitem](#action-find-listitem) - Find value in a custom list <br>
+[add artifact](#action-add-artifact) - Add a new artifact to a container <br>
+[deflate item](#action-deflate-item) - Deflates an item from the vault <br>
+[export container](#action-export-container) - Export local container to the configured Phantom asset <br>
+[import container](#action-import-container) - Import a container from an external Phantom instance <br>
+[create container](#action-create-container) - Create a new container on a Phantom instance <br>
+[get action result](#action-get-action-result) - Find the results of a previously run action <br>
+[update list](#action-update-list) - Update a list <br>
 [no op](#action-no-op) - Wait for the specified number of seconds
 
 ## action: 'test connectivity'
 
 Validate the asset configuration for connectivity
 
-Type: **test** \
+Type: **test** <br>
 Read only: **True**
 
 #### Action Parameters
@@ -156,7 +156,7 @@ No Output
 
 Update or overwrite Phantom artifact with the provided input
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 <h4>Overwrite</h4>By default, this action will append or update these fields: "cef_json", "cef_types_json", and "tags", unless "overwrite" is enabled. In which case, those parameters will replace the entirety of current versions of what that artifact contains.<h4>Optional Fields</h4>While all are not required, for the action to run, at least one of the following optional parameters need to be provided:<table><thead><tr><th>PARAMETER</th><th>EXAMPLE</th></tr></thead><tbody><tr><td>name</td><td>Artifact Name</td></tr><tr><td>label</td><td>artifact_label</td></tr><tr><td>severity</td><td>high</td></tr><tr><td>cef_json</td><td>{"key1": "value1", "goodDomain": "www.splunk.com", "remove_me": ""}</td></tr><tr><td>cef_types_json</td><td>{"goodDomain": ["domain"]}</td></tr><tr><td>tags</td><td>tag1, tag3 <i>or</i> ["tag2", "tag4"]</td></tr><tr><td>artifact_json</td><td>{"source_data_identifier": "myTicket1234", "label": "new_label"}</td></tr></tbody></table><h4>Artifact JSON</h4>Artifact JSON should be used for more advanced aspects of Phantom artifacts. See Phantom REST API docs, specifically regarding artifacts.
@@ -210,7 +210,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Add a note to a container
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id (from where the action is being run) and the status will be reflected accordingly. If the container is a case, a <b>phase_id</b> parameter can be provided to associate the note to a particular phase.
@@ -243,7 +243,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Add/Remove tags from an artifact
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 #### Action Parameters
@@ -275,7 +275,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Find artifacts containing a CEF value
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 If the <b>limit_search</b> parameter is set to true, then the action will search the required artifact in the provided <b>container_ids</b> only. Otherwise, the <b>container_ids</b> parameter will be ignored.<br><br>If any non-integer value is provided in the <b>container_ids</b> parameter, then all the non-integer values will be removed and the parameter will be updated accordingly. If the value of the <b>container_ids</b> parameter is <b>current</b>, then it will be replaced by the current container's id(from which the action is being run) and the status will be reflected accordingly.<br><br>If the <b>exact_match</b> parameter is set to false, then the action will return all those artifacts for which the <b>values</b> parameter is a substring of any one of its cef values. Otherwise it will return those artifacts for which any one of its cef value matches exactly with the <b>values</b> parameter.<br><br>For the <b>values</b> of type integer, float or string, it is suggested to set the <b>exact_match</b> parameter to false.<br><br>By default, 10 artifacts are returned. If you would like to return more or less than 10 artifacts, update the <b>max_results</b> parameter.
@@ -318,7 +318,7 @@ action_result.parameter.max_results | numeric | | 2 |
 
 Add value to a custom list
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 To add a row containing a single value to a list simply pass the value. However, to pass multiple values in a row, format it like a JSON array (e.g. ["item1", "item2", "item3"]).<br><br>The action will update the <b>list</b>, if the <b>list</b> already exists (even if the <b>create</b> parameter is set to true).<br><br>After creating or updating a list through this action, if the same list is updated from the UI, then the user needs to save those changes before updating the list through this action again, otherwise, the changes made from the UI will be overridden.
@@ -350,7 +350,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Find value in a custom list
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 Row and column coordinates for each matching value can be found in the result summary under "locations". The match is case sensitive.<br><br>If the <b>exact_match</b> parameter is set to false, then the action will return all those strings for which the <b>values</b> parameter is its substring. Otherwise it will return those strings which match exactly with the <b>values</b> parameter.
@@ -388,7 +388,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Add a new artifact to a container
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 If the <b>container_id</b> parameter is left empty, then it will be initialized to the current container's id (from which the action is being run) and the status will be reflected accordingly.<br><br>CEF fields can be added to the artifact in two ways, either by using the <b>cef_name</b> and <b>cef_value</b> parameter or by using the <b>cef_dictionary</b> parameter. If the <b>cef_name</b>, <b>cef_value</b>, and <b>cef_dictionary</b> parameters are all included, the action will add the <b>cef_name</b> field to the <b>cef_dictionary</b>.<br><br>Using only the <b>cef_name</b> and <b>cef_value</b> parameter will result in the artifact having one CEF field.<br><br>The <b>cef_dictionary</b> parameter takes a JSON dictionary with key-value pairs representing CEF key-value pairs. To provide values containing double-quotes("), add a backslash(\\) before the double-quotes.<br>For e.g., {"X-Universally-Unique-Identifier":"test","Content-Type":"multipart/alternative; boundary=<b>\\"</b>Apple-Mail=\_0DA95D7E-B791-4751-8043-175949088A2C<b>\\"</b>>","Message-Id":"<abc@xyz.com>"}<br><br>The <b>contains</b> parameter can take a JSON dictionary, with the keys matching the keys of the <b>cef_dictionary</b> and the values being lists of possible contains for the CEF field. If a given value in the <b>cef_dictionary</b> is not present in the <b>contains</b> dictionary, the action will first check the list of default CEF fields. If not a default CEF field, then the action will attempt to identify the appropriate value for contains.<br>The <b>contains</b> parameter can also take a string(or a comma-separated list of strings) representing the contains for the <b>cef_value</b> parameter. This method should be used only if the <b>cef_name</b> and <b>cef_value</b> parameters are used.<br><br>If the <b>run_automation</b> parameter is set to true then the active playbooks will run automatically after the artifact is added. The active playbooks will run on the same container in which the artifact is added.<br><br>See the <a href="https://docs.splunk.com/Documentation/Phantom/4.8/PlatformAPI/RESTArtifacts" target="_blank">REST API Documentation</a> for more information on artifacts, CEF fields, and contains.
@@ -438,7 +438,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Deflates an item from the vault
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 The action will be supported only if the <b>phantom_server</b> parameter (in the asset configurations) is configured to the local Phantom instance, i.e., the instance from which the action is being run.<br><br>The action detects if the input vault item is a compressed file and deflates it. Every file found after deflation is then added to the vault. If <b>container_id</b> is specified will add to its vault, else to the current (the container whose context the action is executed) container. The action supports <b>zip</b>, <b>gzip</b>, <b>bz2</b>, <b>tar</b>, and <b>tgz</b> file types. In the case where the compressed file contains another compressed file in it, set the <b>recursive</b> parameter to true to deflate the inner compressed file.<br><br>If recursion is enabled and a password is specified, the application will use the password for given zip file only. The inner zip file will be extracted only if the file is not password protected. Among the different compression methods, only the zip supports password protection functionality.<br><br>For certain Unicode characters, the file name is not unzipped as it is, by the zipfile module.
@@ -491,7 +491,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Export local container to the configured Phantom asset
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 This action exports a container (that matches the <b>container_id</b>) from the local Phantom instance (the instance from where the action is being run) to the configured Phantom asset (that the action is being executed on).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the local phantom instance and the configured Phantom asset does not match.<br><br>Set the <b>keep_owner</b> parameter to true if you want the owner of the container on the configured Phantom instance to match the owner on the local instance. Note that this will be based on Owner ID, not Owner Name.
@@ -525,7 +525,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Import a container from an external Phantom instance
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 This action imports a container (that matches the <b>container_id</b>) from the configured Phantom asset (that the action is being executed on) into the local Phantom instance (the instance from where the action is being run).<br><br>The action will fail with an error message like <b>severity instance with name u'critical' does not exist</b>, if the container metadata on the configured Phantom asset and the local phantom instance does not match.<br><br>Set the <b>keep_owner</b> parameter to true if you want the owner of the container on the local Phantom instance to match the owner on the configured instance. Note that this will be based on Owner ID, not Owner Name.
@@ -555,7 +555,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Create a new container on a Phantom instance
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 This action creates a new container on the Phantom server, which is configured in the <b>phantom_server</b> asset parameter. The <b>container_json</b> parameter needs to be a JSON string. It is mandatory to provide a <b>label</b> key in the <b>container_json</b> parameter. The action will fail if the <b>container_json</b> has a label that does not exist on the destination Phantom asset.<br>E.g., {"name":"Test Container","label":"events"}<br><br>The <b>container_artifacts</b> is an optional parameter that needs to be a list of artifact objects as a JSON string. Each artifact JSON object should contain the following keys: <b>cef, cef_types, data, description, end_time, ingest_app_id, kill_chain, label, name, owner_id, severity, source_data_identifier, start_time, tags, type</b>. All other keys will be ignored.<br>E.g., [{"name": "artifact 1", "label":"label1", "cef": {"test": "123"}},{"name": "artifact 2", "label":"label2", "cef": {"test": "456"}}]<br><br>See <a href="https://docs.splunk.com/Documentation/Phantom/4.8/PlatformAPI/RESTArtifacts" target="_blank"><b>Splunk Phantom Documentation</b></a> for further details.
@@ -586,7 +586,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Find the results of a previously run action
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 This action returns the most recent results of the given <b>action_name</b> launched with the given <b>parameters</b> within the given <b>time_limit</b>.<br><br>The action will limit the number of results returned to the value in <b>max_results</b>. By default, the limit is 10. To get all the results, set the<b>max_results</b> parameter to 0.<br><br>The <b>parameters</b> parameter takes a JSON string in the format:<br><br><pre>{<br> "parameter_name1": "parameter_value1"<br> "parameter_name2": "parameter_value2"<br> ...<br>}</pre><br>The <b>app</b> parameter takes an app name, and if it is included, the action will only search for action results from that app. Similarly, the <b>asset</b> parameter takes an asset name, and if it is included, the action will only search for action results from that asset.
@@ -650,7 +650,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Update a list
 
-Type: **generic** \
+Type: **generic** <br>
 Read only: **False**
 
 Either the <b>list_name</b> or </b>id</b> is required. If both, <b>list_name</b> and <b>id</b> parameters are provided and both of them point to different lists, then the <b>list_name</b> parameter will be preferred and the action will update the list specified in the list_name parameter.
@@ -683,7 +683,7 @@ summary.total_objects_successful | numeric | | 1 |
 
 Wait for the specified number of seconds
 
-Type: **investigate** \
+Type: **investigate** <br>
 Read only: **True**
 
 #### Action Parameters
