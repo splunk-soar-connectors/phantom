@@ -1544,7 +1544,7 @@ class PhantomConnector(BaseConnector):
         if host.startswith("http:") or host.startswith("https:"):
             return self.set_status(
                 phantom.APP_ERROR,
-                "Please specify the actual IP or hostname used by the Phantom instance in the Asset config wihtout http: or https:",
+                "Please specify the actual IP or hostname used by the Phantom instance in the Asset config without http: or https:",
             )
 
         # Split hostname from port
