@@ -1,6 +1,6 @@
 # File: phantom_connector.py
 #
-# Copyright (c) 2016-2025 Splunk Inc.
+# Copyright (c) 2016-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -1544,7 +1544,7 @@ class PhantomConnector(BaseConnector):
         if host.startswith("http:") or host.startswith("https:"):
             return self.set_status(
                 phantom.APP_ERROR,
-                "Please specify the actual IP or hostname used by the Phantom instance in the Asset config wihtout http: or https:",
+                "Please specify the actual IP or hostname used by the Phantom instance in the Asset config without http: or https:",
             )
 
         # Split hostname from port
