@@ -449,7 +449,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **vault_id** | required | Vault ID | string | `sha1` `vault id` |
 **container_id** | optional | Destination container id | numeric | `phantom container id` |
-**password** | optional | Password for the file | string | |
+**password** | optional | Password for the file | password | |
 **recursive** | optional | Extract recursively (default: false) | boolean | |
 
 #### Action Output
@@ -458,7 +458,7 @@ DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
 --------- | ---- | -------- | --------------
 action_result.status | string | | success failed |
 action_result.parameter.container_id | numeric | `phantom container id` | 3 |
-action_result.parameter.password | string | | P@$$w0rd |
+action_result.parameter.password | password | | P@$$w0rd |
 action_result.parameter.recursive | boolean | | True False |
 action_result.parameter.vault_id | string | `sha1` `vault id` | f582ed9120fa3be94852c73e1cd188f2948f677f |
 action_result.data.\*.aka.\* | string | | test.txt |
