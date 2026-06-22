@@ -4,7 +4,7 @@ Publisher: Splunk <br>
 Connector Version: 3.8.4 <br>
 Product Vendor: Phantom <br>
 Product Name: Phantom <br>
-Minimum Product Version: 6.3.0
+Minimum Product Version: 8.6.0
 
 This App exposes various Phantom APIs as actions
 
