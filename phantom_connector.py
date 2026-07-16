@@ -19,6 +19,7 @@ import ast
 import bz2
 import datetime
 import gzip
+import ipaddress
 import json
 import os
 import pathlib
@@ -1568,7 +1569,12 @@ class PhantomConnector(BaseConnector):
             except Exception:
                 return self.set_status(phantom.APP_ERROR, f"Unable to do name to ip conversion on {host}")
 
-        if unpacked.startswith("127."):
+        try:
+            address = ipaddress.ip_address(unpacked)
+        except ValueError:
+            return self.set_status(phantom.APP_ERROR, f"Unable to parse resolved address {unpacked!r} for {host}")
+
+        if address.is_loopback or address.is_unspecified or address.is_link_local or address.is_reserved:
             return self.set_status(phantom.APP_ERROR, PHANTOM_ERR_SPECIFY_IP_HOSTNAME)
 
         if "127.0.0.1" in host or "localhost" in host:
