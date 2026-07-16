@@ -978,7 +978,8 @@ class PhantomConnector(BaseConnector):
         return file_type, file_type in SUPPORTED_FILES
 
     def _deflate_item(self, param):
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        sanitized_param = {key: value for key, value in param.items() if key != "password"}
+        action_result = self.add_action_result(ActionResult(sanitized_param))
 
         vault_id = param["vault_id"]
 
