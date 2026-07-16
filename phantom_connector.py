@@ -273,7 +273,7 @@ class PhantomConnector(BaseConnector):
     def _test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_val, response, resp_data = self._make_rest_call("/rest/version", action_result)
+        ret_val, _response, resp_data = self._make_rest_call("/rest/version", action_result)
 
         if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed")
@@ -368,7 +368,7 @@ class PhantomConnector(BaseConnector):
         """
 
         # First get the artifacts json
-        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
+        ret_val, _response, resp_data = self._make_rest_call(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
             self.save_progress(PHANTOM_ERR_FIND_ARTIFACT)
@@ -429,7 +429,7 @@ class PhantomConnector(BaseConnector):
                 return action_result.get_status()
             output_artifact.update(art_json)
 
-        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=output_artifact, method="post")
+        ret_val, _response, resp_data = self._make_rest_call(endpoint, action_result, data=output_artifact, method="post")
 
         action_result.add_data({"requested_artifact": output_artifact, "response": resp_data})
 
@@ -535,7 +535,7 @@ class PhantomConnector(BaseConnector):
             "phase": phase_id,
         }
 
-        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=note_data, method="post")
+        ret_val, _response, _resp_data = self._make_rest_call(endpoint, action_result, data=note_data, method="post")
 
         if phantom.is_fail(ret_val):
             self.save_progress("Unable to create note")
@@ -599,7 +599,7 @@ class PhantomConnector(BaseConnector):
                 page_size = 10 if max_results - (page) * 10 == 0 else max_results - (page) * 10
             paginated_endpoint = f"{endpoint}&page_size={page_size}&page={page}"
 
-            ret_val, response, resp_data = self._make_rest_call(paginated_endpoint, action_result)
+            ret_val, _response, resp_data = self._make_rest_call(paginated_endpoint, action_result)
 
             if phantom.is_fail(ret_val):
                 if PAGINATION_COMPLETE in action_result.get_message():
@@ -739,7 +739,7 @@ class PhantomConnector(BaseConnector):
                     except Exception:
                         pass
 
-        success, response, resp_data = self._make_rest_call("/rest/artifact", action_result, method="post", data=artifact)
+        success, _response, resp_data = self._make_rest_call("/rest/artifact", action_result, method="post", data=artifact)
 
         if not resp_data:
             return action_result.get_status()
@@ -836,7 +836,7 @@ class PhantomConnector(BaseConnector):
 
             file_name = vault_info["name"]
 
-            file_type, is_supported = self.check_deflation_supported_file(file_path)
+            _file_type, is_supported = self.check_deflation_supported_file(file_path)
 
             if not is_supported:
                 return phantom.APP_SUCCESS
@@ -1038,7 +1038,7 @@ class PhantomConnector(BaseConnector):
 
         endpoint = f"/rest/decided_list/{list_name}"
 
-        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
+        ret_val, _response, resp_data = self._make_rest_call(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -1077,7 +1077,7 @@ class PhantomConnector(BaseConnector):
             "name": list_name,
         }
 
-        ret_val, response, resp_data = self._make_rest_call("/rest/decided_list", action_result, method="post", data=payload)
+        ret_val, _response, resp_data = self._make_rest_call("/rest/decided_list", action_result, method="post", data=payload)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -1130,7 +1130,7 @@ class PhantomConnector(BaseConnector):
 
     def _add_artifact_list(self, action_result, artifacts, ignore_auth=False):
         """Add a list of artifacts"""
-        ret_val, response, resp_data = self._make_rest_call(
+        ret_val, _response, resp_data = self._make_rest_call(
             "/rest/artifact", action_result, method="post", data=artifacts, ignore_auth=ignore_auth
         )
         if phantom.is_fail(ret_val):
@@ -1165,7 +1165,7 @@ class PhantomConnector(BaseConnector):
         self._base_uri = source
         url = f"/rest/container/{container_id}"
 
-        ret_val, response, resp_data = self._make_rest_call(url, action_result, ignore_auth=source_local)
+        ret_val, _response, resp_data = self._make_rest_call(url, action_result, ignore_auth=source_local)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -1193,7 +1193,7 @@ class PhantomConnector(BaseConnector):
         # container['ingest_app_id'] = container.pop('ingest_app', None)
 
         self._base_uri = destination
-        ret_val, response, resp_data = self._make_rest_call(
+        ret_val, _response, resp_data = self._make_rest_call(
             "/rest/container", action_result, method="post", data=container, ignore_auth=destination_local
         )
 
@@ -1220,7 +1220,7 @@ class PhantomConnector(BaseConnector):
         url = f"/rest/container/{container_id}/artifacts"
         params = {"sort": "id", "order": "asc", "page_size": 0}
         self._base_uri = source
-        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params, ignore_auth=source_local)
+        ret_val, _response, resp_data = self._make_rest_call(url, action_result, params=params, ignore_auth=source_local)
 
         artifacts = resp_data["data"]
         if artifacts:
@@ -1271,7 +1271,7 @@ class PhantomConnector(BaseConnector):
         else:
             artifacts = []
 
-        ret_val, response, resp_data = self._make_rest_call("/rest/container", action_result, method="post", data=container)
+        ret_val, _response, resp_data = self._make_rest_call("/rest/container", action_result, method="post", data=container)
         if phantom.is_fail(ret_val):
             return ret_val
 
@@ -1390,7 +1390,7 @@ class PhantomConnector(BaseConnector):
         if "app" in param:
             app_name = param.get("app")
             app_params = {"_filter_name__iexact": f'"{app_name}"'}
-            ret_val, response, resp_json = self._make_rest_call("/rest/app", action_result, params=app_params)
+            ret_val, _response, resp_json = self._make_rest_call("/rest/app", action_result, params=app_params)
 
             if phantom.is_fail(ret_val):
                 return ret_val
@@ -1403,7 +1403,7 @@ class PhantomConnector(BaseConnector):
         if "asset" in param:
             asset = param.get("asset")
             asset_params = {"_filter_name__iexact": f'"{asset}"'}
-            ret_val, response, resp_json = self._make_rest_call("/rest/asset", action_result, params=asset_params)
+            ret_val, _response, resp_json = self._make_rest_call("/rest/asset", action_result, params=asset_params)
 
             if phantom.is_fail(ret_val):
                 return ret_val
@@ -1413,7 +1413,7 @@ class PhantomConnector(BaseConnector):
 
             url_params["_filter_asset"] = resp_json["data"][0]["id"]
 
-        ret_val, response, resp_json = self._make_rest_call("/rest/app_run", action_result, params=url_params)
+        ret_val, _response, resp_json = self._make_rest_call("/rest/app_run", action_result, params=url_params)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -1496,7 +1496,7 @@ class PhantomConnector(BaseConnector):
         data = {"update_rows": {str(row_number): row_values}}
 
         # make rest call
-        ret_val, response, resp_data = self._make_rest_call(f"/rest/decided_list/{list_identifier}", action_result, data=data, method="post")
+        ret_val, _response, resp_data = self._make_rest_call(f"/rest/decided_list/{list_identifier}", action_result, data=data, method="post")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
