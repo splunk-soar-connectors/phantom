@@ -1,3 +1,3 @@
 **Unreleased**
 
-* Refresh development checks for the connector repository.
+* Validate artifact identifiers before using them in REST endpoint paths.

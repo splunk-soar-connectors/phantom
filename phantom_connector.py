@@ -319,7 +319,9 @@ class PhantomConnector(BaseConnector):
     def _update_artifact(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        artifact_id = param["artifact_id"]
+        ret_val, artifact_id = self._validate_integer(action_result, param["artifact_id"], "artifact_id")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         name = param.get("name")
         label = param.get("label")
@@ -442,7 +444,9 @@ class PhantomConnector(BaseConnector):
     def _tag_artifact(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        artifact_id = param["artifact_id"]
+        ret_val, artifact_id = self._validate_integer(action_result, param["artifact_id"], "artifact_id")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         add_tags = param.get("add_tags", "")
         remove_tags = param.get("remove_tags", "")
 
