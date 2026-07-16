@@ -1184,6 +1184,7 @@ class PhantomConnector(BaseConnector):
             return ret_val
 
         container = resp_data
+        source_artifact_count = container.get("artifact_count")
         # Remove data from original we dont want
         container.pop("asset", None)
         container.pop("artifact_count", None)
@@ -1196,10 +1197,10 @@ class PhantomConnector(BaseConnector):
         container.pop("id")
         if label:
             container["label"] = label
-        if keep_owner:
-            container["owner_id"] = container.pop("owner")
-        else:
-            container.pop("owner")
+        owner_name = container.pop("owner_name", None)
+        container.pop("owner", None)
+        if keep_owner and owner_name:
+            container["owner_id"] = owner_name
 
         if destination_local:
             container["asset_id"] = int(self.get_asset_id())
@@ -1235,7 +1236,19 @@ class PhantomConnector(BaseConnector):
         self._base_uri = source
         ret_val, _response, resp_data = self._make_rest_call(url, action_result, params=params, ignore_auth=source_local)
 
+        if phantom.is_fail(ret_val) or not isinstance(resp_data, dict) or not isinstance(resp_data.get("data"), list):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Container created:{new_container_id}. Failed to retrieve artifacts from the source: {action_result.get_message()}",
+            )
+
         artifacts = resp_data["data"]
+        if isinstance(source_artifact_count, int) and len(artifacts) < source_artifact_count:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Container created:{new_container_id}. Source reports {source_artifact_count} artifact(s) "
+                f"but only {len(artifacts)} could be retrieved",
+            )
         if artifacts:
             for artifact in artifacts:
                 # Remove data from artifacts that we dont want
@@ -1248,7 +1261,10 @@ class PhantomConnector(BaseConnector):
                 artifact.pop("id", None)
                 artifact["run_automation"] = False
                 artifact["container_id"] = new_container_id
-                artifact["owner_id"] = artifact.pop("owner")
+                artifact.pop("owner", None)
+                owner_name = artifact.pop("owner_name", None)
+                if keep_owner and owner_name:
+                    artifact["owner_id"] = owner_name
             artifacts[-1]["run_automation"] = run_automation
 
             self._base_uri = destination
@@ -1353,7 +1369,13 @@ class PhantomConnector(BaseConnector):
         source = self._base_uri
 
         return self._create_container_copy(
-            action_result, container_id, destination, source, destination_local=True, keep_owner=param.get("keep_owner", False)
+            action_result,
+            container_id,
+            destination,
+            source,
+            destination_local=True,
+            keep_owner=param.get("keep_owner", False),
+            run_automation=False,
         )
 
     def _get_action(self, param):
