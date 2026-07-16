@@ -614,7 +614,14 @@ class PhantomConnector(BaseConnector):
             if PAGINATION_COMPLETE in action_result.get_message():
                 break
 
-            records += resp_data["data"]
+            page_records = resp_data["data"]
+            if not page_records:
+                break
+
+            records += page_records
+            if len(records) >= ARTIFACT_ABSOLUTE_MAX_RESULTS:
+                records = records[:ARTIFACT_ABSOLUTE_MAX_RESULTS]
+                break
             if max_results != 0 and count >= max_results:
                 break
             page += 1
