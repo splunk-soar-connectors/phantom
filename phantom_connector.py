@@ -19,6 +19,7 @@ import ast
 import bz2
 import datetime
 import gzip
+import ipaddress
 import json
 import os
 import pathlib
@@ -273,7 +274,7 @@ class PhantomConnector(BaseConnector):
     def _test_connectivity(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        ret_val, response, resp_data = self._make_rest_call("/rest/version", action_result)
+        ret_val, _response, resp_data = self._make_rest_call("/rest/version", action_result)
 
         if phantom.is_fail(ret_val):
             self.save_progress("Test Connectivity Failed")
@@ -319,7 +320,9 @@ class PhantomConnector(BaseConnector):
     def _update_artifact(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        artifact_id = param["artifact_id"]
+        ret_val, artifact_id = self._validate_integer(action_result, param["artifact_id"], "artifact_id")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         name = param.get("name")
         label = param.get("label")
@@ -368,7 +371,7 @@ class PhantomConnector(BaseConnector):
         """
 
         # First get the artifacts json
-        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
+        ret_val, _response, resp_data = self._make_rest_call(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
             self.save_progress(PHANTOM_ERR_FIND_ARTIFACT)
@@ -429,7 +432,7 @@ class PhantomConnector(BaseConnector):
                 return action_result.get_status()
             output_artifact.update(art_json)
 
-        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=output_artifact, method="post")
+        ret_val, _response, resp_data = self._make_rest_call(endpoint, action_result, data=output_artifact, method="post")
 
         action_result.add_data({"requested_artifact": output_artifact, "response": resp_data})
 
@@ -442,7 +445,9 @@ class PhantomConnector(BaseConnector):
     def _tag_artifact(self, param):
         action_result = self.add_action_result(ActionResult(dict(param)))
 
-        artifact_id = param["artifact_id"]
+        ret_val, artifact_id = self._validate_integer(action_result, param["artifact_id"], "artifact_id")
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
         add_tags = param.get("add_tags", "")
         remove_tags = param.get("remove_tags", "")
 
@@ -535,7 +540,7 @@ class PhantomConnector(BaseConnector):
             "phase": phase_id,
         }
 
-        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result, data=note_data, method="post")
+        ret_val, _response, _resp_data = self._make_rest_call(endpoint, action_result, data=note_data, method="post")
 
         if phantom.is_fail(ret_val):
             self.save_progress("Unable to create note")
@@ -599,7 +604,7 @@ class PhantomConnector(BaseConnector):
                 page_size = 10 if max_results - (page) * 10 == 0 else max_results - (page) * 10
             paginated_endpoint = f"{endpoint}&page_size={page_size}&page={page}"
 
-            ret_val, response, resp_data = self._make_rest_call(paginated_endpoint, action_result)
+            ret_val, _response, resp_data = self._make_rest_call(paginated_endpoint, action_result)
 
             if phantom.is_fail(ret_val):
                 if PAGINATION_COMPLETE in action_result.get_message():
@@ -609,7 +614,14 @@ class PhantomConnector(BaseConnector):
             if PAGINATION_COMPLETE in action_result.get_message():
                 break
 
-            records += resp_data["data"]
+            page_records = resp_data["data"]
+            if not page_records:
+                break
+
+            records += page_records
+            if len(records) >= ARTIFACT_ABSOLUTE_MAX_RESULTS:
+                records = records[:ARTIFACT_ABSOLUTE_MAX_RESULTS]
+                break
             if max_results != 0 and count >= max_results:
                 break
             page += 1
@@ -739,7 +751,7 @@ class PhantomConnector(BaseConnector):
                     except Exception:
                         pass
 
-        success, response, resp_data = self._make_rest_call("/rest/artifact", action_result, method="post", data=artifact)
+        success, _response, resp_data = self._make_rest_call("/rest/artifact", action_result, method="post", data=artifact)
 
         if not resp_data:
             return action_result.get_status()
@@ -836,7 +848,7 @@ class PhantomConnector(BaseConnector):
 
             file_name = vault_info["name"]
 
-            file_type, is_supported = self.check_deflation_supported_file(file_path)
+            _file_type, is_supported = self.check_deflation_supported_file(file_path)
 
             if not is_supported:
                 return phantom.APP_SUCCESS
@@ -973,7 +985,8 @@ class PhantomConnector(BaseConnector):
         return file_type, file_type in SUPPORTED_FILES
 
     def _deflate_item(self, param):
-        action_result = self.add_action_result(ActionResult(dict(param)))
+        sanitized_param = {key: value for key, value in param.items() if key != "password"}
+        action_result = self.add_action_result(ActionResult(sanitized_param))
 
         vault_id = param["vault_id"]
 
@@ -1038,7 +1051,7 @@ class PhantomConnector(BaseConnector):
 
         endpoint = f"/rest/decided_list/{list_name}"
 
-        ret_val, response, resp_data = self._make_rest_call(endpoint, action_result)
+        ret_val, _response, resp_data = self._make_rest_call(endpoint, action_result)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -1077,7 +1090,7 @@ class PhantomConnector(BaseConnector):
             "name": list_name,
         }
 
-        ret_val, response, resp_data = self._make_rest_call("/rest/decided_list", action_result, method="post", data=payload)
+        ret_val, _response, resp_data = self._make_rest_call("/rest/decided_list", action_result, method="post", data=payload)
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -1130,7 +1143,7 @@ class PhantomConnector(BaseConnector):
 
     def _add_artifact_list(self, action_result, artifacts, ignore_auth=False):
         """Add a list of artifacts"""
-        ret_val, response, resp_data = self._make_rest_call(
+        ret_val, _response, resp_data = self._make_rest_call(
             "/rest/artifact", action_result, method="post", data=artifacts, ignore_auth=ignore_auth
         )
         if phantom.is_fail(ret_val):
@@ -1165,12 +1178,13 @@ class PhantomConnector(BaseConnector):
         self._base_uri = source
         url = f"/rest/container/{container_id}"
 
-        ret_val, response, resp_data = self._make_rest_call(url, action_result, ignore_auth=source_local)
+        ret_val, _response, resp_data = self._make_rest_call(url, action_result, ignore_auth=source_local)
 
         if phantom.is_fail(ret_val):
             return ret_val
 
         container = resp_data
+        source_artifact_count = container.get("artifact_count")
         # Remove data from original we dont want
         container.pop("asset", None)
         container.pop("artifact_count", None)
@@ -1183,17 +1197,17 @@ class PhantomConnector(BaseConnector):
         container.pop("id")
         if label:
             container["label"] = label
-        if keep_owner:
-            container["owner_id"] = container.pop("owner")
-        else:
-            container.pop("owner")
+        owner_name = container.pop("owner_name", None)
+        container.pop("owner", None)
+        if keep_owner and owner_name:
+            container["owner_id"] = owner_name
 
         if destination_local:
             container["asset_id"] = int(self.get_asset_id())
         # container['ingest_app_id'] = container.pop('ingest_app', None)
 
         self._base_uri = destination
-        ret_val, response, resp_data = self._make_rest_call(
+        ret_val, _response, resp_data = self._make_rest_call(
             "/rest/container", action_result, method="post", data=container, ignore_auth=destination_local
         )
 
@@ -1220,9 +1234,21 @@ class PhantomConnector(BaseConnector):
         url = f"/rest/container/{container_id}/artifacts"
         params = {"sort": "id", "order": "asc", "page_size": 0}
         self._base_uri = source
-        ret_val, response, resp_data = self._make_rest_call(url, action_result, params=params, ignore_auth=source_local)
+        ret_val, _response, resp_data = self._make_rest_call(url, action_result, params=params, ignore_auth=source_local)
+
+        if phantom.is_fail(ret_val) or not isinstance(resp_data, dict) or not isinstance(resp_data.get("data"), list):
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Container created:{new_container_id}. Failed to retrieve artifacts from the source: {action_result.get_message()}",
+            )
 
         artifacts = resp_data["data"]
+        if isinstance(source_artifact_count, int) and len(artifacts) < source_artifact_count:
+            return action_result.set_status(
+                phantom.APP_ERROR,
+                f"Container created:{new_container_id}. Source reports {source_artifact_count} artifact(s) "
+                f"but only {len(artifacts)} could be retrieved",
+            )
         if artifacts:
             for artifact in artifacts:
                 # Remove data from artifacts that we dont want
@@ -1235,7 +1261,10 @@ class PhantomConnector(BaseConnector):
                 artifact.pop("id", None)
                 artifact["run_automation"] = False
                 artifact["container_id"] = new_container_id
-                artifact["owner_id"] = artifact.pop("owner")
+                artifact.pop("owner", None)
+                owner_name = artifact.pop("owner_name", None)
+                if keep_owner and owner_name:
+                    artifact["owner_id"] = owner_name
             artifacts[-1]["run_automation"] = run_automation
 
             self._base_uri = destination
@@ -1271,7 +1300,7 @@ class PhantomConnector(BaseConnector):
         else:
             artifacts = []
 
-        ret_val, response, resp_data = self._make_rest_call("/rest/container", action_result, method="post", data=container)
+        ret_val, _response, resp_data = self._make_rest_call("/rest/container", action_result, method="post", data=container)
         if phantom.is_fail(ret_val):
             return ret_val
 
@@ -1340,7 +1369,13 @@ class PhantomConnector(BaseConnector):
         source = self._base_uri
 
         return self._create_container_copy(
-            action_result, container_id, destination, source, destination_local=True, keep_owner=param.get("keep_owner", False)
+            action_result,
+            container_id,
+            destination,
+            source,
+            destination_local=True,
+            keep_owner=param.get("keep_owner", False),
+            run_automation=False,
         )
 
     def _get_action(self, param):
@@ -1390,7 +1425,7 @@ class PhantomConnector(BaseConnector):
         if "app" in param:
             app_name = param.get("app")
             app_params = {"_filter_name__iexact": f'"{app_name}"'}
-            ret_val, response, resp_json = self._make_rest_call("/rest/app", action_result, params=app_params)
+            ret_val, _response, resp_json = self._make_rest_call("/rest/app", action_result, params=app_params)
 
             if phantom.is_fail(ret_val):
                 return ret_val
@@ -1403,7 +1438,7 @@ class PhantomConnector(BaseConnector):
         if "asset" in param:
             asset = param.get("asset")
             asset_params = {"_filter_name__iexact": f'"{asset}"'}
-            ret_val, response, resp_json = self._make_rest_call("/rest/asset", action_result, params=asset_params)
+            ret_val, _response, resp_json = self._make_rest_call("/rest/asset", action_result, params=asset_params)
 
             if phantom.is_fail(ret_val):
                 return ret_val
@@ -1413,7 +1448,7 @@ class PhantomConnector(BaseConnector):
 
             url_params["_filter_asset"] = resp_json["data"][0]["id"]
 
-        ret_val, response, resp_json = self._make_rest_call("/rest/app_run", action_result, params=url_params)
+        ret_val, _response, resp_json = self._make_rest_call("/rest/app_run", action_result, params=url_params)
 
         if phantom.is_fail(ret_val):
             return ret_val
@@ -1496,7 +1531,7 @@ class PhantomConnector(BaseConnector):
         data = {"update_rows": {str(row_number): row_values}}
 
         # make rest call
-        ret_val, response, resp_data = self._make_rest_call(f"/rest/decided_list/{list_identifier}", action_result, data=data, method="post")
+        ret_val, _response, resp_data = self._make_rest_call(f"/rest/decided_list/{list_identifier}", action_result, data=data, method="post")
 
         if phantom.is_fail(ret_val):
             return action_result.get_status()
@@ -1564,7 +1599,12 @@ class PhantomConnector(BaseConnector):
             except Exception:
                 return self.set_status(phantom.APP_ERROR, f"Unable to do name to ip conversion on {host}")
 
-        if unpacked.startswith("127."):
+        try:
+            address = ipaddress.ip_address(unpacked)
+        except ValueError:
+            return self.set_status(phantom.APP_ERROR, f"Unable to parse resolved address {unpacked!r} for {host}")
+
+        if address.is_loopback or address.is_unspecified or address.is_link_local or address.is_reserved:
             return self.set_status(phantom.APP_ERROR, PHANTOM_ERR_SPECIFY_IP_HOSTNAME)
 
         if "127.0.0.1" in host or "localhost" in host:
