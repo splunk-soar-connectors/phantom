@@ -1414,13 +1414,10 @@ class PhantomConnector(BaseConnector):
             time_str = (datetime.datetime.utcnow() - datetime.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%SZ")
             url_params["_filter_start_time__gt"] = f'"{time_str}"'
 
-        if "max_results" in param:
-            limit = param.get("max_results")
-            ret_val, limit = self._validate_integer(action_result, limit, "max_results")
-            if phantom.is_fail(ret_val):
-                return action_result.get_status()
-
-            url_params["page_size"] = limit
+        limit = param.get("max_results", 10)
+        ret_val, limit = self._validate_integer(action_result, limit, "max_results", allow_zero=True)
+        if phantom.is_fail(ret_val):
+            return action_result.get_status()
 
         if "app" in param:
             app_name = param.get("app")
@@ -1448,14 +1445,32 @@ class PhantomConnector(BaseConnector):
 
             url_params["_filter_asset"] = resp_json["data"][0]["id"]
 
-        ret_val, _response, resp_json = self._make_rest_call("/rest/app_run", action_result, params=url_params)
+        action_runs = []
+        page = 0
+        page_size = 10
+        while True:
+            page_params = dict(url_params)
+            page_params["page"] = page
+            page_params["page_size"] = min(page_size, limit - len(action_runs)) if limit else page_size
 
-        if phantom.is_fail(ret_val):
-            return ret_val
+            ret_val, _response, resp_json = self._make_rest_call("/rest/app_run", action_result, params=page_params)
+            if phantom.is_fail(ret_val):
+                return ret_val
+
+            page_data = resp_json.get("data", [])
+            action_runs.extend(page_data)
+            if not page_data or (limit and len(action_runs) >= limit):
+                break
+            if page + 1 >= resp_json.get("num_pages", 1):
+                break
+            page += 1
+
+        if limit:
+            action_runs = action_runs[:limit]
 
         count = 0
         if len(parameters) > 0:
-            for action_run in resp_json["data"]:
+            for action_run in action_runs:
                 for result in action_run["result_data"]:
                     cur_params = result["parameter"]
 
@@ -1481,13 +1496,13 @@ class PhantomConnector(BaseConnector):
                 action_result.set_summary({"num_results": count})
                 return action_result.set_status(phantom.APP_SUCCESS)
 
-        elif resp_json["count"] == 0:
+        elif not action_runs:
             return action_result.set_status(phantom.APP_SUCCESS, PHANTOM_ERR_ACTION_RESULT_NOT_FOUND)
 
-        for action_run in resp_json["data"]:
+        for action_run in action_runs:
             action_result.add_data(action_run)
 
-        action_result.set_summary({"num_results": len(resp_json["data"])})
+        action_result.set_summary({"num_results": len(action_runs)})
         self.debug_print("Successfully executed the action.")
         return action_result.set_status(phantom.APP_SUCCESS)
 

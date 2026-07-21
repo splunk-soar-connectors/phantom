@@ -168,6 +168,29 @@ class PhantomConnectorLogicTest(unittest.TestCase):
         connector._find_listitem({"list": "allowlist", "values": "foo", "exact_match": False})
         self.assertEqual(connector.last_result.get_data(), [["foobar"]])
 
+    def test_action_result_search_pages_until_the_requested_limit(self):
+        connector = object.__new__(CONNECTOR.PhantomConnector)
+        connector.save_progress = lambda _message: None
+        connector.get_action_identifier = lambda: "get_action"
+        connector.debug_print = lambda _message: None
+        connector.add_action_result = lambda result: setattr(connector, "last_result", result) or result
+        connector._validate_integer = lambda _result, value, _key, allow_zero=False: (0, int(value))
+        calls = []
+
+        def make_rest_call(_endpoint, _result, params=None):
+            calls.append(params)
+            page = params["page"]
+            return 0, None, {"data": [{"id": index} for index in range(page * 10, page * 10 + 10)], "num_pages": 2}
+
+        connector._make_rest_call = make_rest_call
+        result = connector._get_action({"action_name": "lookup", "max_results": 15})
+
+        self.assertEqual(result, 0)
+        self.assertEqual([call["page"] for call in calls], [0, 1])
+        self.assertEqual([call["page_size"] for call in calls], [10, 5])
+        self.assertEqual(connector.last_result.get_data_size(), 15)
+        self.assertEqual(connector.last_result.summary["num_results"], 15)
+
 
 if __name__ == "__main__":
     unittest.main()
