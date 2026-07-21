@@ -1611,7 +1611,7 @@ class PhantomConnector(BaseConnector):
             return self.set_status(phantom.APP_ERROR, PHANTOM_ERR_SPECIFY_IP_HOSTNAME)
 
         self._base_uri = "https://{}".format(config["phantom_server"])
-        self._verify_cert = config.get("verify_certificate", False)
+        self._verify_cert = config.get("verify_certificate", True)
 
         self._auth = None
 

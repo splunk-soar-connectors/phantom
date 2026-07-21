@@ -57,8 +57,8 @@
         "verify_certificate": {
             "data_type": "boolean",
             "order": 4,
-            "description": "Verify HTTPS certificate (default: false)",
-            "default": false
+            "description": "Verify HTTPS certificate (default: true)",
+            "default": true
         },
         "deflate_item_extensions": {
             "data_type": "string",

@@ -16,7 +16,7 @@ import sys
 import types
 import unittest
 from pathlib import Path
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 
 class _ActionResult:
@@ -113,6 +113,28 @@ CONNECTOR = _load_connector_module()
 
 
 class PhantomConnectorLogicTest(unittest.TestCase):
+    def test_remote_requests_verify_but_local_peer_requests_do_not(self):
+        connector = object.__new__(CONNECTOR.PhantomConnector)
+        connector._auth = "basic-auth"
+        connector._base_uri = "https://peer.example"
+        connector._verify_cert = True
+        connector.get_config = lambda: {"auth_token": "token"}
+        connector._process_response = lambda response, _result: (0, response, {})
+        action_result = _ActionResult({})
+        response = Mock()
+
+        with patch.object(CONNECTOR.requests, "get", return_value=response) as request:
+            connector._make_rest_call("/rest/version", action_result)
+            connector._make_rest_call("/rest/container", action_result, ignore_auth=True)
+
+        remote_call, local_call = request.call_args_list
+        self.assertTrue(remote_call.kwargs["verify"])
+        self.assertEqual(remote_call.kwargs["auth"], "basic-auth")
+        self.assertEqual(remote_call.kwargs["headers"]["ph-auth-token"], "token")
+        self.assertFalse(local_call.kwargs["verify"])
+        self.assertIsNone(local_call.kwargs["auth"])
+        self.assertNotIn("ph-auth-token", local_call.kwargs["headers"])
+
     def test_exact_match_defaults_to_true_with_a_substring_opt_out(self):
         connector = object.__new__(CONNECTOR.PhantomConnector)
         connector._base_uri = "https://peer.example"
