@@ -32,18 +32,18 @@ import zipfile
 from pathlib import Path
 
 import magic
-import requests
-from bs4 import BeautifulSoup
-from requests.exceptions import SSLError, Timeout
-
 import phantom.app as phantom
 import phantom.rules as ph_rules
 import phantom.utils as ph_utils
+import requests
+from bs4 import BeautifulSoup
 from phantom.action_result import ActionResult
 from phantom.base_connector import BaseConnector
 from phantom.cef import CEF_JSON, CEF_NAME_MAPPING
 from phantom.utils import CONTAINS_VALIDATORS
 from phantom.vault import Vault
+from requests.exceptions import SSLError, Timeout
+
 from phantom_consts import *
 
 
@@ -578,7 +578,7 @@ class PhantomConnector(BaseConnector):
 
         cef_key = param.get("cef_key")
 
-        exact_match = param.get("exact_match", False)
+        exact_match = param.get("exact_match", True)
 
         if exact_match and not cef_key:
             values = f'"{values}"'
@@ -655,7 +655,7 @@ class PhantomConnector(BaseConnector):
                         f"Error occurred while processing the artifacts data: {self._get_error_message_from_exception(e)}",
                     )
 
-                if values in curr_value.lower() or (exact_match and values.strip('"') == curr_value.lower()):
+                if (exact_match and values.strip('"') == curr_value.lower()) or (not exact_match and values in curr_value.lower()):
                     key = k
                     value = curr_value
                     break
@@ -1039,7 +1039,7 @@ class PhantomConnector(BaseConnector):
 
         values = param.get("values")
         list_name = param["list"]
-        exact_match = param.get("exact_match", False)
+        exact_match = param.get("exact_match", True)
         column_index = param.get("column_index")
 
         ret_val, column_index = self._validate_integer(action_result, column_index, "column_index", True)
