@@ -26,6 +26,7 @@ max-complexity = 28
 [tool.ruff.lint.isort]
 combine-as-imports = true
 lines-after-imports = 2
+known-first-party = ["phantom"]
 
 [tool.ruff.format]
 quote-style = "double"
