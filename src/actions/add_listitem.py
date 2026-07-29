@@ -12,6 +12,7 @@
 # and limitations under the License.
 
 import ast
+import contextlib
 from urllib.parse import quote
 
 from soar_sdk.abstract import SOARClient
@@ -24,12 +25,20 @@ from ..helper import PhantomClientError
 
 class AddListitemParams(Params):
     list: str = Param(description="Name/ID of the list to append to", required=True)
-    new_row: str = Param(description="Value(s) to append to the list", required=True, cef_types=["*"])
-    create: bool = Param(description="Create the list if it does not exist", required=False, default=False)
+    new_row: str = Param(
+        description="Value(s) to append to the list", required=True, cef_types=["*"]
+    )
+    create: bool = Param(
+        description="Create the list if it does not exist",
+        required=False,
+        default=False,
+    )
 
 
 class AddListitemOutput(PermissiveActionOutput):
-    status: str = OutputField(column_name="Status", example_values=["success", "failed"])
+    status: str = OutputField(
+        column_name="Status", example_values=["success", "failed"]
+    )
 
 
 class AddListitemSummary(ActionOutput):
@@ -40,7 +49,9 @@ def _create_list(client, list_name: str, row, soar: SOARClient) -> AddListitemOu
     if isinstance(row, (str, int, float, bool)):
         row = [row]
     payload = {"content": [row], "name": list_name}
-    _response, resp_data = client.make_rest_call("/rest/decided_list", method="post", data=payload)
+    _response, resp_data = client.make_rest_call(
+        "/rest/decided_list", method="post", data=payload
+    )
     soar.set_summary(AddListitemSummary(server=client.base_uri))
     resp_data.pop("status", None)
     return AddListitemOutput(status="success", **resp_data)
@@ -55,15 +66,15 @@ def _create_list(client, list_name: str, row, soar: SOARClient) -> AddListitemOu
     render_as="table",
     summary_type=AddListitemSummary,
 )
-def add_listitem(params: AddListitemParams, soar: SOARClient, asset: Asset) -> AddListitemOutput:
+def add_listitem(
+    params: AddListitemParams, soar: SOARClient, asset: Asset
+) -> AddListitemOutput:
     client = get_client(asset)
 
     list_name = params.list
     row = params.new_row
-    try:
+    with contextlib.suppress(Exception):
         row = ast.literal_eval(row)
-    except Exception:
-        pass
 
     url = f"/rest/decided_list/{quote(list_name, safe='')}"
     payload = {"append_rows": [row]}

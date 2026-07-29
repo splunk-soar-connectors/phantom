@@ -44,7 +44,9 @@ class NoOpOutput(ActionOutput):
     render_as="table",
 )
 def no_op(params: NoOpParams, soar: SOARClient, asset: Asset) -> NoOpOutput:
-    sleep_seconds = validate_integer(params.sleep_seconds, "sleep_seconds", allow_zero=True)
+    sleep_seconds = validate_integer(
+        params.sleep_seconds, "sleep_seconds", allow_zero=True
+    )
 
     remainder = sleep_seconds % 60
 

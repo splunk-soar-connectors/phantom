@@ -52,7 +52,7 @@ try:
 except ImportError:
 
     def is_ip(value: str) -> bool:
-        import ipaddress
+        import ipaddress  # noqa: PLC0415
 
         try:
             ipaddress.ip_address(value)
@@ -72,7 +72,9 @@ class PhantomClient:
         self.asset = asset
         _validate_phantom_server(asset.phantom_server)
         self.base_uri = f"https://{asset.phantom_server}".strip("/")
-        self.verify_cert = asset.verify_certificate if asset.verify_certificate is not None else True
+        self.verify_cert = (
+            asset.verify_certificate if asset.verify_certificate is not None else True
+        )
         self.auth = None
         if asset.username and asset.password:
             self.auth = (asset.username, asset.password)
@@ -98,7 +100,9 @@ class PhantomClient:
         try:
             resp_json = response.json()
         except Exception as e:
-            raise PhantomClientError(PHANTOM_ERR_PARSE_JSON_RESPONSE.format(str(e))) from e
+            raise PhantomClientError(
+                PHANTOM_ERR_PARSE_JSON_RESPONSE.format(str(e))
+            ) from e
 
         if isinstance(resp_json, list):
             return resp_json
@@ -106,13 +110,17 @@ class PhantomClient:
         failed = resp_json.get("failed", False)
         if failed:
             message = resp_json.get("message") or "Error message is unavailable"
-            raise PhantomClientError(PHANTOM_ERR_SERVER.format(response.status_code, message))
+            raise PhantomClientError(
+                PHANTOM_ERR_SERVER.format(response.status_code, message)
+            )
 
         if 200 <= response.status_code < 399:
             return resp_json
 
         message = resp_json.get("message") or "Error message is unavailable"
-        raise PhantomClientError(PHANTOM_ERR_SERVER.format(response.status_code, message))
+        raise PhantomClientError(
+            PHANTOM_ERR_SERVER.format(response.status_code, message)
+        )
 
     def _process_response(self, response):
         content_type = response.headers.get("Content-Type", "")
@@ -130,7 +138,16 @@ class PhantomClient:
         )
         raise PhantomClientError(message)
 
-    def make_rest_call(self, endpoint, headers=None, params=None, data=None, method="get", ignore_auth=False, base_uri=None):
+    def make_rest_call(
+        self,
+        endpoint,
+        headers=None,
+        params=None,
+        data=None,
+        method="get",
+        ignore_auth=False,
+        base_uri=None,
+    ):
         if headers is None:
             headers = {}
         elif isinstance(headers, str):
@@ -160,7 +177,7 @@ class PhantomClient:
                 auth=auth,
                 json=data,
                 headers=headers if headers else None,
-                verify=False if ignore_auth else self.verify_cert,  # noqa: S501
+                verify=False if ignore_auth else self.verify_cert,
                 params=params,
                 timeout=TIMEOUT,
             )
@@ -169,15 +186,17 @@ class PhantomClient:
         except requests.exceptions.SSLError as e:
             raise PhantomClientError(f"HTTPS SSL validation failed: {e}") from e
         except Exception as e:
-            raise PhantomClientError(f"Error connecting to server. Error Details: {e}") from e
+            raise PhantomClientError(
+                f"Error connecting to server. Error Details: {e}"
+            ) from e
 
         return response, self._process_response(response)
 
 
 def _validate_phantom_server(host: str) -> None:
     """Reject loopback/localhost targets. Ported from the connector's initialize()."""
-    import ipaddress
-    import socket
+    import ipaddress  # noqa: PLC0415
+    import socket  # noqa: PLC0415
 
     if host.startswith("http:") or host.startswith("https:"):
         raise ActionFailure(
@@ -185,26 +204,37 @@ def _validate_phantom_server(host: str) -> None:
             "in the Asset config without http: or https:"
         )
 
-    bare_host = host.split(":")[0]
+    bare_host = host.split(":", 1)[0]
 
     if is_ip(bare_host):
         try:
             packed = socket.inet_aton(bare_host)
             unpacked = socket.inet_ntoa(packed)
         except Exception as e:
-            raise ActionFailure(f"Unable to do ip to name conversion on {bare_host}") from e
+            raise ActionFailure(
+                f"Unable to do ip to name conversion on {bare_host}"
+            ) from e
     else:
         try:
             unpacked = socket.gethostbyname(bare_host)
         except Exception as e:
-            raise ActionFailure(f"Unable to do name to ip conversion on {bare_host}") from e
+            raise ActionFailure(
+                f"Unable to do name to ip conversion on {bare_host}"
+            ) from e
 
     try:
         address = ipaddress.ip_address(unpacked)
     except ValueError as e:
-        raise ActionFailure(f"Unable to parse resolved address {unpacked!r} for {bare_host}") from e
+        raise ActionFailure(
+            f"Unable to parse resolved address {unpacked!r} for {bare_host}"
+        ) from e
 
-    if address.is_loopback or address.is_unspecified or address.is_link_local or address.is_reserved:
+    if (
+        address.is_loopback
+        or address.is_unspecified
+        or address.is_link_local
+        or address.is_reserved
+    ):
         raise ActionFailure(PHANTOM_ERR_SPECIFY_IP_HOSTNAME)
 
     if "127.0.0.1" in bare_host or "localhost" in bare_host:
@@ -215,7 +245,9 @@ def get_client(asset) -> PhantomClient:
     return PhantomClient(asset)
 
 
-def _add_artifact_list(client: "PhantomClient", artifacts: list, ignore_auth: bool = False) -> None:
+def _add_artifact_list(
+    client: "PhantomClient", artifacts: list, ignore_auth: bool = False
+) -> None:
     try:
         _response, resp_data = client.make_rest_call(
             "/rest/artifact", data=artifacts, method="post", ignore_auth=ignore_auth
@@ -244,11 +276,22 @@ def create_container_copy(
     Returns (new_container_id, artifact_count). Raises PhantomClientError on failure.
     """
     url = f"/rest/container/{container_id}"
-    _response, resp_data = client.make_rest_call(url, ignore_auth=source_local, base_uri=source)
+    _response, resp_data = client.make_rest_call(
+        url, ignore_auth=source_local, base_uri=source
+    )
 
     container = resp_data
     source_artifact_count = container.get("artifact_count")
-    for key in ("asset", "artifact_count", "start_time", "source_data_identifier", "ingest_app", "closing_rule_run", "tenant", "id"):
+    for key in (
+        "asset",
+        "artifact_count",
+        "start_time",
+        "source_data_identifier",
+        "ingest_app",
+        "closing_rule_run",
+        "tenant",
+        "id",
+    ):
         container.pop(key, None)
     if label:
         container["label"] = label
@@ -261,7 +304,11 @@ def create_container_copy(
 
     try:
         _response, resp_data = client.make_rest_call(
-            "/rest/container", data=container, method="post", ignore_auth=destination_local, base_uri=destination
+            "/rest/container",
+            data=container,
+            method="post",
+            ignore_auth=destination_local,
+            base_uri=destination,
         )
     except PhantomClientError as e:
         act_message = str(e)
@@ -279,17 +326,24 @@ def create_container_copy(
     url = f"/rest/container/{container_id}/artifacts"
     params = {"sort": "id", "order": "asc", "page_size": 0}
     try:
-        _response, resp_data = client.make_rest_call(url, params=params, ignore_auth=source_local, base_uri=source)
+        _response, resp_data = client.make_rest_call(
+            url, params=params, ignore_auth=source_local, base_uri=source
+        )
     except PhantomClientError as e:
         raise PhantomClientError(
             f"Container created:{new_container_id}. Failed to retrieve artifacts from the source: {e}"
         ) from e
 
     if not isinstance(resp_data, dict) or not isinstance(resp_data.get("data"), list):
-        raise PhantomClientError(f"Container created:{new_container_id}. Failed to retrieve artifacts from the source")
+        raise PhantomClientError(
+            f"Container created:{new_container_id}. Failed to retrieve artifacts from the source"
+        )
 
     artifacts = resp_data["data"]
-    if isinstance(source_artifact_count, int) and len(artifacts) < source_artifact_count:
+    if (
+        isinstance(source_artifact_count, int)
+        and len(artifacts) < source_artifact_count
+    ):
         raise PhantomClientError(
             f"Container created:{new_container_id}. Source reports {source_artifact_count} artifact(s) "
             f"but only {len(artifacts)} could be retrieved"
@@ -297,7 +351,16 @@ def create_container_copy(
 
     if artifacts:
         for artifact in artifacts:
-            for key in ("update_time", "create_time", "start_time", "end_time", "asset_id", "container", "id", "owner"):
+            for key in (
+                "update_time",
+                "create_time",
+                "start_time",
+                "end_time",
+                "asset_id",
+                "container",
+                "id",
+                "owner",
+            ):
                 artifact.pop(key, None)
             artifact["run_automation"] = False
             artifact["container_id"] = new_container_id
@@ -309,7 +372,9 @@ def create_container_copy(
         try:
             _add_artifact_list(client, artifacts, ignore_auth=destination_local)
         except PhantomClientError as e:
-            raise PhantomClientError(f"Container created:{new_container_id}. {e}") from e
+            raise PhantomClientError(
+                f"Container created:{new_container_id}. {e}"
+            ) from e
 
     return new_container_id, len(artifacts)
 
@@ -326,9 +391,13 @@ def validate_integer(value, key: str, allow_zero: bool = False) -> int | None:
         raise ActionFailure(PHANTOM_ERR_INVALID_INT.format(msg="", param=key)) from e
 
     if value < 0:
-        raise ActionFailure(PHANTOM_ERR_INVALID_INT.format(msg="non-negative", param=key))
+        raise ActionFailure(
+            PHANTOM_ERR_INVALID_INT.format(msg="non-negative", param=key)
+        )
     if not allow_zero and value == 0:
-        raise ActionFailure(PHANTOM_ERR_INVALID_INT.format(msg="non-zero positive", param=key))
+        raise ActionFailure(
+            PHANTOM_ERR_INVALID_INT.format(msg="non-zero positive", param=key)
+        )
     return value
 
 
@@ -363,7 +432,7 @@ def determine_contains(value) -> list:
         try:
             if f(value):
                 valid_contains.append(c)
-        except Exception:
+        except Exception:  # noqa: S112
             continue
     return valid_contains
 
@@ -385,7 +454,7 @@ def _detect_ooxml_mime(file_path: str) -> str | None:
     files, which otherwise look like plain ZIPs and trigger a runaway recursive
     deflation that can hang the service.
     """
-    import zipfile
+    import zipfile  # noqa: PLC0415
 
     if not zipfile.is_zipfile(file_path):
         return None
@@ -419,7 +488,7 @@ def check_deflation_supported_file(file_path: str) -> tuple[str, bool]:
     files (eg. xlsx) as zip files which lead to an enormous deflation process
     run hanging the service.
     """
-    import magic
+    import magic  # noqa: PLC0415
 
     file_type = _detect_ooxml_mime(file_path)
 

@@ -21,9 +21,17 @@ from ..helper import PhantomClientError, validate_integer
 
 
 class TagArtifactParams(Params):
-    artifact_id: str = Param(description="Artifact ID to update", required=True, cef_types=["phantom artifact id"])
-    add_tags: str = Param(description="Comma separated list of tags to add", required=False)
-    remove_tags: str = Param(description="Comma separated list of tags to remove", required=False)
+    artifact_id: str = Param(
+        description="Artifact ID to update",
+        required=True,
+        cef_types=["phantom artifact id"],
+    )
+    add_tags: str = Param(
+        description="Comma separated list of tags to add", required=False
+    )
+    remove_tags: str = Param(
+        description="Comma separated list of tags to remove", required=False
+    )
 
 
 class TagArtifactSummary(ActionOutput):
@@ -41,7 +49,9 @@ class TagArtifactSummary(ActionOutput):
     read_only=False,
     summary_type=TagArtifactSummary,
 )
-def tag_artifact(params: TagArtifactParams, soar: SOARClient, asset: Asset) -> ActionOutput:
+def tag_artifact(
+    params: TagArtifactParams, soar: SOARClient, asset: Asset
+) -> ActionOutput:
     client = get_client(asset)
 
     artifact_id = validate_integer(params.artifact_id, "artifact_id")

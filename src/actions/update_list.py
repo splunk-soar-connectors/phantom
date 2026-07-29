@@ -26,7 +26,10 @@ from ..helper import PhantomClientError, validate_integer
 class UpdateListParams(Params):
     list_name: str = Param(description="Name of the custom list", required=False)
     id: int = Param(description="ID of the custom list", required=False)
-    row_number: int = Param(description="Row number of the list to update (index starts from 0)", required=True)
+    row_number: int = Param(
+        description="Row number of the list to update (index starts from 0)",
+        required=True,
+    )
     row_values_as_list: str = Param(
         description="Values to set the row to, as a JSON formatted list",
         required=True,
@@ -45,7 +48,9 @@ class UpdateListOutput(ActionOutput):
     read_only=False,
     render_as="json",
 )
-def update_list(params: UpdateListParams, soar: SOARClient, asset: Asset) -> UpdateListOutput:
+def update_list(
+    params: UpdateListParams, soar: SOARClient, asset: Asset
+) -> UpdateListOutput:
     client = get_client(asset)
 
     row_number = validate_integer(params.row_number, "row_number", allow_zero=True)
@@ -72,7 +77,9 @@ def update_list(params: UpdateListParams, soar: SOARClient, asset: Asset) -> Upd
 
     data = {"update_rows": {str(row_number): row_values}}
 
-    client.make_rest_call(f"/rest/decided_list/{list_identifier}", data=data, method="post")
+    client.make_rest_call(
+        f"/rest/decided_list/{list_identifier}", data=data, method="post"
+    )
 
     soar.set_message("Success: True")
     return UpdateListOutput(success=True)

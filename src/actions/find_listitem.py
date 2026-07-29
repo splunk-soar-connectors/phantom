@@ -23,9 +23,16 @@ from ..helper import validate_integer
 
 class FindListitemParams(Params):
     list: str = Param(description="Name/ID of the list to search", required=True)
-    column_index: int = Param(description="Column index to match against (indexing starts at 0)", required=False)
-    values: str = Param(description="Value to search for", required=True, cef_types=["*"])
-    exact_match: bool = Param(description="List value must match exactly", required=False, default=True)
+    column_index: int = Param(
+        description="Column index to match against (indexing starts at 0)",
+        required=False,
+    )
+    values: str = Param(
+        description="Value to search for", required=True, cef_types=["*"]
+    )
+    exact_match: bool = Param(
+        description="List value must match exactly", required=False, default=True
+    )
 
 
 class FindListitemOutput(PermissiveActionOutput):
@@ -55,10 +62,14 @@ def find_listitem_view(outputs: list[FindListitemOutput]) -> dict:
     view_handler=find_listitem_view,
     summary_type=FindListitemSummary,
 )
-def find_listitem(params: FindListitemParams, soar: SOARClient, asset: Asset) -> list[FindListitemOutput]:
+def find_listitem(
+    params: FindListitemParams, soar: SOARClient, asset: Asset
+) -> list[FindListitemOutput]:
     client = get_client(asset)
 
-    column_index = validate_integer(params.column_index, "column_index", allow_zero=True)
+    column_index = validate_integer(
+        params.column_index, "column_index", allow_zero=True
+    )
 
     endpoint = f"/rest/decided_list/{quote(params.list, safe='')}"
     _response, resp_data = client.make_rest_call(endpoint)
@@ -70,15 +81,13 @@ def find_listitem(params: FindListitemParams, soar: SOARClient, asset: Asset) ->
     found = 0
     for rownum, row in enumerate(content):
         for cid, value in enumerate(row):
-            if column_index is None or cid == column_index:
-                if params.exact_match and value == params.values:
-                    found += 1
-                    matched_rows.append(row)
-                    coordinates.append((rownum, cid))
-                elif not params.exact_match and value and params.values in value:
-                    found += 1
-                    matched_rows.append(row)
-                    coordinates.append((rownum, cid))
+            if (column_index is None or cid == column_index) and (
+                (params.exact_match and value == params.values)
+                or (not params.exact_match and value and params.values in value)
+            ):
+                found += 1
+                matched_rows.append(row)
+                coordinates.append((rownum, cid))
 
     soar.set_summary(
         FindListitemSummary(

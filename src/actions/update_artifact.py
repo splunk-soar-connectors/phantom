@@ -18,20 +18,36 @@ from soar_sdk.action_results import OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
-from ..consts import PHANTOM_ERR_FIND_ARTIFACT, PHANTOM_ERR_GET_ARTIFACT, PHANTOM_ERR_UPDATE_ARTIFACT
+from ..consts import (
+    PHANTOM_ERR_FIND_ARTIFACT,
+    PHANTOM_ERR_GET_ARTIFACT,
+    PHANTOM_ERR_UPDATE_ARTIFACT,
+)
 from ..helper import PhantomClientError, load_dirty_json, validate_integer
 
 
 class UpdateArtifactParams(Params):
-    artifact_id: str = Param(description="Artifact ID to update", required=True, cef_types=["phantom artifact id"])
+    artifact_id: str = Param(
+        description="Artifact ID to update",
+        required=True,
+        cef_types=["phantom artifact id"],
+    )
     name: str = Param(description="Name of artifact", required=False)
     label: str = Param(description="Label of artifact", required=False)
     severity: str = Param(description="Severity of artifact", required=False)
     cef_json: str = Param(description="JSON string of CEF fields", required=False)
-    cef_types_json: str = Param(description="JSON string of CEF data types (contains)", required=False)
+    cef_types_json: str = Param(
+        description="JSON string of CEF data types (contains)", required=False
+    )
     tags: str = Param(description="Comma separated list of tags", required=False)
-    overwrite: bool = Param(description="Overwrite artifact with provided values", required=False, default=False)
-    artifact_json: str = Param(description="JSON string of the whole artifact to overwrite", required=False)
+    overwrite: bool = Param(
+        description="Overwrite artifact with provided values",
+        required=False,
+        default=False,
+    )
+    artifact_json: str = Param(
+        description="JSON string of the whole artifact to overwrite", required=False
+    )
 
 
 class UpdateArtifactResponse(PermissiveActionOutput):
@@ -50,7 +66,9 @@ class UpdateArtifactOutput(PermissiveActionOutput):
     read_only=False,
     render_as="table",
 )
-def update_artifact(params: UpdateArtifactParams, soar: SOARClient, asset: Asset) -> UpdateArtifactOutput:
+def update_artifact(
+    params: UpdateArtifactParams, soar: SOARClient, asset: Asset
+) -> UpdateArtifactOutput:
     client = get_client(asset)
 
     artifact_id = validate_integer(params.artifact_id, "artifact_id")
@@ -65,7 +83,9 @@ def update_artifact(params: UpdateArtifactParams, soar: SOARClient, asset: Asset
     overwrite = params.overwrite
 
     if not any((name, label, severity, cef_json, cef_types_json, tags, art_json)):
-        req_params = "name, label, severity, cef_json, cef_types_json, tags, artifact_json"
+        req_params = (
+            "name, label, severity, cef_json, cef_types_json, tags, artifact_json"
+        )
         raise PhantomClientError(
             f"At least one of the following parameters are required to update an artifact: {req_params}"
         )
@@ -83,7 +103,9 @@ def update_artifact(params: UpdateArtifactParams, soar: SOARClient, asset: Asset
     try:
         _response, resp_data = client.make_rest_call(endpoint)
     except PhantomClientError as e:
-        raise PhantomClientError(f"{PHANTOM_ERR_FIND_ARTIFACT} {PHANTOM_ERR_GET_ARTIFACT.format(e)}") from e
+        raise PhantomClientError(
+            f"{PHANTOM_ERR_FIND_ARTIFACT} {PHANTOM_ERR_GET_ARTIFACT.format(e)}"
+        ) from e
 
     existing_artifact = resp_data if overwrite is False else {}
     if "label" not in output_artifact:
@@ -109,13 +131,17 @@ def update_artifact(params: UpdateArtifactParams, soar: SOARClient, asset: Asset
 
     if tags:
         cleaned_tags = [tag.strip().strip("'\"") for tag in tags.strip("[]").split(",")]
-        output_artifact["tags"] = list(set(existing_artifact.get("tags", []) + cleaned_tags))
+        output_artifact["tags"] = list(
+            set(existing_artifact.get("tags", []) + cleaned_tags)
+        )
 
     if art_json:
         output_artifact.update(load_dirty_json(art_json, "art_json"))
 
     try:
-        _response, resp_data = client.make_rest_call(endpoint, data=output_artifact, method="post")
+        _response, resp_data = client.make_rest_call(
+            endpoint, data=output_artifact, method="post"
+        )
     except PhantomClientError as e:
         raise PhantomClientError(PHANTOM_ERR_UPDATE_ARTIFACT.format(e)) from e
 

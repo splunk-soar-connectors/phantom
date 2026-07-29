@@ -21,15 +21,29 @@ from ..helper import create_container_copy, validate_integer
 
 class ExportContainerParams(Params):
     container_id: int = Param(
-        description="Container ID to export to configured Phantom asset", required=True, cef_types=["phantom container id"]
+        description="Container ID to export to configured Phantom asset",
+        required=True,
+        cef_types=["phantom container id"],
     )
-    keep_owner: bool = Param(description="Attempt to keep the same container owner", required=False, default=False)
-    label: str = Param(description="Label to apply to the exported container", required=False)
-    run_automation: bool = Param(description="Enable active playbooks on the new container", required=False, default=False)
+    keep_owner: bool = Param(
+        description="Attempt to keep the same container owner",
+        required=False,
+        default=False,
+    )
+    label: str = Param(
+        description="Label to apply to the exported container", required=False
+    )
+    run_automation: bool = Param(
+        description="Enable active playbooks on the new container",
+        required=False,
+        default=False,
+    )
 
 
 class ExportContainerSummary(ActionOutput):
-    container_id: int = OutputField(column_name="New Container", cef_types=["phantom container id"])
+    container_id: int = OutputField(
+        column_name="New Container", cef_types=["phantom container id"]
+    )
     artifact_count: int
 
 
@@ -42,7 +56,9 @@ class ExportContainerSummary(ActionOutput):
     render_as="table",
     summary_type=ExportContainerSummary,
 )
-def export_container(params: ExportContainerParams, soar: SOARClient, asset: Asset) -> ActionOutput:
+def export_container(
+    params: ExportContainerParams, soar: SOARClient, asset: Asset
+) -> ActionOutput:
     client = get_client(asset)
 
     container_id = validate_integer(params.container_id, "container_id")
@@ -62,6 +78,10 @@ def export_container(params: ExportContainerParams, soar: SOARClient, asset: Ass
         label=params.label,
     )
 
-    soar.set_summary(ExportContainerSummary(container_id=new_container_id, artifact_count=artifact_count))
+    soar.set_summary(
+        ExportContainerSummary(
+            container_id=new_container_id, artifact_count=artifact_count
+        )
+    )
     soar.set_message(f"Container id: {new_container_id}")
     return ActionOutput()

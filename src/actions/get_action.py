@@ -25,11 +25,15 @@ from ..helper import PhantomClientError, validate_integer
 
 class GetActionParams(Params):
     action_name: str = Param(description="Name of action to search for", required=True)
-    parameters: str = Param(description="Parameters to search for, in JSON format", required=False)
+    parameters: str = Param(
+        description="Parameters to search for, in JSON format", required=False
+    )
     app: str = Param(description="App to filter on", required=False)
     asset: str = Param(description="Asset to filter on", required=False)
     time_limit: int = Param(description="Hours to search back", required=False)
-    max_results: int = Param(description="Max number of results to return", required=False, default=10)
+    max_results: int = Param(
+        description="Max number of results to return", required=False, default=10
+    )
 
 
 class GetActionSummary(ActionOutput):
@@ -49,7 +53,9 @@ class GetActionOutput(PermissiveActionOutput):
     render_as="json",
     summary_type=GetActionSummary,
 )
-def get_action(params: GetActionParams, soar: SOARClient, asset: Asset) -> list[GetActionOutput]:
+def get_action(
+    params: GetActionParams, soar: SOARClient, asset: Asset
+) -> list[GetActionOutput]:
     client = get_client(asset)
 
     url_params: dict = {
@@ -64,16 +70,24 @@ def get_action(params: GetActionParams, soar: SOARClient, asset: Asset) -> list[
         try:
             parameters = json.loads(params.parameters)
         except Exception as e:
-            raise PhantomClientError("Could not load JSON from 'parameters' parameter") from e
+            raise PhantomClientError(
+                "Could not load JSON from 'parameters' parameter"
+            ) from e
 
         search_key, search_value = parameters.popitem()
         is_not_string = isinstance(search_value, (float, int, bool))
-        formatted_search_value = json.dumps(search_value) if is_not_string else f'\\"{search_value}\\"'
-        url_params["_filter_result_data__regex"] = f"'parameter.*\\\"{search_key}\\\": {formatted_search_value}'"
+        formatted_search_value = (
+            json.dumps(search_value) if is_not_string else f'\\"{search_value}\\"'
+        )
+        url_params["_filter_result_data__regex"] = (
+            f"'parameter.*\\\"{search_key}\\\": {formatted_search_value}'"
+        )
 
     if params.time_limit is not None:
         hours = validate_integer(params.time_limit, "time_limit")
-        time_str = (datetime.datetime.utcnow() - datetime.timedelta(hours=hours)).strftime("%Y-%m-%dT%H:%M:%SZ")
+        time_str = (
+            datetime.datetime.now(tz=datetime.UTC) - datetime.timedelta(hours=hours)
+        ).strftime("%Y-%m-%dT%H:%M:%SZ")
         url_params["_filter_start_time__gt"] = f'"{time_str}"'
 
     limit = validate_integer(params.max_results, "max_results", allow_zero=True)
@@ -98,9 +112,13 @@ def get_action(params: GetActionParams, soar: SOARClient, asset: Asset) -> list[
     while True:
         page_params = dict(url_params)
         page_params["page"] = page
-        page_params["page_size"] = min(page_size, limit - len(action_runs)) if limit else page_size
+        page_params["page_size"] = (
+            min(page_size, limit - len(action_runs)) if limit else page_size
+        )
 
-        _response, resp_json = client.make_rest_call("/rest/app_run", params=page_params)
+        _response, resp_json = client.make_rest_call(
+            "/rest/app_run", params=page_params
+        )
 
         page_data = resp_json.get("data", [])
         action_runs.extend(page_data)

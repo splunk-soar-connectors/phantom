@@ -86,7 +86,7 @@ __all__ = ["Asset", "PhantomClient", "app", "get_client"]
 # Register actions via import side effect. Custom-view actions register their
 # view handler within the same module. Imports are at the bottom so the `app`
 # instance exists first.
-from .actions import (  # noqa: E402, F401
+from .actions import (  # noqa: F401
     add_artifact,
     add_listitem,
     add_note,

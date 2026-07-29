@@ -19,17 +19,35 @@ from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
-from ..consts import ARTIFACT_ABSOLUTE_MAX_RESULTS, ARTIFACT_DEFAULT_MAX_RESULTS, PAGINATION_COMPLETE
+from ..consts import (
+    ARTIFACT_ABSOLUTE_MAX_RESULTS,
+    ARTIFACT_DEFAULT_MAX_RESULTS,
+    PAGINATION_COMPLETE,
+)
 from ..helper import PhantomClientError
 
 
 class FindArtifactsParams(Params):
     cef_key: str = Param(description="CEF key to search on", required=False)
-    values: str = Param(description="Value to search for", required=True, cef_types=["*"])
-    exact_match: bool = Param(description="Value must match exactly", required=False, default=True)
-    limit_search: bool = Param(description="Limit search to given container IDs", required=False, default=False)
-    container_ids: str = Param(description="Container IDs to limit the search to", required=False, default="current")
-    max_results: int = Param(description="Max number of artifacts to return", required=False, default=ARTIFACT_DEFAULT_MAX_RESULTS)
+    values: str = Param(
+        description="Value to search for", required=True, cef_types=["*"]
+    )
+    exact_match: bool = Param(
+        description="Value must match exactly", required=False, default=True
+    )
+    limit_search: bool = Param(
+        description="Limit search to given container IDs", required=False, default=False
+    )
+    container_ids: str = Param(
+        description="Container IDs to limit the search to",
+        required=False,
+        default="current",
+    )
+    max_results: int = Param(
+        description="Max number of artifacts to return",
+        required=False,
+        default=ARTIFACT_DEFAULT_MAX_RESULTS,
+    )
 
 
 class FindArtifactsOutput(ActionOutput):
@@ -48,7 +66,14 @@ class FindArtifactsSummary(ActionOutput):
 
 @app.view_handler(template="phantom_find_artifacts.html")
 def find_artifacts_view(outputs: list[FindArtifactsOutput]) -> dict:
-    headers = ["Container ID", "Container", "Artifact ID", "Artifact Name", "Found in field", "Matched Value"]
+    headers = [
+        "Container ID",
+        "Container",
+        "Artifact ID",
+        "Artifact Name",
+        "Found in field",
+        "Matched Value",
+    ]
     data = [o.model_dump(by_alias=True) for o in outputs]
     return {"results": [{"data": data}], "headers": headers}
 
@@ -62,7 +87,9 @@ def find_artifacts_view(outputs: list[FindArtifactsOutput]) -> dict:
     view_handler=find_artifacts_view,
     summary_type=FindArtifactsSummary,
 )
-def find_artifacts(params: FindArtifactsParams, soar: SOARClient, asset: Asset) -> list[FindArtifactsOutput]:
+def find_artifacts(
+    params: FindArtifactsParams, soar: SOARClient, asset: Asset
+) -> list[FindArtifactsOutput]:
     client = get_client(asset)
 
     limit_search = params.limit_search
@@ -72,15 +99,21 @@ def find_artifacts(params: FindArtifactsParams, soar: SOARClient, asset: Asset) 
 
     if limit_search:
         resolved = []
-        for token in container_ids.replace(",", " ").split():
-            token = token.strip()
-            candidate = soar.get_executing_container_id() if token == "current" else token
-            if isinstance(candidate, int) or (isinstance(candidate, str) and candidate.isdigit()):
+        for entry in container_ids.replace(",", " ").split():
+            entry = entry.strip()  # noqa: PLW2901
+            candidate = (
+                soar.get_executing_container_id() if entry == "current" else entry
+            )
+            if isinstance(candidate, int) or (
+                isinstance(candidate, str) and candidate.isdigit()
+            ):
                 resolved.append(int(candidate))
         container_ids = sorted(set(resolved))
 
         if not container_ids:
-            soar.set_summary(FindArtifactsSummary(artifacts_found=0, server=client.base_uri))
+            soar.set_summary(
+                FindArtifactsSummary(artifacts_found=0, server=client.base_uri)
+            )
             return []
 
     cef_key = params.cef_key
@@ -158,5 +191,7 @@ def find_artifacts(params: FindArtifactsParams, soar: SOARClient, asset: Asset) 
             )
         )
 
-    soar.set_summary(FindArtifactsSummary(artifacts_found=len(records), server=client.base_uri))
+    soar.set_summary(
+        FindArtifactsSummary(artifacts_found=len(records), server=client.base_uri)
+    )
     return outputs

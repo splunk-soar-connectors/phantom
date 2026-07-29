@@ -23,18 +23,24 @@ from ..helper import PhantomClient, PhantomClientError
 
 
 class CreateContainerParams(Params):
-    container_json: str = Param(description="JSON string of the container", required=True)
+    container_json: str = Param(
+        description="JSON string of the container", required=True
+    )
     container_artifacts: str = Param(
         description="List of artifact objects in JSON format", required=False
     )
 
 
 class CreateContainerSummary(ActionOutput):
-    container_id: int = OutputField(column_name="New Container", cef_types=["phantom container id"])
+    container_id: int = OutputField(
+        column_name="New Container", cef_types=["phantom container id"]
+    )
     artifact_count: int
 
 
-def _add_artifact_list(client: PhantomClient, artifacts: list, ignore_auth: bool = False) -> None:
+def _add_artifact_list(
+    client: PhantomClient, artifacts: list, ignore_auth: bool = False
+) -> None:
     _response, resp_data = client.make_rest_call(
         "/rest/artifact", data=artifacts, method="post", ignore_auth=ignore_auth
     )
@@ -52,13 +58,17 @@ def _add_artifact_list(client: PhantomClient, artifacts: list, ignore_auth: bool
     render_as="table",
     summary_type=CreateContainerSummary,
 )
-def create_container(params: CreateContainerParams, soar: SOARClient, asset: Asset) -> ActionOutput:
+def create_container(
+    params: CreateContainerParams, soar: SOARClient, asset: Asset
+) -> ActionOutput:
     client = get_client(asset)
 
     try:
         container = json.loads(params.container_json)
         if not isinstance(container, dict):
-            raise PhantomClientError("Please provide json formatted dictionary in container_json action parameter")
+            raise PhantomClientError(
+                "Please provide json formatted dictionary in container_json action parameter"
+            )
     except json.JSONDecodeError as e:
         raise PhantomClientError(f"Error parsing container JSON: {e}") from e
 
@@ -67,12 +77,16 @@ def create_container(params: CreateContainerParams, soar: SOARClient, asset: Ass
             artifacts = json.loads(params.container_artifacts)
         except json.JSONDecodeError as e:
             raise PhantomClientError(f"Error parsing artifacts list JSON: {e}") from e
-        if not isinstance(artifacts, list) or any(not isinstance(a, dict) for a in artifacts):
+        if not isinstance(artifacts, list) or any(
+            not isinstance(a, dict) for a in artifacts
+        ):
             raise PhantomClientError(PHANTOM_ERR_CONTAINER_ARTIFACT)
     else:
         artifacts = []
 
-    _response, resp_data = client.make_rest_call("/rest/container", data=container, method="post")
+    _response, resp_data = client.make_rest_call(
+        "/rest/container", data=container, method="post"
+    )
 
     try:
         new_container_id = resp_data["id"]
@@ -86,6 +100,10 @@ def create_container(params: CreateContainerParams, soar: SOARClient, asset: Ass
         artifacts[-1]["run_automation"] = True
         _add_artifact_list(client, artifacts)
 
-    soar.set_summary(CreateContainerSummary(container_id=new_container_id, artifact_count=len(artifacts)))
+    soar.set_summary(
+        CreateContainerSummary(
+            container_id=new_container_id, artifact_count=len(artifacts)
+        )
+    )
     soar.set_message(f"Container id: {new_container_id}")
     return ActionOutput()
