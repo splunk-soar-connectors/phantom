@@ -1,5 +1,3 @@
-# File: phantom_consts.py
-#
 # Copyright (c) 2016-2026 Splunk Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,8 +26,6 @@ SUPPORTED_FILES = ["application/zip", "application/x-gzip", "application/x-tar",
 
 # Consts for error messages
 PHANTOM_ERR_INVALID_INT = "Please provide a valid {msg} integer value in the '{param}' action parameter"
-PHANTOM_ERR_CODE_UNAVAILABLE = "Error code unavailable"
-PHANTOM_ERR_MSG_UNAVAILABLE = "Unknown error occurred. Please check the asset configuration and|or action parameters."
 PHANTOM_ERR_PARSE_JSON_RESPONSE = "Unable to parse response as JSON: {}"
 PHANTOM_ERR_SERVER = "Error from server. Status code: {0}, Details: {1}"
 PHANTOM_ERR_FIND_ARTIFACT = "Unable to find artifact, please check the artifact id."
