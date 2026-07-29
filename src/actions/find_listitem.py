@@ -24,7 +24,7 @@ from ..helper import validate_integer
 class FindListitemParams(Params):
     list: str = Param(description="Name/ID of the list to search", required=True)
     column_index: int = Param(description="Column index to match against (indexing starts at 0)", required=False)
-    values: str = Param(description="Value to search for", required=True)
+    values: str = Param(description="Value to search for", required=True, cef_types=["*"])
     exact_match: bool = Param(description="List value must match exactly", required=False, default=True)
 
 
@@ -33,7 +33,7 @@ class FindListitemOutput(PermissiveActionOutput):
 
 
 class FindListitemSummary(ActionOutput):
-    server: str
+    server: str = OutputField(cef_types=["url"])
     found_matches: int
     list_id: int
     locations: list[str]

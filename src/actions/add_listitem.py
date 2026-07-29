@@ -24,7 +24,7 @@ from ..helper import PhantomClientError
 
 class AddListitemParams(Params):
     list: str = Param(description="Name/ID of the list to append to", required=True)
-    new_row: str = Param(description="Value(s) to append to the list", required=True)
+    new_row: str = Param(description="Value(s) to append to the list", required=True, cef_types=["*"])
     create: bool = Param(description="Create the list if it does not exist", required=False, default=False)
 
 
@@ -33,7 +33,7 @@ class AddListitemOutput(PermissiveActionOutput):
 
 
 class AddListitemSummary(ActionOutput):
-    server: str
+    server: str = OutputField(cef_types=["url"])
 
 
 def _create_list(client, list_name: str, row, soar: SOARClient) -> AddListitemOutput:

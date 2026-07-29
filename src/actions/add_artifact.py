@@ -14,7 +14,7 @@
 import json
 
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput, PermissiveActionOutput
+from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
@@ -23,11 +23,13 @@ from ..helper import CEF_JSON, CEF_NAME_MAPPING, PhantomClientError, determine_c
 
 class AddArtifactParams(Params):
     name: str = Param(description="Name of artifact", required=False, default="User created artifact")
-    container_id: int = Param(description="Container to add the artifact to", required=False)
+    container_id: int = Param(
+        description="Container to add the artifact to", required=False, cef_types=["phantom container id"]
+    )
     label: str = Param(description="Artifact label", required=False, default="event")
     source_data_identifier: str = Param(description="Source data identifier", required=True)
     cef_name: str = Param(description="Name of a CEF field", required=False)
-    cef_value: str = Param(description="Value for the CEF field", required=False)
+    cef_value: str = Param(description="Value for the CEF field", required=False, cef_types=["*"])
     cef_dictionary: str = Param(description="JSON string of CEF fields and values", required=False)
     contains: str = Param(description="Data type for the CEF field", required=False)
     run_automation: bool = Param(description="Run active playbooks", required=False, default=False)
@@ -43,8 +45,8 @@ class AddArtifactOutput(PermissiveActionOutput):
 
 class AddArtifactSummary(ActionOutput):
     artifact_id: int
-    container_id: int
-    server: str
+    container_id: int = OutputField(cef_types=["phantom container id"])
+    server: str = OutputField(cef_types=["url"])
 
 
 @app.view_handler(template="phantom_add_artifact.html")

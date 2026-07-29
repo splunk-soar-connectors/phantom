@@ -20,14 +20,16 @@ from ..helper import create_container_copy, validate_integer
 
 
 class ExportContainerParams(Params):
-    container_id: int = Param(description="Container ID to export to configured Phantom asset", required=True)
+    container_id: int = Param(
+        description="Container ID to export to configured Phantom asset", required=True, cef_types=["phantom container id"]
+    )
     keep_owner: bool = Param(description="Attempt to keep the same container owner", required=False, default=False)
     label: str = Param(description="Label to apply to the exported container", required=False)
     run_automation: bool = Param(description="Enable active playbooks on the new container", required=False, default=False)
 
 
 class ExportContainerSummary(ActionOutput):
-    container_id: int = OutputField(column_name="New Container")
+    container_id: int = OutputField(column_name="New Container", cef_types=["phantom container id"])
     artifact_count: int
 
 

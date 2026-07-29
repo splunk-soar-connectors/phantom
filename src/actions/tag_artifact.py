@@ -21,7 +21,7 @@ from ..helper import PhantomClientError, validate_integer
 
 
 class TagArtifactParams(Params):
-    artifact_id: str = Param(description="Artifact ID to update", required=True)
+    artifact_id: str = Param(description="Artifact ID to update", required=True, cef_types=["phantom artifact id"])
     add_tags: str = Param(description="Comma separated list of tags to add", required=False)
     remove_tags: str = Param(description="Comma separated list of tags to remove", required=False)
 

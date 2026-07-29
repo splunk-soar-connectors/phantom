@@ -22,7 +22,7 @@ from ..helper import PhantomClientError, validate_integer
 class AddNoteParams(Params):
     title: str = Param(description="Title of note", required=True)
     content: str = Param(description="Content of note", required=False)
-    container_id: int = Param(description="Container ID", required=False)
+    container_id: int = Param(description="Container ID", required=False, cef_types=["phantom container id"])
     phase_id: str = Param(description="Phase ID", required=False)
 
 

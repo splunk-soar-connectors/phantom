@@ -23,7 +23,7 @@ from ..helper import PhantomClientError, load_dirty_json, validate_integer
 
 
 class UpdateArtifactParams(Params):
-    artifact_id: str = Param(description="Artifact ID to update", required=True)
+    artifact_id: str = Param(description="Artifact ID to update", required=True, cef_types=["phantom artifact id"])
     name: str = Param(description="Name of artifact", required=False)
     label: str = Param(description="Label of artifact", required=False)
     severity: str = Param(description="Severity of artifact", required=False)

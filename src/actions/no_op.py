@@ -39,8 +39,8 @@ class NoOpOutput(ActionOutput):
     name="no op",
     identifier="no_op",
     description="Performs no action, and can be used to introduce a configurable delay in a playbook",
-    action_type="generic",
-    read_only=False,
+    action_type="investigate",
+    read_only=True,
     render_as="table",
 )
 def no_op(params: NoOpParams, soar: SOARClient, asset: Asset) -> NoOpOutput:

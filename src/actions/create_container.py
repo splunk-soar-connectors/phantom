@@ -30,7 +30,7 @@ class CreateContainerParams(Params):
 
 
 class CreateContainerSummary(ActionOutput):
-    container_id: int = OutputField(column_name="New Container")
+    container_id: int = OutputField(column_name="New Container", cef_types=["phantom container id"])
     artifact_count: int
 
 

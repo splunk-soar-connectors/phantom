@@ -20,12 +20,14 @@ from ..helper import create_container_copy, validate_integer
 
 
 class ImportContainerParams(Params):
-    container_id: int = Param(description="Container ID on the configured Phantom asset to import", required=True)
+    container_id: int = Param(
+        description="Container ID on the configured Phantom asset to import", required=True, cef_types=["phantom container id"]
+    )
     keep_owner: bool = Param(description="Attempt to keep the same container owner", required=False, default=False)
 
 
 class ImportContainerSummary(ActionOutput):
-    container_id: int = OutputField(column_name="New Container")
+    container_id: int = OutputField(column_name="New Container", cef_types=["phantom container id"])
     artifact_count: int
 
 

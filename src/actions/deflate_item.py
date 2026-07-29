@@ -34,20 +34,25 @@ from ..helper import (
 
 
 class DeflateItemParams(Params):
-    vault_id: str = Param(description="Vault ID of the item to deflate", required=True)
-    container_id: int = Param(description="Container to add the deflated items to", required=False)
-    password: str = Param(description="Password for the archive", required=False)
+    vault_id: str = Param(description="Vault ID of the item to deflate", required=True, cef_types=["sha1", "vault id"])
+    container_id: int = Param(
+        description="Container to add the deflated items to", required=False, cef_types=["phantom container id"]
+    )
+    password: str = Param(description="Password for the archive", required=False, sensitive=True)
     recursive: bool = Param(description="Recursively deflate the item", required=False, default=False)
 
 
 class DeflateItemMetadata(PermissiveActionOutput):
-    md5: str | None = OutputField(column_name="MD5")
-    sha256: str | None = OutputField(column_name="SHA256")
+    md5: str | None = OutputField(column_name="MD5", cef_types=["md5"])
+    sha1: str | None = OutputField(cef_types=["sha1"])
+    sha256: str | None = OutputField(column_name="SHA256", cef_types=["sha256"])
 
 
 class DeflateItemOutput(PermissiveActionOutput):
     name: str | None = OutputField(column_name="Name")
-    vault_id: str | None = OutputField(column_name="Vault ID")
+    hash: str | None = OutputField(cef_types=["sha1"])
+    container_id: int | None = OutputField(cef_types=["phantom container id"])
+    vault_id: str | None = OutputField(column_name="Vault ID", cef_types=["sha1", "vault id"])
     size: int | None = OutputField(column_name="Size")
     metadata: DeflateItemMetadata | None = OutputField()
 

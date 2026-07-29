@@ -25,7 +25,7 @@ from ..helper import PhantomClientError
 
 class FindArtifactsParams(Params):
     cef_key: str = Param(description="CEF key to search on", required=False)
-    values: str = Param(description="Value to search for", required=True)
+    values: str = Param(description="Value to search for", required=True, cef_types=["*"])
     exact_match: bool = Param(description="Value must match exactly", required=False, default=True)
     limit_search: bool = Param(description="Limit search to given container IDs", required=False, default=False)
     container_ids: str = Param(description="Container IDs to limit the search to", required=False, default="current")
