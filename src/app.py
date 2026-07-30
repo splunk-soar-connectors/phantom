@@ -97,6 +97,7 @@ from .actions import (  # noqa: F401
     find_listitem,
     get_action,
     import_container,
+    make_request,
     no_op,
     tag_artifact,
     update_artifact,

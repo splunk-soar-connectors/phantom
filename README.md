@@ -132,6 +132,7 @@ VARIABLE | REQUIRED | TYPE | DESCRIPTION
 [find listitem](#action-find-listitem) - Find a value in a custom list <br>
 [get action result](#action-get-action-result) - Find the results of a previously run action <br>
 [import container](#action-import-container) - Import a container from another Phantom instance to this Phantom instance <br>
+[make request](#action-make-request) - make request <br>
 [no op](#action-no-op) - Performs no action, and can be used to introduce a configurable delay in a playbook <br>
 [update artifact tags](#action-update-artifact-tags) - Add/remove tags from an artifact <br>
 [update artifact](#action-update-artifact) - Update an artifact <br>
@@ -495,6 +496,45 @@ action_result.parameter.container_id | numeric | `phantom container id` | |
 action_result.parameter.keep_owner | boolean | | |
 action_result.summary.container_id | numeric | `phantom container id` | |
 action_result.summary.artifact_count | numeric | | |
+summary.total_objects | numeric | | 1 |
+summary.total_objects_successful | numeric | | 1 |
+
+## action: 'make request'
+
+make request
+
+Type: **generic** <br>
+Read only: **False**
+
+'make request' action for the app. Used to handle arbitrary HTTP requests with the app's asset
+
+#### Action Parameters
+
+PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
+--------- | -------- | ----------- | ---- | --------
+**http_method** | required | The HTTP method to use for the request. | string | |
+**endpoint** | required | Phantom REST endpoint to call, appended to the asset base URL. Example: '/rest/version' | string | |
+**headers** | optional | The headers to send with the request (JSON object). An example is {'Content-Type': 'application/json'} | string | |
+**query_parameters** | optional | Parameters to append to the URL (JSON object or query string). An example is ?key=value&key2=value2 | string | |
+**body** | optional | The body to send with the request (JSON object). An example is {'key': 'value', 'key2': 'value2'} | string | |
+**timeout** | optional | The timeout for the request in seconds. | numeric | |
+**verify_ssl** | optional | Whether to verify the SSL certificate. Default is False. | boolean | |
+
+#### Action Output
+
+DATA PATH | TYPE | CONTAINS | EXAMPLE VALUES
+--------- | ---- | -------- | --------------
+action_result.status | string | | success failure |
+action_result.message | string | | |
+action_result.parameter.http_method | string | | |
+action_result.parameter.endpoint | string | | |
+action_result.parameter.headers | string | | |
+action_result.parameter.query_parameters | string | | |
+action_result.parameter.body | string | | |
+action_result.parameter.timeout | numeric | | |
+action_result.parameter.verify_ssl | boolean | | |
+action_result.data.\*.status_code | numeric | | 200 |
+action_result.data.\*.response_body | string | | {"version": "6.0.0"} |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 
