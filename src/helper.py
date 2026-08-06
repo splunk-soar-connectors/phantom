@@ -246,11 +246,18 @@ def get_client(asset) -> PhantomClient:
 
 
 def _add_artifact_list(
-    client: "PhantomClient", artifacts: list, ignore_auth: bool = False
+    client: "PhantomClient",
+    artifacts: list,
+    ignore_auth: bool = False,
+    base_uri: str | None = None,
 ) -> None:
     try:
         _response, resp_data = client.make_rest_call(
-            "/rest/artifact", data=artifacts, method="post", ignore_auth=ignore_auth
+            "/rest/artifact",
+            data=artifacts,
+            method="post",
+            ignore_auth=ignore_auth,
+            base_uri=base_uri,
         )
     except PhantomClientError as e:
         raise PhantomClientError(f"Error adding artifact: {e}") from e
@@ -370,7 +377,12 @@ def create_container_copy(
         artifacts[-1]["run_automation"] = run_automation
 
         try:
-            _add_artifact_list(client, artifacts, ignore_auth=destination_local)
+            _add_artifact_list(
+                client,
+                artifacts,
+                ignore_auth=destination_local,
+                base_uri=destination,
+            )
         except PhantomClientError as e:
             raise PhantomClientError(
                 f"Container created:{new_container_id}. {e}"
