@@ -14,7 +14,7 @@
 from unittest.mock import MagicMock, patch
 
 from src.consts import TIMEOUT
-from src.helper import PhantomClient, create_container_copy
+from src.helper import PhantomClient, create_container_copy, parse_query_parameters
 
 
 def test_create_container_copy_import_posts_container_and_artifacts_to_destination():
@@ -100,3 +100,19 @@ def test_make_rest_call_defaults_timeout_and_verify_cert_when_not_overridden():
 
     assert mock_request.call_args.kwargs["timeout"] == TIMEOUT
     assert mock_request.call_args.kwargs["verify"] is True
+
+
+def test_parse_query_parameters_returns_json_object_when_valid_json():
+    assert parse_query_parameters('{"key": "value"}') == {"key": "value"}
+
+
+def test_parse_query_parameters_preserves_repeated_keys_in_query_string():
+    pairs = parse_query_parameters("tag=a&tag=b")
+
+    assert pairs == [("tag", "a"), ("tag", "b")]
+
+
+def test_parse_query_parameters_preserves_blank_values_in_query_string():
+    pairs = parse_query_parameters("?empty=&key=value")
+
+    assert pairs == [("empty", ""), ("key", "value")]

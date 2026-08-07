@@ -14,6 +14,7 @@
 import json
 import pathlib
 import re
+from urllib.parse import parse_qsl
 
 import requests
 from bs4 import BeautifulSoup
@@ -444,6 +445,23 @@ def load_dirty_json(dirty_json: str, parameter: str) -> dict:
         raise ActionFailure(f"Please provide {parameter} parameter in JSON format")
 
     return clean_json
+
+
+def parse_query_parameters(query_parameters: str) -> dict | list[tuple[str, str]]:
+    """Parse the make_request query_parameters field as JSON, falling back to a query string.
+
+    Query-string pairs are kept as a list of tuples (not collapsed into a dict) so that
+    repeated keys and blank values survive to reach requests.request's params argument.
+    """
+    try:
+        return json.loads(query_parameters)
+    except (json.JSONDecodeError, TypeError):
+        pairs = parse_qsl(query_parameters.lstrip("?"), keep_blank_values=True)
+        if not pairs:
+            raise ActionFailure(
+                f"Invalid JSON or query string in query_parameters: {query_parameters}"
+            ) from None
+        return pairs
 
 
 def determine_contains(value) -> list:

@@ -12,13 +12,13 @@
 # and limitations under the License.
 
 import json
-from urllib.parse import parse_qsl
 
 from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.params import MakeRequestParams, Param
 
 from ..app import Asset, app, get_client
+from ..helper import parse_query_parameters
 
 
 class PhantomMakeRequestParams(MakeRequestParams):
@@ -59,14 +59,7 @@ def make_request(
 
     query_params = None
     if params.query_parameters:
-        try:
-            query_params = json.loads(params.query_parameters)
-        except (json.JSONDecodeError, TypeError):
-            query_params = dict(parse_qsl(params.query_parameters.lstrip("?")))
-            if not query_params:
-                raise ActionFailure(
-                    f"Invalid JSON or query string in query_parameters: {params.query_parameters}"
-                ) from None
+        query_params = parse_query_parameters(params.query_parameters)
 
     data = None
     if params.body:
