@@ -179,4 +179,4 @@ def add_artifact(
             artifact_id=artifact_id, container_id=container_id, server=client.base_uri
         )
     )
-    return [AddArtifactOutput(**resp_data)]
+    return [AddArtifactOutput(**{**resp_data, "container_id": container_id})]
