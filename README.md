@@ -430,11 +430,13 @@ action_result.parameter.list | string | | |
 action_result.parameter.column_index | numeric | | |
 action_result.parameter.values | string | `\*` | |
 action_result.parameter.exact_match | boolean | | |
+action_result.data.\*.list_name | string | | |
 action_result.data.\*.row.\* | string | | |
+action_result.data.\*.found_at | string | | |
 action_result.summary.server | string | `url` | |
 action_result.summary.found_matches | numeric | | |
 action_result.summary.list_id | numeric | | |
-action_result.summary.locations.\* | string | | |
+action_result.summary.locations.\*.\* | numeric | | |
 summary.total_objects | numeric | | 1 |
 summary.total_objects_successful | numeric | | 1 |
 

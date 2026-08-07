@@ -36,20 +36,29 @@ class FindListitemParams(Params):
 
 
 class FindListitemOutput(PermissiveActionOutput):
+    list_name: str | None = OutputField()
     row: list[str] | None = OutputField()
+    found_at: str | None = OutputField()
 
 
 class FindListitemSummary(ActionOutput):
     server: str = OutputField(cef_types=["url"])
     found_matches: int
     list_id: int
-    locations: list[str]
+    locations: list[list[int]]
 
 
 @app.view_handler(template="phantom_find_listitem.html")
 def find_listitem_view(outputs: list[FindListitemOutput]) -> dict:
     headers = ["List Name", "Matched Row", "Found at"]
-    data = [o.model_dump() for o in outputs]
+    data = [
+        {
+            "list_name": o.list_name,
+            "row": ",".join(f'"{v}"' for v in (o.row or [])),
+            "found_at": o.found_at,
+        }
+        for o in outputs
+    ]
     return {"results": [{"data": data}], "headers": headers}
 
 
@@ -94,7 +103,14 @@ def find_listitem(
             server=client.base_uri,
             found_matches=found,
             list_id=list_id,
-            locations=[f"Row {r}, Column {c}" for r, c in coordinates],
+            locations=[[r, c] for r, c in coordinates],
         )
     )
-    return [FindListitemOutput(row=[str(v) for v in row]) for row in matched_rows]
+    return [
+        FindListitemOutput(
+            list_name=params.list,
+            row=[str(v) for v in row],
+            found_at=f"Row {r}, Column {c}",
+        )
+        for row, (r, c) in zip(matched_rows, coordinates, strict=False)
+    ]

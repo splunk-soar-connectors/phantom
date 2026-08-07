@@ -41,7 +41,9 @@
             <tbody>
               {% for item in result.data %}
                 <tr>
+                  <td class="widget-td">{{ item.list_name }}</td>
                   <td class="widget-td">{{ item.row }}</td>
+                  <td class="widget-td">{{ item.found_at }}</td>
                 </tr>
               {% endfor %}
             </tbody>
