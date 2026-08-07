@@ -147,6 +147,8 @@ class PhantomClient:
         method="get",
         ignore_auth=False,
         base_uri=None,
+        timeout=None,
+        verify_cert=None,
     ):
         if headers is None:
             headers = {}
@@ -170,6 +172,12 @@ class PhantomClient:
             headers.pop("ph-auth-token", None)
 
         url = f"{base_uri}{endpoint}"
+        if ignore_auth:
+            verify = False
+        elif verify_cert is not None:
+            verify = verify_cert
+        else:
+            verify = self.verify_cert
         try:
             response = requests.request(
                 method,
@@ -177,9 +185,9 @@ class PhantomClient:
                 auth=auth,
                 json=data,
                 headers=headers if headers else None,
-                verify=False if ignore_auth else self.verify_cert,
+                verify=verify,
                 params=params,
-                timeout=TIMEOUT,
+                timeout=timeout if timeout is not None else TIMEOUT,
             )
         except requests.exceptions.Timeout as e:
             raise PhantomClientError(f"Request timed out: {e}") from e

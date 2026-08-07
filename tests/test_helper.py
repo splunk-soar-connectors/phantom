@@ -11,9 +11,10 @@
 # either express or implied. See the License for the specific language governing permissions
 # and limitations under the License.
 
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, patch
 
-from src.helper import create_container_copy
+from src.consts import TIMEOUT
+from src.helper import PhantomClient, create_container_copy
 
 
 def test_create_container_copy_import_posts_container_and_artifacts_to_destination():
@@ -48,3 +49,54 @@ def test_create_container_copy_import_posts_container_and_artifacts_to_destinati
 
     assert container_post_call.kwargs["base_uri"] == destination
     assert artifact_post_call.kwargs["base_uri"] == destination
+
+
+def test_make_rest_call_threads_timeout_and_verify_cert_overrides():
+    """Regression test for make_request: per-call timeout/verify_ssl parameters
+    must reach requests.request instead of being silently dropped in favor of
+    the asset-level default timeout and verify_certificate setting.
+    """
+    client = PhantomClient.__new__(PhantomClient)
+    client.base_uri = "https://remote-asset"
+    client.verify_cert = True
+    client.auth = None
+    client.auth_token = None
+
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.headers = {"Content-Type": "application/json"}
+    mock_response.text = "{}"
+    mock_response.json.return_value = {}
+
+    with patch(
+        "src.helper.requests.request", return_value=mock_response
+    ) as mock_request:
+        client.make_rest_call("/rest/version", timeout=5, verify_cert=False)
+
+    assert mock_request.call_args.kwargs["timeout"] == 5
+    assert mock_request.call_args.kwargs["verify"] is False
+
+
+def test_make_rest_call_defaults_timeout_and_verify_cert_when_not_overridden():
+    """Without explicit overrides, make_rest_call must keep using the global
+    TIMEOUT constant and the asset's verify_certificate setting.
+    """
+    client = PhantomClient.__new__(PhantomClient)
+    client.base_uri = "https://remote-asset"
+    client.verify_cert = True
+    client.auth = None
+    client.auth_token = None
+
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.headers = {"Content-Type": "application/json"}
+    mock_response.text = "{}"
+    mock_response.json.return_value = {}
+
+    with patch(
+        "src.helper.requests.request", return_value=mock_response
+    ) as mock_request:
+        client.make_rest_call("/rest/version")
+
+    assert mock_request.call_args.kwargs["timeout"] == TIMEOUT
+    assert mock_request.call_args.kwargs["verify"] is True

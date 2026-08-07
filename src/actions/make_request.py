@@ -12,6 +12,7 @@
 # and limitations under the License.
 
 import json
+from urllib.parse import parse_qsl
 
 from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.exceptions import ActionFailure
@@ -60,10 +61,12 @@ def make_request(
     if params.query_parameters:
         try:
             query_params = json.loads(params.query_parameters)
-        except (json.JSONDecodeError, TypeError) as e:
-            raise ActionFailure(
-                f"Invalid JSON query_parameters: {params.query_parameters}"
-            ) from e
+        except (json.JSONDecodeError, TypeError):
+            query_params = dict(parse_qsl(params.query_parameters.lstrip("?")))
+            if not query_params:
+                raise ActionFailure(
+                    f"Invalid JSON or query string in query_parameters: {params.query_parameters}"
+                ) from None
 
     data = None
     if params.body:
@@ -79,6 +82,8 @@ def make_request(
         params=query_params,
         data=data,
         method=params.http_method.lower(),
+        timeout=params.timeout,
+        verify_cert=params.verify_ssl,
     )
 
     return PhantomMakeRequestOutput(
