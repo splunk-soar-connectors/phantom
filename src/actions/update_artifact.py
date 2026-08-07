@@ -31,6 +31,7 @@ class UpdateArtifactParams(Params):
         description="Artifact ID to update",
         required=True,
         cef_types=["phantom artifact id"],
+        column_name="Artifact ID",
     )
     name: str = Param(description="Name of artifact", required=False)
     label: str = Param(description="Label of artifact", required=False)

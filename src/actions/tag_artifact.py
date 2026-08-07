@@ -12,7 +12,7 @@
 # and limitations under the License.
 
 from soar_sdk.abstract import SOARClient
-from soar_sdk.action_results import ActionOutput
+from soar_sdk.action_results import ActionOutput, OutputField
 from soar_sdk.params import Param, Params
 
 from ..app import Asset, app, get_client
@@ -41,17 +41,22 @@ class TagArtifactSummary(ActionOutput):
     tags_already_absent: str
 
 
+class TagArtifactOutput(ActionOutput):
+    status: str = OutputField(column_name="Status", example_values=["success"])
+
+
 @app.action(
     name="update artifact tags",
     identifier="tag_artifact",
     description="Add/remove tags from an artifact",
     action_type="generic",
     read_only=False,
+    render_as="table",
     summary_type=TagArtifactSummary,
 )
 def tag_artifact(
     params: TagArtifactParams, soar: SOARClient, asset: Asset
-) -> ActionOutput:
+) -> TagArtifactOutput:
     client = get_client(asset)
 
     artifact_id = validate_integer(params.artifact_id, "artifact_id")
@@ -96,4 +101,4 @@ def tag_artifact(
             tags_already_absent=", ".join(list(tags_already_removed)),
         )
     )
-    return ActionOutput()
+    return TagArtifactOutput(status="success")

@@ -586,6 +586,7 @@ action_result.message | string | | |
 action_result.parameter.artifact_id | string | `phantom artifact id` | |
 action_result.parameter.add_tags | string | | |
 action_result.parameter.remove_tags | string | | |
+action_result.data.\*.status | string | | success |
 action_result.summary.tags_added | string | | |
 action_result.summary.tags_removed | string | | |
 action_result.summary.tags_already_present | string | | |
