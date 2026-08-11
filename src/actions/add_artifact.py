@@ -17,15 +17,10 @@ import json
 from soar_sdk.abstract import SOARClient
 from soar_sdk.action_results import ActionOutput, OutputField, PermissiveActionOutput
 from soar_sdk.params import Param, Params
+from soar_sdk.shims.phantom.cef import CEF_JSON, CEF_NAME_MAPPING
 
 from ..app import Asset, app, get_client
-from ..helper import (
-    CEF_JSON,
-    CEF_NAME_MAPPING,
-    PhantomClientError,
-    determine_contains,
-    validate_integer,
-)
+from ..helper import PhantomClientError, determine_contains, validate_integer
 
 
 class AddArtifactParams(Params):

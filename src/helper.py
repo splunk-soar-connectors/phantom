@@ -20,6 +20,7 @@ import requests
 from bs4 import BeautifulSoup
 from soar_sdk.exceptions import ActionFailure
 from soar_sdk.logging import getLogger
+from soar_sdk.shims.phantom.utils import CONTAINS_VALIDATORS, is_ip
 
 from .consts import (
     OPEN_XML_FORMATS,
@@ -34,32 +35,6 @@ from .consts import (
 
 
 logger = getLogger()
-
-# The following identifiers are provided by the SOAR platform runtime but are not
-# part of the SDK package, so guard the imports to keep the build/test venv happy.
-try:
-    from phantom.cef import CEF_JSON, CEF_NAME_MAPPING
-except ImportError:
-    CEF_JSON = {}
-    CEF_NAME_MAPPING = {}
-
-try:
-    from phantom.utils import CONTAINS_VALIDATORS
-except ImportError:
-    CONTAINS_VALIDATORS = {}
-
-try:
-    from phantom.utils import is_ip
-except ImportError:
-
-    def is_ip(value: str) -> bool:
-        import ipaddress  # noqa: PLC0415
-
-        try:
-            ipaddress.ip_address(value)
-            return True
-        except ValueError:
-            return False
 
 
 class PhantomClientError(ActionFailure):
