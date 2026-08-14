@@ -1,6 +1,6 @@
 [project]
 name = "phantom"
-version = "4.0.0"
+version = "5.0.0"
 description = "This app integrates with the Phantom platform to perform investigative and containment actions"
 license = "Copyright (c) 2016-2026 Splunk Inc."
 requires-python = ">=3.13, <3.15"
