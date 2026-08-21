@@ -11,7 +11,7 @@ dependencies = [
     "beautifulsoup4>=4.11.1",
     "python-magic==0.4.18",
     "requests>=2.32.0",
-    "splunk-soar-sdk>=4.1.1",
+    "splunk-soar-sdk>=4.1.2",
 ]
 
 [tool.soar.app]
