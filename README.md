@@ -307,7 +307,7 @@ PARAMETER | REQUIRED | DESCRIPTION | TYPE | CONTAINS
 --------- | -------- | ----------- | ---- | --------
 **vault_id** | required | Vault ID of the item to deflate | string | `sha1` `vault id` |
 **container_id** | optional | Container to add the deflated items to | numeric | `phantom container id` |
-**password** | optional | Password for the archive | password | |
+**password** | optional | Password for the archive | string | |
 **recursive** | optional | Recursively deflate the item | boolean | |
 
 #### Action Output

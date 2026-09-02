@@ -48,9 +48,7 @@ class DeflateItemParams(Params):
         required=False,
         cef_types=["phantom container id"],
     )
-    password: str = Param(
-        description="Password for the archive", required=False, sensitive=True
-    )
+    password: str = Param(description="Password for the archive", required=False)
     recursive: bool = Param(
         description="Recursively deflate the item", required=False, default=False
     )
