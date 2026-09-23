@@ -37,6 +37,24 @@ from ..helper import (
 )
 
 
+_ZIP_ENCRYPTED_FLAG = 1 << 0
+
+
+def _is_password_protected_zip(file_path: str) -> bool:
+    """Return whether a valid ZIP contains at least one encrypted member."""
+    if not zipfile.is_zipfile(file_path):
+        return False
+
+    try:
+        with zipfile.ZipFile(file_path, "r") as archive:
+            return any(
+                member.flag_bits & _ZIP_ENCRYPTED_FLAG for member in archive.infolist()
+            )
+    except (OSError, zipfile.BadZipFile):
+        # Let the existing extraction path report malformed or inaccessible ZIPs.
+        return False
+
+
 class DeflateItemParams(Params):
     vault_id: str = Param(
         description="Vault ID of the item to deflate",
@@ -124,9 +142,15 @@ class _Deflater:
 
         if recursive:
             file_path = vault_info.path
-            _file_type, is_supported = check_deflation_supported_file(file_path)
+            file_type, is_supported = check_deflation_supported_file(file_path)
             if not is_supported:
                 return
+
+            # The action password applies only to the input archive. Preserve an
+            # encrypted nested ZIP in Vault without attempting to extract it.
+            if file_type == "application/zip" and _is_password_protected_zip(file_path):
+                return
+
             self.extract_file(file_path, vault_info.name, recursive, container_id)
 
     def extract_file(
