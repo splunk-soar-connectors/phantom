@@ -22,11 +22,6 @@ from ..helper import parse_query_parameters
 
 
 class PhantomMakeRequestParams(MakeRequestParams):
-    verify_ssl: bool = Param(
-        default=False,
-        required=False,
-        description="Whether to verify the SSL certificate. Default is False.",
-    )
     endpoint: str = Param(
         description=(
             "Phantom REST endpoint to call, appended to the asset base URL. "
