@@ -10,6 +10,7 @@ authors = [
 dependencies = [
     "beautifulsoup4>=4.11.1",
     "python-magic==0.4.18",
+    "pyjwt==2.15.0",
     "requests>=2.32.0",
     "splunk-soar-sdk>=6.1.2",
 ]
