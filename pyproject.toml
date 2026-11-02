@@ -3,15 +3,16 @@ name = "phantom"
 version = "5.0.2"
 description = "This app integrates with the Phantom platform to perform investigative and containment actions"
 license = "Copyright (c) 2016-2026 Splunk Inc."
-requires-python = ">=3.13, <3.15"
+requires-python = ">=3.13, <3.16, !=3.14.*"
 authors = [
     { name = "import-au" },
 ]
 dependencies = [
     "beautifulsoup4>=4.11.1",
     "python-magic==0.4.18",
+    "pyjwt==2.15.0",
     "requests>=2.32.0",
-    "splunk-soar-sdk>=6.1.2",
+    "splunk-soar-sdk>=7.1.1",
 ]
 
 [tool.soar.app]
@@ -39,14 +40,14 @@ environments = [
     "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.13'",
     "sys_platform == 'darwin' and platform_machine == 'x86_64' and python_version == '3.13'",
     "sys_platform == 'darwin' and platform_machine == 'arm64' and python_version == '3.13'",
-    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.14'",
-    "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.14'",
-    "sys_platform == 'darwin' and platform_machine == 'x86_64' and python_version == '3.14'",
-    "sys_platform == 'darwin' and platform_machine == 'arm64' and python_version == '3.14'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.15'",
+    "sys_platform == 'linux' and platform_machine == 'aarch64' and python_version == '3.15'",
+    "sys_platform == 'darwin' and platform_machine == 'x86_64' and python_version == '3.15'",
+    "sys_platform == 'darwin' and platform_machine == 'arm64' and python_version == '3.15'",
 ]
 required-environments = [
     "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.13'",
-    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.14'",
+    "sys_platform == 'linux' and platform_machine == 'x86_64' and python_version == '3.15'",
 ]
 
 [tool.ruff]
