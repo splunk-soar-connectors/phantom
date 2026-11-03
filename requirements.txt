@@ -1,1 +1,2 @@
+pyjwt==2.15.0
 python-magic==0.4.18
