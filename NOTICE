@@ -1725,7 +1725,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 @@@@============================================================================
 
-Library: joserfc - 1.7.4
+Library: joserfc - 1.8.0
 Homepage: https://github.com/authlib/joserfc
 License: BSD License
 License Text:
@@ -3438,7 +3438,7 @@ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
 @@@@============================================================================
 
-Library: splunk-soar-sdk - 7.1.2
+Library: splunk-soar-sdk - 7.3.1
 Homepage: https://github.com/phantomcyber/splunk-soar-sdk
 License: Apache-2.0
 License Text:
